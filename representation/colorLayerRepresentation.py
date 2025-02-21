@@ -25,7 +25,7 @@ class colorLayerRepresentation:
         return 9
 
     def moveLayer(self, index, color, direction):
-        adapted_index = index % 9
+        adapted_index = (index - 1) % 9
         if len(self.FigureListLayer[adapted_index]) == 0:
             return
         new_figure = list()
@@ -130,20 +130,45 @@ class colorLayerRepresentation:
                     layer.pop(x)
 
     def layerUnion(self, index, color, direction):
-        adapted_index = index % 9
-        adapted_color = color % 9
-        if adapted_index != adapted_color:
-            for pixel in self.FigureListLayer[adapted_index]:
-                ok = 0
-                for p in self.FigureListLayer[adapted_color]:
-                    if p.x == pixel.x and p.y == pixel.y:
-                        ok = 1
-                if ok == 0:
-                    self.FigureListLayer[adapted_color].append(PixelNode(pixel.x, pixel.y))
-            self.FigureListLayer[adapted_index].clear()
+        adapted_index = (index - 1) % 9
+        if color % 2 == 0:
+            if adapted_index == 8:
+                for pixel in self.FigureListLayer[adapted_index]:
+                    ok = 0
+                    for p in self.FigureListLayer[0]:
+                        if p.x == pixel.x and p.y == pixel.y:
+                            ok = 1
+                    if ok == 0:
+                        self.FigureListLayer[0].append(PixelNode(pixel.x, pixel.y))
+            else:
+                for pixel in self.FigureListLayer[adapted_index]:
+                    ok = 0
+                    for p in self.FigureListLayer[adapted_index + 1]:
+                        if p.x == pixel.x and p.y == pixel.y:
+                            ok = 1
+                    if ok == 0:
+                        self.FigureListLayer[adapted_index + 1].append(PixelNode(pixel.x, pixel.y))
+        else:
+            if adapted_index == 0:
+                for pixel in self.FigureListLayer[adapted_index]:
+                    ok = 0
+                    for p in self.FigureListLayer[8]:
+                        if p.x == pixel.x and p.y == pixel.y:
+                            ok = 1
+                    if ok == 0:
+                        self.FigureListLayer[8].append(PixelNode(pixel.x, pixel.y))
+            else:
+                for pixel in self.FigureListLayer[adapted_index]:
+                    ok = 0
+                    for p in self.FigureListLayer[adapted_index - 1]:
+                        if p.x == pixel.x and p.y == pixel.y:
+                            ok = 1
+                    if ok == 0:
+                        self.FigureListLayer[adapted_index - 1].append(PixelNode(pixel.x, pixel.y))
+        self.FigureListLayer[adapted_index].clear()
 
     def addPixelLayer(self, index, color, direction):
-        adapted_index = index % 9
+        adapted_index = (index - 1) % 9
         if len(self.FigureListLayer[adapted_index]) == 0:
             return
         pixel_index = color % len(self.FigureListLayer[adapted_index])
@@ -165,110 +190,32 @@ class colorLayerRepresentation:
                 self.FigureListLayer[adapted_index].append(PixelNode(self.FigureListLayer[adapted_index][pixel_index].x, self.FigureListLayer[adapted_index][pixel_index].y - 1)) 
 
     def delPixelLayer(self, index, color, direction):
-        adapted_index = index % 9
+        adapted_index = (index - 1) % 9
         if len(self.FigureListLayer[adapted_index]) == 0:
             return
         pixel_index = color % len(self.FigureListLayer[adapted_index])
         self.FigureListLayer[adapted_index].pop(pixel_index)
 
-    def score(self, output_grid):
-        #-2 punti per posizione non giusta, -1 punto per colore sbagliato, -3 punti dimensione griglia sbagliata per casella
-        score = 0
-        if self.nr <= output_grid.shape[0] and self.nc <= output_grid.shape[1]:
-            for x in range(self.nr):
-                for y in range(self.nc):
-                    if output_grid[x][y] != 0:
-                        ok = 0
-                        c = 1
-                        color = 0
-                        for layer in self.FigureListLayer:
-                            for pixel in layer:
-                                if x == pixel.x and y == pixel.y:
-                                    if output_grid[x][y] == c:
-                                        color = 1
-                                    ok = 1
-                            c += 1
-                        if ok == 0:
-                            score += 2
-                        elif ok == 1 and color != 1:
-                            score += 1
-                    else:
-                        for layer in self.FigureListLayer:
-                            for pixel in layer:
-                                if x == pixel.x and y == pixel.y:
-                                    score += 2
-        elif self.nr > output_grid.shape[0] and self.nc > output_grid.shape[1]:
-            for x in range(output_grid.shape[0]):
-                for y in range(output_grid.shape[1]):
-                    if output_grid[x][y] != 0:
-                        ok = 0
-                        c = 1
-                        color = 0
-                        for layer in self.FigureListLayer:
-                            for pixel in layer:
-                                if x == pixel.x and y == pixel.y:
-                                    if output_grid[x][y] == c:
-                                        color = 1
-                                    ok = 1
-                            c += 1
-                        if ok == 0:
-                            score += 2
-                        elif ok == 1 and color != 1:
-                            score += 1
-                    else:
-                        for layer in self.FigureListLayer:
-                            for pixel in layer:
-                                if x == pixel.x and y == pixel.y:
-                                    score += 2
-        elif self.nr <= output_grid.shape[0] and self.nc > output_grid.shape[1]:
-            for x in range(self.nr):
-                for y in range(output_grid.shape[1]):
-                    if output_grid[x][y] != 0:
-                        ok = 0
-                        c = 1
-                        color = 0
-                        for layer in self.FigureListLayer:
-                            for pixel in layer:
-                                if x == pixel.x and y == pixel.y:
-                                    if output_grid[x][y] == c:
-                                        color = 1
-                                    ok = 1
-                            c += 1
-                        if ok == 0:
-                            score += 2
-                        elif ok == 1 and color != 1:
-                            score += 1
-                    else:
-                        for layer in self.FigureListLayer:
-                            for pixel in layer:
-                                if x == pixel.x and y == pixel.y:
-                                    score += 2
-        elif self.nr > output_grid.shape[0] and self.nc <= output_grid.shape[1]:
-            for x in range(output_grid.shape[0]):
-                for y in range(self.nc):
-                    if output_grid[x][y] != 0:
-                        ok = 0
-                        c = 1
-                        color = 0
-                        for layer in self.FigureListLayer:
-                            for pixel in layer:
-                                if x == pixel.x and y == pixel.y:
-                                    if output_grid[x][y] == c:
-                                        color = 1
-                                    ok = 1
-                            c += 1
-                        if ok == 0:
-                            score += 2
-                        elif ok == 1 and color != 1:
-                            score += 1
-                    else:
-                        for layer in self.FigureListLayer:
-                            for pixel in layer:
-                                if x == pixel.x and y == pixel.y:
-                                    score += 2
-        else:
-            return -100
-        score += abs(output_grid.shape[0] - self.nr)*min(self.nc, output_grid.shape[1])*3 + abs(output_grid.shape[1] - self.nc)*min(self.nr, output_grid.shape[0])*3 + abs(output_grid.shape[0] - self.nr)*abs(output_grid.shape[1] - self.nc)*3
+    def score(self, output):
+        score = abs(output.nr - self.nr)*min(self.nc, output.nc)*2 + abs(output.nc - self.nc)*min(self.nr,  output.nr)*2 + abs(output.nr - self.nr)*abs(output.nc - self.nc)*2
+        mask = [1 for i in range(0, 9) for _ in range(0, len(output.FigureListLayer[i]))]
+        for lx in range(0, 9):
+            for px in self.FigureListLayer[lx]:
+                ok = 0
+                c = 0
+                for ly in range(0, 9):
+                    for py in output.FigureListLayer[ly]:
+                        if px.x == py.x and px.y == py.y and mask[c] == 1:
+                            score += abs(int(lx + 1) - int(ly + 1))/10
+                            mask[c] = 0
+                            ok = 1
+                            break
+                        c += 1
+                    if ok == 1:
+                        break
+                if ok != 1:
+                    score += 1
+        score += sum(mask)
         return -score
     
     def rappToGrid(self):

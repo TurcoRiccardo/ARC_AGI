@@ -105,6 +105,16 @@ def generate_representation_solution(rep, demo_pairs, act):
         population.sort(key=lambda i: i.fitness, reverse = True)
         population = population[:POPULATION_SIZE]
     #Validazione: applico la miglior serie di azioni al secondo esempio e trovo l'error rate
+
+    #print(population[0].fitness)
+    #print(population[0].genome.scoresc(rappresentationY))
+    #prediction = ArcIOPair(demo_pairs[0].x, demo_pairs[0].y)
+    #prediction.plot(show=True, title=f"Input-Output")
+    #prediction = ArcIOPair(demo_pairs[0].y, population[0].genome.rappToGrid())
+    #prediction.plot(show=True, title=f"Output-OutputGenerato")
+
+
+
     rappresentationX = rep(demo_pairs[1].x)
     c = 0
     for action in population[0].performed_actions:
@@ -153,10 +163,10 @@ class Agent(ArcAgent):
 
         possibleSolution = list()
 
-        possibleSolution.append(generate_representation_solution(pixelRepresentation, demo_pairs, actionsPR))
+        #possibleSolution.append(generate_representation_solution(pixelRepresentation, demo_pairs, actionsPR))
         #possibleSolution.append(generate_representation_solution(rowRepresentation, demo_pairs, actionsRR))
         #possibleSolution.append(generate_representation_solution(columnsRepresentation, demo_pairs, actionsCR))
-        #possibleSolution.append(generate_representation_solution(colorLayerRepresentation, demo_pairs, actionsCLR))
+        possibleSolution.append(generate_representation_solution(colorLayerRepresentation, demo_pairs, actionsCLR))
 
 
 

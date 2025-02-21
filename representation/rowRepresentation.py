@@ -103,7 +103,16 @@ class rowRepresentation:
         adapted_index = index % self.nr
         for element in self.RigheList[adapted_index]:
             if element != 0:
-                element = (element + color) % 10
+                if color % 2 == 0:
+                    if element == 9:
+                        element = 1
+                    else:
+                        element += 1
+                else:
+                    if element == 1:
+                        element = 9
+                    else:
+                        element -= 1
 
     def modifyRigaAdd(self, index, color, direction):
         adapted_index = index % self.nr
@@ -138,40 +147,40 @@ class rowRepresentation:
             self.RigheList[adapted_index][adapted_pos - 1] = self.RigheList[adapted_index][adapted_pos]
             self.RigheList[adapted_index][adapted_pos] = tmp
 
-    def score(self, output_grid):
-        #-2 punti per posizione non giusta, -1 punto per colore sbagliato, -3 punti dimensione griglia sbagliata per casella
-        score = 0
-        if self.nr <= output_grid.shape[0] and self.nc <= output_grid.shape[1]:
+    def score(self, output):
+        score = abs(output.nr - self.nr)*min(self.nc, output.nc)*2 + abs(output.nc - self.nc)*min(self.nr,  output.nr)*2 + abs(output.nr - self.nr)*abs(output.nc - self.nc)*2
+        if self.nr <= output.nr and self.nc <= output.nc:
             for x in range(self.nr):
                 for y in range(self.nc):
-                    if output_grid[x][y] != self.RigheList[x][y]:
-                        score += 1
-                        if output_grid[x][y] == 0 or self.RigheList[x][y] == 0:
+                    if output.RigheList[x][y] != self.RigheList[x][y]:
+                        if output.RigheList[x][y] == 0 or self.RigheList[x][y] == 0:
                             score += 1
-        elif self.nr > output_grid.shape[0] and self.nc > output_grid.shape[1]:
-            for x in range(output_grid.shape[0]):
-                for y in range(output_grid.shape[1]):
-                    if output_grid[x][y] != self.RigheList[x][y]:
-                        score += 1
-                        if output_grid[x][y] == 0 or self.RigheList[x][y] == 0:
+                        else:
+                            score += abs(int(self.RigheList[x][y]) - int(output.RigheList[x][y]))/10
+        elif self.nr > output.nr and self.nc > output.nc:
+            for x in range(output.nr):
+                for y in range(output.nc):
+                    if output.RigheList[x][y] != self.RigheList[x][y]:
+                        if output.RigheList[x][y] == 0 or self.RigheList[x][y] == 0:
                             score += 1
-        elif self.nr <= output_grid.shape[0] and self.nc > output_grid.shape[1]:
+                        else:
+                            score += abs(int(self.RigheList[x][y]) - int(output.RigheList[x][y]))/10
+        elif self.nr <= output.nr and self.nc > output.nc:
             for x in range(self.nr):
-                for y in range(output_grid.shape[1]):
-                    if output_grid[x][y] != self.RigheList[x][y]:
-                        score += 1
-                        if output_grid[x][y] == 0 or self.RigheList[x][y] == 0:
+                for y in range(output.nc):
+                    if output.RigheList[x][y] != self.RigheList[x][y]:
+                        if output.RigheList[x][y] == 0 or self.RigheList[x][y] == 0:
                             score += 1
-        elif self.nr > output_grid.shape[0] and self.nc <= output_grid.shape[1]:
-            for x in range(output_grid.shape[0]):
+                        else:
+                            score += abs(int(self.RigheList[x][y]) - int(output.RigheList[x][y]))/10
+        elif self.nr > output.nr and self.nc <= output.nc:
+            for x in range(output.nr):
                 for y in range(self.nc):
-                    if output_grid[x][y] != self.RigheList[x][y]:
-                        score += 1
-                        if output_grid[x][y] == 0 or self.RigheList[x][y] == 0:
+                    if output.RigheList[x][y] != self.RigheList[x][y]:
+                        if output.RigheList[x][y] == 0 or self.RigheList[x][y] == 0:
                             score += 1
-        else:
-            return -100
-        score += abs(output_grid.shape[0] - self.nr)*min(self.nc, output_grid.shape[1])*3 + abs(output_grid.shape[1] - self.nc)*min(self.nr, output_grid.shape[0])*3 + abs(output_grid.shape[0] - self.nr)*abs(output_grid.shape[1] - self.nc)*3
+                        else:
+                            score += abs(int(self.RigheList[x][y]) - int(output.RigheList[x][y]))/10
         return -score
 
     def rappToGrid(self):
