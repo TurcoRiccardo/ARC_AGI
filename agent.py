@@ -16,7 +16,7 @@ from representation.colorLayerRepresentation import colorLayerRepresentation
 
 POPULATION_SIZE = 50
 OFFSPRING_SIZE = 10
-MAX_GENERATIONS = 2000
+MAX_GENERATIONS = 1000
 
 @dataclass
 class Individual:
@@ -47,15 +47,22 @@ def mutation(p: Individual):
     return Individual(new_gen, p.available_actions, new_parameters, new_paction)
 
 @dataclass
-class PossibleSolution:
+class PossibleSolutionRepresentation:
     classe: classmethod
-    actions1: list
-    parameters1: list
-    err1: int
-    actions2: list
-    parameters2: list
-    err2: int
+    list: list
+    errTot: int
+    errMin: int
+    indMin: int
 
+@dataclass
+class PossibleSolution:
+    train: int
+    validation: int
+    actions: list
+    parameters: list
+    err: int
+
+#Classe in cui calcolo l'error rate semplicemente confrontando la grizioa di input e quella di output ed ogni differenza conta 1
 def error_rate(input: ArcGrid, output: ArcGrid):
     val = 0
     if input.shape[0] <= output.shape[0] and input.shape[1] <= output.shape[1]:
@@ -83,9 +90,10 @@ def error_rate(input: ArcGrid, output: ArcGrid):
     val += abs(output.shape[0] - input.shape[0])*min(input.shape[1], output.shape[1]) + abs(output.shape[1] - input.shape[1])*min(input.shape[0], output.shape[0]) + abs(output.shape[0] - input.shape[0])*abs(output.shape[1] - input.shape[1])
     return val
 
-def generate_representation_solution(rep, demo_pairs, act):
-    rappresentationX = rep(demo_pairs[0].x)
-    rappresentationY = rep(demo_pairs[0].y)
+#Algoritmo evolutivo sulla rappresentazione rep: addestro su esempio i1 e valido su esempio i2
+def generate_representation_solution(rep, demo_pairs, act, i1, i2):
+    rappresentationX = rep(demo_pairs[i1].x)
+    rappresentationY = rep(demo_pairs[i1].y)
     population = list()
     population.append(Individual(copy.deepcopy(rappresentationX), act, [], [], (rappresentationX.score(rappresentationY), 0)))
     population.append(Individual(copy.deepcopy(rappresentationX), act, [], [], (rappresentationX.score(rappresentationY), 0)))
@@ -105,53 +113,31 @@ def generate_representation_solution(rep, demo_pairs, act):
         population.sort(key=lambda i: i.fitness, reverse = True)
         population = population[:POPULATION_SIZE]
     #Validazione: applico la miglior serie di azioni al secondo esempio e trovo l'error rate
-
-    #print(population[0].fitness)
-    #print(population[0].genome.scoresc(rappresentationY))
-    #prediction = ArcIOPair(demo_pairs[0].x, demo_pairs[0].y)
-    #prediction.plot(show=True, title=f"Input-Output")
-    #prediction = ArcIOPair(demo_pairs[0].y, population[0].genome.rappToGrid())
-    #prediction.plot(show=True, title=f"Output-OutputGenerato")
-
-
-
-    rappresentationX = rep(demo_pairs[1].x)
+    rappresentationX = rep(demo_pairs[i2].x)
     c = 0
     for action in population[0].performed_actions:
         action(rappresentationX, population[0].parameters[c][0], population[0].parameters[c][1], population[0].parameters[c][2])
         c += 1
-    err1 = error_rate(demo_pairs[1].y, rappresentationX.rappToGrid())
-    actions1 = copy.deepcopy(population[0].performed_actions)
-    parameters1 = copy.deepcopy(population[0].parameters)
-    #Ripeto procedimento ma addestro su esempio 2 e valido su esempio 1 del training set
-    rappresentationX = rep(demo_pairs[1].x)
-    rappresentationY = rep(demo_pairs[1].y)
-    population = list()
-    population.append(Individual(copy.deepcopy(rappresentationX), act, [], [], (rappresentationX.score(rappresentationY), 0)))
-    population.append(Individual(copy.deepcopy(rappresentationX), act, [], [], (rappresentationX.score(rappresentationY), 0)))
-    for _ in range(MAX_GENERATIONS):
-        #genero gli offspring
-        offspring = list()
-        for _ in range(OFFSPRING_SIZE):
-            p = parent_selection(population)
-            o: Individual = mutation(p)
-            offspring.append(o)
-        #valuto il genome calcolando fitness
-        for i in offspring:
-            i.fitness = (i.genome.score(rappresentationY), -len(i.performed_actions))  
-        #reinserisco gli offspring nella popolazione e tengo solo i primi POPULATION_SIZE individui
-        population.extend(offspring)
-        population.sort(key=lambda i: i.fitness, reverse = True)
-        population = population[:POPULATION_SIZE]
-    #Validazione: applico la miglior serie di azioni al primo esempio e trovo l'error rate
-    rappresentationX = rep(demo_pairs[0].x)
-    c = 0
-    for action in population[0].performed_actions:
-        action(rappresentationX, population[0].parameters[c][0], population[0].parameters[c][1], population[0].parameters[c][2])
-        c += 1
-    err = error_rate(demo_pairs[0].y, rappresentationX.rappToGrid())
-    return PossibleSolution(rep, actions1, parameters1, err1, copy.deepcopy(population[0].performed_actions), copy.deepcopy(population[0].parameters), err)
+    err = error_rate(demo_pairs[i2].y, rappresentationX.rappToGrid())
+    actions = copy.deepcopy(population[0].performed_actions)
+    parameters = copy.deepcopy(population[0].parameters)
+    return PossibleSolution(i1, i2, actions, parameters, err)
 
+#svolgo le operazioni su tutte le combinazioni degli esempi ricevuti
+def generate_representation(rep, demo_pairs, act):
+    possibleSolution = list()
+    errTot = 0
+    errMin = 1000
+    indMin = 0
+    for x in range(0, len(demo_pairs)):
+        for y in range(0, len(demo_pairs)):
+            if x != y:
+                possibleSolution.append(generate_representation_solution(rep, demo_pairs, act, x, y))
+                errTot += possibleSolution[-1].err
+                if possibleSolution[-1].err < errMin:
+                    errMin = possibleSolution[-1].err
+                    indMin = len(possibleSolution) - 1
+    return PossibleSolutionRepresentation(rep, possibleSolution, errTot, errMin, indMin)
 
 #Classe in cui cerco la serie di azioni necessarie a risolvere il problema con un algoritmo evolutivo: addestro su esempio 1 e valido su esempio 2 e poi faccio viceversa
 class Agent(ArcAgent):
@@ -161,30 +147,27 @@ class Agent(ArcAgent):
         actionsCR = [columnsRepresentation.moveColonna, columnsRepresentation.changeColorColonna, columnsRepresentation.modifyColonnaAdd, columnsRepresentation.modifyColonnaDel, columnsRepresentation.modifyColonnaMove, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
         actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
 
-        possibleSolution = list()
+        possibleSolutionRep = list()
 
-        #possibleSolution.append(generate_representation_solution(pixelRepresentation, demo_pairs, actionsPR))
-        #possibleSolution.append(generate_representation_solution(rowRepresentation, demo_pairs, actionsRR))
-        #possibleSolution.append(generate_representation_solution(columnsRepresentation, demo_pairs, actionsCR))
-        possibleSolution.append(generate_representation_solution(colorLayerRepresentation, demo_pairs, actionsCLR))
+        possibleSolutionRep.append(generate_representation(pixelRepresentation, demo_pairs, actionsPR))
+        possibleSolutionRep.append(generate_representation(rowRepresentation, demo_pairs, actionsRR))
+        possibleSolutionRep.append(generate_representation(columnsRepresentation, demo_pairs, actionsCR))
+        possibleSolutionRep.append(generate_representation(colorLayerRepresentation, demo_pairs, actionsCLR))
 
 
 
         #scelgo la miglior soluzione in base all'error rate e la applico alla griglia in input di test
-        possibleSolution.sort(key=lambda i: i.err1 + i.err2, reverse = False)
-        rappInput = possibleSolution[0].classe(copy.deepcopy(test_grids[0]))
-        c = 0
-        print(possibleSolution[0].classe)
-        print(possibleSolution[0].err1)
-        print(possibleSolution[0].err2)
-        if possibleSolution[0].err1 < possibleSolution[0].err2:
-            for action in possibleSolution[0].actions1:
-                action(rappInput, possibleSolution[0].parameters1[c][0], possibleSolution[0].parameters1[c][1], possibleSolution[0].parameters1[c][2])
-                c += 1
-        else:
-            for action in possibleSolution[0].actions2:
-                action(rappInput, possibleSolution[0].parameters2[c][0], possibleSolution[0].parameters2[c][1], possibleSolution[0].parameters2[c][2])
-                c += 1
         outputs = []
-        outputs.append([rappInput.rappToGrid()])
+        possibleSolutionRep.sort(key=lambda i: i.errTot, reverse = False)
+        print("Representation 1: " + str(possibleSolutionRep[0].classe))
+        print("Tot Error: " + str(possibleSolutionRep[0].errTot))
+        print("Min Error: " + str(possibleSolutionRep[0].errMin))
+        for x in range(0, len(test_grids)):
+            rappInput = possibleSolutionRep[0].classe(copy.deepcopy(test_grids[x]))
+            c = 0
+            ind = possibleSolutionRep[0].indMin
+            for action in possibleSolutionRep[0].list[ind].actions:
+                action(rappInput, possibleSolutionRep[0].list[ind].parameters[c][0], possibleSolutionRep[0].list[ind].parameters[c][1], possibleSolutionRep[0].list[ind].parameters[c][2])
+                c += 1
+            outputs.append([rappInput.rappToGrid()])
         return outputs
