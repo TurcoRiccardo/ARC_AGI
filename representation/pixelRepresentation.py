@@ -1,5 +1,6 @@
 import numpy as np
 from dataclasses import dataclass
+from selection.selector import Selector
 
 
 @dataclass
@@ -21,11 +22,11 @@ class pixelRepresentation:
     def getNElement(self):
         return len(self.pixelList)
 
-    def movePixel(self, index, color, direction):
+    def movePixel(self, s):
         if len(self.pixelList) == 0:
             return
-        adapted_index = index % len(self.pixelList)
-        if (direction % 4) == 0:
+        adapted_index = s.index % len(self.pixelList)
+        if (s.direction % 4) == 0:
             if self.pixelList[adapted_index].x + 1 < self.nr:
                 #down
                 ok = 0
@@ -35,7 +36,7 @@ class pixelRepresentation:
                         break
                 if ok == 0:
                     self.pixelList[adapted_index].x += 1
-        elif (direction % 4) == 1:
+        elif (s.direction % 4) == 1:
             if self.pixelList[adapted_index].x > 0:
                 #up
                 ok = 0
@@ -45,7 +46,7 @@ class pixelRepresentation:
                         break
                 if ok == 0:
                     self.pixelList[adapted_index].x -= 1
-        elif (direction % 4) == 2:
+        elif (s.direction % 4) == 2:
             if self.pixelList[adapted_index].y + 1 < self.nc:
                 #right
                 ok = 0
@@ -55,7 +56,7 @@ class pixelRepresentation:
                         break
                 if ok == 0:
                     self.pixelList[adapted_index].y += 1
-        elif (direction % 4) == 3:
+        elif (s.direction % 4) == 3:
             if self.pixelList[adapted_index].y > 0:
                 #left
                 ok = 0
@@ -66,26 +67,26 @@ class pixelRepresentation:
                 if ok == 0:
                     self.pixelList[adapted_index].y -= 1
 
-    def expandGrid(self, index, color, direction):
-        if (direction % 4) == 0:
+    def expandGrid(self, s):
+        if (s.direction % 4) == 0:
             #down
             self.nr += 1
-        elif (direction % 4) == 1:
+        elif (s.direction % 4) == 1:
             #up
             self.nr += 1
             for pixel in self.pixelList:
                 pixel.x += 1
-        elif (direction % 4) == 2:
+        elif (s.direction % 4) == 2:
             #right
             self.nc += 1
-        elif (direction % 4) == 3:
+        elif (s.direction % 4) == 3:
             #left
             self.nc += 1
             for pixel in self.pixelList:
                 pixel.y += 1
 
-    def reduceGrid(self, index, color, direction):
-        if (direction % 4) == 0:
+    def reduceGrid(self, s):
+        if (s.direction % 4) == 0:
             #down
             self.nr -= 1
             remove = list()
@@ -95,7 +96,7 @@ class pixelRepresentation:
             remove.sort(reverse = True)
             for x in remove:
                 self.pixelList.pop(x)
-        elif (direction % 4) == 1:
+        elif (s.direction % 4) == 1:
             #up
             self.nr -= 1
             remove = list()
@@ -107,7 +108,7 @@ class pixelRepresentation:
             remove.sort(reverse = True)
             for x in remove:
                 self.pixelList.pop(x)
-        elif (direction % 4) == 2:
+        elif (s.direction % 4) == 2:
             #right
             self.nc -= 1
             remove = list()
@@ -117,7 +118,7 @@ class pixelRepresentation:
             remove.sort(reverse = True)
             for x in remove:
                 self.pixelList.pop(x)
-        elif (direction % 4) == 3:
+        elif (s.direction % 4) == 3:
             #left
             self.nc -= 1
             remove = list()
@@ -130,11 +131,11 @@ class pixelRepresentation:
             for x in remove:
                 self.pixelList.pop(x)
 
-    def changeColorPixel(self, index, color, direction):
+    def changeColorPixel(self, s):
         if len(self.pixelList) == 0:
             return
-        adapted_index = index % len(self.pixelList)
-        if color % 2 == 0:
+        adapted_index = s.index % len(self.pixelList)
+        if s.color % 2 == 0:
             if self.pixelList[adapted_index].color == 9:
                 self.pixelList[adapted_index].color = 1
             else:
@@ -145,18 +146,18 @@ class pixelRepresentation:
             else:
                 self.pixelList[adapted_index].color -= 1
 
-    def RemovePixel(self, index, color, direction):
+    def RemovePixel(self, s):
         if len(self.pixelList) == 0:
             return
-        adapted_index = index % len(self.pixelList)
+        adapted_index = s.index % len(self.pixelList)
         self.pixelList.pop(adapted_index)
 
-    def DuplicateNearPixel(self, index, color, direction):
+    def DuplicateNearPixel(self, s):
         if len(self.pixelList) == 0:
             return
-        adapted_index = index % len(self.pixelList)
+        adapted_index = s.index % len(self.pixelList)
         new_pixel = PixelNode(self.pixelList[adapted_index].x, self.pixelList[adapted_index].y, self.pixelList[adapted_index].color)
-        if (direction % 4) == 0:
+        if (s.direction % 4) == 0:
             #down
             if new_pixel.x + 1 < self.nr:
                 ok = 0
@@ -166,7 +167,7 @@ class pixelRepresentation:
                         break
                 if ok == 0:
                     new_pixel.x += 1
-        elif (direction % 4) == 1:
+        elif (s.direction % 4) == 1:
             #up
             if new_pixel.x > 0:
                 ok = 0
@@ -176,7 +177,7 @@ class pixelRepresentation:
                         break
                 if ok == 0:
                     new_pixel.x -= 1
-        elif (direction % 4) == 2:
+        elif (s.direction % 4) == 2:
             #right
             if new_pixel.y + 1 < self.nc:
                 ok = 0
@@ -186,7 +187,7 @@ class pixelRepresentation:
                         break
                 if ok == 0:
                     new_pixel.y += 1
-        elif (direction % 4) == 3:
+        elif (s.direction % 4) == 3:
             #left
             if new_pixel.y > 0:
                 ok = 0

@@ -1,5 +1,6 @@
 import numpy as np
 from dataclasses import dataclass
+from selection.selector import Selector
 
 
 @dataclass
@@ -24,33 +25,33 @@ class colorLayerRepresentation:
     def getNElement(self):
         return 9
 
-    def moveLayer(self, index, color, direction):
-        adapted_index = (index - 1) % 9
+    def moveLayer(self, s):
+        adapted_index = (s.index - 1) % 9
         if len(self.FigureListLayer[adapted_index]) == 0:
             return
         new_figure = list()
-        if (direction % 4) == 0:
+        if (s.direction % 4) == 0:
             #down
             for pixel in self.FigureListLayer[adapted_index]:
                 if pixel.x + 1 < self.nr:
                     new_figure.append(PixelNode(pixel.x+1, pixel.y))
                 elif pixel.x + 1 == self.nr:
                     new_figure.append(PixelNode(0, pixel.y))
-        elif (direction % 4) == 1:
+        elif (s.direction % 4) == 1:
             #up
             for pixel in self.FigureListLayer[adapted_index]:
                 if pixel.x > 0:
                     new_figure.append(PixelNode(pixel.x-1, pixel.y))
                 elif pixel.x == 0:
                     new_figure.append(PixelNode(self.nr-1, pixel.y))
-        elif (direction % 4) == 2:
+        elif (s.direction % 4) == 2:
             #right
             for pixel in self.FigureListLayer[adapted_index]:
                 if pixel.y + 1 < self.nc:
                     new_figure.append(PixelNode(pixel.x, pixel.y+1))
                 elif pixel.y + 1 == self.nc:
                     new_figure.append(PixelNode(pixel.x, 0))
-        elif (direction % 4) == 3:
+        elif (s.direction % 4) == 3:
             #left
             for pixel in self.FigureListLayer[adapted_index]:
                 if pixel.y > 0:
@@ -59,28 +60,28 @@ class colorLayerRepresentation:
                     new_figure.append(PixelNode(pixel.x, self.nc-1))
         self.FigureListLayer[adapted_index] = new_figure
 
-    def expandGrid(self, index, color, direction):
-        if (direction % 4) == 0:
+    def expandGrid(self, s):
+        if (s.direction % 4) == 0:
             #down
             self.nr += 1
-        elif (direction % 4) == 1:
+        elif (s.direction % 4) == 1:
             #up
             self.nr += 1
             for layer in self.FigureListLayer:
                 for pixel in layer:
                     pixel.x += 1
-        elif (direction % 4) == 2:
+        elif (s.direction % 4) == 2:
             #right
             self.nc += 1
-        elif (direction % 4) == 3:
+        elif (s.direction % 4) == 3:
             #left
             self.nc += 1
             for layer in self.FigureListLayer:
                 for pixel in layer:
                     pixel.y += 1
 
-    def reduceGrid(self, index, color, direction):
-        if (direction % 4) == 0:
+    def reduceGrid(self, s):
+        if (s.direction % 4) == 0:
             #down
             self.nr -= 1
             for layer in self.FigureListLayer:
@@ -91,7 +92,7 @@ class colorLayerRepresentation:
                 remove.sort(reverse = True)
                 for x in remove:
                     layer.pop(x)
-        elif (direction % 4) == 1:
+        elif (s.direction % 4) == 1:
             #up
             self.nr -= 1
             for layer in self.FigureListLayer:
@@ -104,7 +105,7 @@ class colorLayerRepresentation:
                 remove.sort(reverse = True)
                 for x in remove:
                     layer.pop(x)
-        elif (direction % 4) == 2:
+        elif (s.direction % 4) == 2:
             #right
             self.nc -= 1
             for layer in self.FigureListLayer:
@@ -115,7 +116,7 @@ class colorLayerRepresentation:
                 remove.sort(reverse = True)
                 for x in remove:
                     layer.pop(x)
-        elif (direction % 4) == 3:
+        elif (s.direction % 4) == 3:
             #left
             self.nc -= 1
             for layer in self.FigureListLayer:
@@ -129,9 +130,9 @@ class colorLayerRepresentation:
                 for x in remove:
                     layer.pop(x)
 
-    def layerUnion(self, index, color, direction):
-        adapted_index = (index - 1) % 9
-        if color % 2 == 0:
+    def layerUnion(self, s):
+        adapted_index = (s.index - 1) % 9
+        if s.color % 2 == 0:
             if adapted_index == 8:
                 for pixel in self.FigureListLayer[adapted_index]:
                     ok = 0
@@ -167,33 +168,33 @@ class colorLayerRepresentation:
                         self.FigureListLayer[adapted_index - 1].append(PixelNode(pixel.x, pixel.y))
         self.FigureListLayer[adapted_index].clear()
 
-    def addPixelLayer(self, index, color, direction):
-        adapted_index = (index - 1) % 9
+    def addPixelLayer(self, s):
+        adapted_index = (s.index - 1) % 9
         if len(self.FigureListLayer[adapted_index]) == 0:
             return
-        pixel_index = color % len(self.FigureListLayer[adapted_index])
-        if (direction % 4) == 0:
+        pixel_index = s.color % len(self.FigureListLayer[adapted_index])
+        if (s.direction % 4) == 0:
             #down
             if self.FigureListLayer[adapted_index][pixel_index].x + 1 < self.nr:
                 self.FigureListLayer[adapted_index].append(PixelNode(self.FigureListLayer[adapted_index][pixel_index].x + 1, self.FigureListLayer[adapted_index][pixel_index].y))
-        elif (direction % 4) == 1:
+        elif (s.direction % 4) == 1:
             #up
             if self.FigureListLayer[adapted_index][pixel_index].x > 0:
                 self.FigureListLayer[adapted_index].append(PixelNode(self.FigureListLayer[adapted_index][pixel_index].x - 1, self.FigureListLayer[adapted_index][pixel_index].y))
-        elif (direction % 4) == 2:
+        elif (s.direction % 4) == 2:
             #right
             if self.FigureListLayer[adapted_index][pixel_index].y + 1 < self.nc:
                 self.FigureListLayer[adapted_index].append(PixelNode(self.FigureListLayer[adapted_index][pixel_index].x, self.FigureListLayer[adapted_index][pixel_index].y + 1))
-        elif (direction % 4) == 3:
+        elif (s.direction % 4) == 3:
             #left
             if self.FigureListLayer[adapted_index][pixel_index].y > 0:
                 self.FigureListLayer[adapted_index].append(PixelNode(self.FigureListLayer[adapted_index][pixel_index].x, self.FigureListLayer[adapted_index][pixel_index].y - 1)) 
 
-    def delPixelLayer(self, index, color, direction):
-        adapted_index = (index - 1) % 9
+    def delPixelLayer(self, s):
+        adapted_index = (s.index - 1) % 9
         if len(self.FigureListLayer[adapted_index]) == 0:
             return
-        pixel_index = color % len(self.FigureListLayer[adapted_index])
+        pixel_index = s.color % len(self.FigureListLayer[adapted_index])
         self.FigureListLayer[adapted_index].pop(pixel_index)
 
     def score(self, output):

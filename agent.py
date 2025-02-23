@@ -7,6 +7,7 @@ from arc.evaluation import evaluate_agent
 from typing import List
 from dataclasses import dataclass
 import copy
+from selection.selector import Selector
 
 from representation.pixelRepresentation import pixelRepresentation
 from representation.rowRepresentation import rowRepresentation
@@ -22,9 +23,25 @@ MAX_GENERATIONS = 1000
 class Individual:
     genome: object
     available_actions: list
-    parameters: list
+    performed_selection: list
     performed_actions: list
     fitness: tuple = (None, 0)
+
+@dataclass
+class PossibleSolution:
+    train: int
+    validation: int
+    actions: list
+    selectors: List[Selector]
+    err: int
+
+@dataclass
+class PossibleSolutionRepresentation:
+    classe: classmethod
+    list: List[PossibleSolution]
+    errTot: int
+    errMin: int
+    indMin: int
 
 def parent_selection(population):
     candidates = sorted(np.random.choice(population, 2), key=lambda e: e.fitness, reverse = True)
@@ -35,32 +52,21 @@ def mutation(p: Individual):
     action = p.available_actions[x]
     new_gen = copy.deepcopy(p.genome)
     index = 0
-    if p.genome.getNElement() != 0:
-        index = np.random.randint(0, p.genome.getNElement())
-    col = np.random.randint(0, 9)
-    pos = np.random.randint(0, 4)
-    action(new_gen, index, col, pos)
-    new_parameters = p.parameters.copy()
-    new_parameters.append((index, col, pos))
+    if len(p.performed_selection) > 0 and np.random.random() < 0.2:
+        s = copy.deepcopy(p.performed_selection[-1])
+    else:
+        #generate a new selector
+        if p.genome.getNElement() != 0:
+            index = np.random.randint(0, p.genome.getNElement())
+        col = np.random.randint(0, 9)
+        pos = np.random.randint(0, 4)
+        s = Selector(index, col, pos)
+    action(new_gen, s)
+    new_selection = p.performed_selection.copy()
+    new_selection.append(s)
     new_paction = p.performed_actions.copy()
     new_paction.append(action)
-    return Individual(new_gen, p.available_actions, new_parameters, new_paction)
-
-@dataclass
-class PossibleSolutionRepresentation:
-    classe: classmethod
-    list: list
-    errTot: int
-    errMin: int
-    indMin: int
-
-@dataclass
-class PossibleSolution:
-    train: int
-    validation: int
-    actions: list
-    parameters: list
-    err: int
+    return Individual(new_gen, p.available_actions, new_selection, new_paction)
 
 #Classe in cui calcolo l'error rate semplicemente confrontando la grizioa di input e quella di output ed ogni differenza conta 1
 def error_rate(input: ArcGrid, output: ArcGrid):
@@ -106,7 +112,6 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
             offspring.append(o)
         #valuto il genome calcolando fitness
         for i in offspring:
-
             i.fitness = (i.genome.score(rappresentationY), -len(i.performed_actions))  
         #reinserisco gli offspring nella popolazione e tengo solo i primi POPULATION_SIZE individui
         population.extend(offspring)
@@ -116,12 +121,12 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
     rappresentationX = rep(demo_pairs[i2].x)
     c = 0
     for action in population[0].performed_actions:
-        action(rappresentationX, population[0].parameters[c][0], population[0].parameters[c][1], population[0].parameters[c][2])
+        action(rappresentationX, population[0].performed_selection[c])
         c += 1
     err = error_rate(demo_pairs[i2].y, rappresentationX.rappToGrid())
     actions = copy.deepcopy(population[0].performed_actions)
-    parameters = copy.deepcopy(population[0].parameters)
-    return PossibleSolution(i1, i2, actions, parameters, err)
+    selections = copy.deepcopy(population[0].performed_selection)
+    return PossibleSolution(i1, i2, actions, selections, err)
 
 #svolgo le operazioni su tutte le combinazioni degli esempi ricevuti
 def generate_representation(rep, demo_pairs, act):
@@ -167,7 +172,7 @@ class Agent(ArcAgent):
             c = 0
             ind = possibleSolutionRep[0].indMin
             for action in possibleSolutionRep[0].list[ind].actions:
-                action(rappInput, possibleSolutionRep[0].list[ind].parameters[c][0], possibleSolutionRep[0].list[ind].parameters[c][1], possibleSolutionRep[0].list[ind].parameters[c][2])
+                action(rappInput, possibleSolutionRep[0].list[ind].selectors[c])
                 c += 1
             outputs.append([rappInput.rappToGrid()])
         return outputs

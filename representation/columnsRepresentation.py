@@ -1,5 +1,6 @@
 import numpy as np
 import copy
+from selection.selector import Selector
 
 
 class columnsRepresentation:
@@ -16,43 +17,43 @@ class columnsRepresentation:
     def getNElement(self):
         return self.nc
 
-    def moveColonna(self, index, color, direction):
-        adapted_index = index % self.nc
-        if (direction % 4) == 0:
+    def moveColonna(self, s):
+        adapted_index = s.index % self.nc
+        if (s.direction % 4) == 0:
             #scalo la colonna verso l'alto
             new_colonna = list()
             for x in range(1, self.nr):
                 new_colonna.append(self.ColonneList[adapted_index][x])
             new_colonna.append(self.ColonneList[adapted_index][0])
             self.ColonneList[adapted_index] = new_colonna
-        elif (direction % 4) == 1:
+        elif (s.direction % 4) == 1:
             #scalo la colonna verso il basso
             new_colonna = list()
             new_colonna.append(self.ColonneList[adapted_index][self.nr-1])
             for x in range(0, self.nr-1):
                 new_colonna.append(self.ColonneList[adapted_index][x])
             self.ColonneList[adapted_index] = new_colonna
-        elif (direction % 4) == 2:
+        elif (s.direction % 4) == 2:
             #sposto la colonna a destra
             if adapted_index + 1 < self.nc:
                 colonnaDestra = self.ColonneList[adapted_index + 1]
                 self.ColonneList[adapted_index + 1] = self.ColonneList[adapted_index]
                 self.ColonneList[adapted_index] = colonnaDestra
-        elif (direction % 4) == 3:
+        elif (s.direction % 4) == 3:
             #sposto la colonna a sinista
             if adapted_index > 0:
                 colonnaDestra = self.ColonneList[adapted_index]
                 self.ColonneList[adapted_index] = self.ColonneList[adapted_index - 1]
                 self.ColonneList[adapted_index - 1] = colonnaDestra
     
-    def expandGrid(self, index, color, direction):
-        adapted_index = index % self.nc
-        if (direction % 4) == 0:
+    def expandGrid(self, s):
+        adapted_index = s.index % self.nc
+        if (s.direction % 4) == 0:
             #down
             self.nr += 1
             for x in range(0, self.nc):
                 self.ColonneList[x].append(0)
-        elif (direction % 4) == 1:
+        elif (s.direction % 4) == 1:
             #up
             self.nr += 1
             for x in range(0, self.nc):
@@ -61,12 +62,12 @@ class columnsRepresentation:
                 for element in self.ColonneList[x]:
                     new_Colonna.append(element)
                 self.ColonneList[x] = new_Colonna
-        elif (direction % 4) == 2:
+        elif (s.direction % 4) == 2:
             #right
             self.nc += 1
             new_Colonna = copy.deepcopy(self.ColonneList[adapted_index])
             self.ColonneList.append(new_Colonna)
-        elif (direction % 4) == 3:
+        elif (s.direction % 4) == 3:
             #left
             self.nc += 1
             new_Colonna = copy.deepcopy(self.ColonneList[adapted_index])
@@ -75,35 +76,35 @@ class columnsRepresentation:
                 new_ColonneList.append(colonna)
             self.ColonneList = new_ColonneList
 
-    def reduceGrid(self, index, color, direction):
-        if (direction % 4) == 0:
+    def reduceGrid(self, s):
+        if (s.direction % 4) == 0:
             #down
             if self.nr > 1:
                 self.nr -= 1
                 for colonna in self.ColonneList:
                     colonna.pop()
-        elif (direction % 4) == 1:
+        elif (s.direction % 4) == 1:
             #up
             if self.nr > 1:
                 self.nr -= 1
                 for colonna in self.ColonneList:
                     colonna.pop(0)
-        elif (direction % 4) == 2:
+        elif (s.direction % 4) == 2:
             #right
             if self.nc > 1:
                 self.nc -= 1
                 self.ColonneList.pop()
-        elif (direction % 4) == 3:
+        elif (s.direction % 4) == 3:
             #left
             if self.nc > 1:
                 self.nc -= 1
                 self.ColonneList.pop(0)
 
-    def changeColorColonna(self, index, color, direction):
-        adapted_index = index % self.nc
+    def changeColorColonna(self, s):
+        adapted_index = s.index % self.nc
         for element in self.ColonneList[adapted_index]:
             if element != 0:
-                if color % 2 == 0:
+                if s.color % 2 == 0:
                     if element == 9:
                         element = 1
                     else:
@@ -114,8 +115,8 @@ class columnsRepresentation:
                     else:
                         element -= 1
 
-    def modifyColonnaAdd(self, index, color, direction):
-        adapted_index = index % self.nc
+    def modifyColonnaAdd(self, s):
+        adapted_index = s.index % self.nc
         valid_position = list()
         color = 0
         for x in range(0, self.nr):
@@ -124,20 +125,20 @@ class columnsRepresentation:
             else:
                 color = self.ColonneList[adapted_index][x]
         if len(valid_position) != 0:
-            self.ColonneList[adapted_index][valid_position[direction % len(valid_position)]] = color
+            self.ColonneList[adapted_index][valid_position[s.direction % len(valid_position)]] = color
 
-    def modifyColonnaDel(self, index, color, direction):
-        adapted_index = index % self.nc
+    def modifyColonnaDel(self, s):
+        adapted_index = s.index % self.nc
         if sum(self.ColonneList[adapted_index]) > 0:
             valid_position = list()
             for x in range(0, self.nr):
                 if self.ColonneList[adapted_index][x] != 0:
                     valid_position.append(x)
-            self.ColonneList[adapted_index][valid_position[direction % len(valid_position)]] = 0
+            self.ColonneList[adapted_index][valid_position[s.direction % len(valid_position)]] = 0
 
-    def modifyColonnaMove(self, index, color, direction):
-        adapted_index = index % self.nc
-        adapted_pos = direction % self.nr
+    def modifyColonnaMove(self, s):
+        adapted_index = s.index % self.nc
+        adapted_pos = s.direction % self.nr
         if adapted_pos == 0:
             tmp = self.ColonneList[adapted_index][self.nr - 1]
             self.ColonneList[adapted_index][self.nr - 1] = self.ColonneList[adapted_index][adapted_pos]

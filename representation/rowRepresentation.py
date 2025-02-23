@@ -1,5 +1,6 @@
 import numpy as np
 import copy
+from selection.selector import Selector
 
 
 class rowRepresentation:
@@ -16,28 +17,28 @@ class rowRepresentation:
     def getNElement(self):
         return self.nr
 
-    def moveRiga(self, index, color, direction):
-        adapted_index = index % self.nr
-        if (direction % 4) == 0:
+    def moveRiga(self, s):
+        adapted_index = s.index % self.nr
+        if (s.direction % 4) == 0:
             #sposto riga sopra
             if adapted_index > 0:
                 rigaSopra = self.RigheList[adapted_index - 1]
                 self.RigheList[adapted_index - 1] = self.RigheList[adapted_index]
                 self.RigheList[adapted_index] = rigaSopra
-        elif (direction % 4) == 1:
+        elif (s.direction % 4) == 1:
             #sposto riga sotto
             if adapted_index + 1 < self.nr:
                 rigaSopra = self.RigheList[adapted_index]
                 self.RigheList[adapted_index] = self.RigheList[adapted_index + 1]
                 self.RigheList[adapted_index + 1] = rigaSopra
-        elif (direction % 4) == 2:
+        elif (s.direction % 4) == 2:
             #scalo la riga verso destra
             new_riga = list()
             new_riga.append(self.RigheList[adapted_index][self.nc-1])
             for x in range(0, self.nc-1):
                 new_riga.append(self.RigheList[adapted_index][x])
             self.RigheList[adapted_index] = new_riga
-        elif (direction % 4) == 3:
+        elif (s.direction % 4) == 3:
             #scalo la riga verso sinistra
             new_riga = list()
             for x in range(1, self.nc):
@@ -45,14 +46,14 @@ class rowRepresentation:
             new_riga.append(self.RigheList[adapted_index][0])
             self.RigheList[adapted_index] = new_riga
 
-    def expandGrid(self, index, color, direction):
-        adapted_index = index % self.nr
-        if (direction % 4) == 0:
+    def expandGrid(self, s):
+        adapted_index = s.index % self.nr
+        if (s.direction % 4) == 0:
             #down
             self.nr += 1
             new_Riga = copy.deepcopy(self.RigheList[adapted_index])
             self.RigheList.append(new_Riga) 
-        elif (direction % 4) == 1:
+        elif (s.direction % 4) == 1:
             #up
             self.nr += 1
             new_Riga = copy.deepcopy(self.RigheList[adapted_index])
@@ -60,12 +61,12 @@ class rowRepresentation:
             for riga in self.RigheList:
                 new_RigheList.append(riga)
             self.RigheList = new_RigheList
-        elif (direction % 4) == 2:
+        elif (s.direction % 4) == 2:
             #right
             self.nc += 1
             for x in range(0, self.nr):
                 self.RigheList[x].append(0)
-        elif (direction % 4) == 3:
+        elif (s.direction % 4) == 3:
             #left
             self.nc += 1
             for x in range(0, self.nr):
@@ -75,35 +76,35 @@ class rowRepresentation:
                     new_riga.append(element)
                 self.RigheList[x] = new_riga
 
-    def reduceGrid(self, index, color, direction):
-        if (direction % 4) == 0:
+    def reduceGrid(self, s):
+        if (s.direction % 4) == 0:
             #down
             if self.nr > 1:
                 self.nr -= 1
                 self.RigheList.pop()
-        elif (direction % 4) == 1:
+        elif (s.direction % 4) == 1:
             #up
             if self.nr > 1:
                 self.nr -= 1
                 self.RigheList.pop(0)
-        elif (direction % 4) == 2:
+        elif (s.direction % 4) == 2:
             #right
             if self.nc > 1:
                 self.nc -= 1
                 for riga in self.RigheList:
                     riga.pop()
-        elif (direction % 4) == 3:
+        elif (s.direction % 4) == 3:
             #left
             if self.nc > 1:
                 self.nc -= 1
                 for riga in self.RigheList:
                     riga.pop(0)
 
-    def changeColorRiga(self, index, color, direction):
-        adapted_index = index % self.nr
+    def changeColorRiga(self, s):
+        adapted_index = s.index % self.nr
         for element in self.RigheList[adapted_index]:
             if element != 0:
-                if color % 2 == 0:
+                if s.color % 2 == 0:
                     if element == 9:
                         element = 1
                     else:
@@ -114,8 +115,8 @@ class rowRepresentation:
                     else:
                         element -= 1
 
-    def modifyRigaAdd(self, index, color, direction):
-        adapted_index = index % self.nr
+    def modifyRigaAdd(self, s):
+        adapted_index = s.index % self.nr
         valid_position = list()
         color = 0
         for x in range(0, self.nc):
@@ -124,20 +125,20 @@ class rowRepresentation:
             else:
                 color = self.RigheList[adapted_index][x]
         if len(valid_position) != 0:
-            self.RigheList[adapted_index][valid_position[direction % len(valid_position)]] = color
+            self.RigheList[adapted_index][valid_position[s.direction % len(valid_position)]] = color
         
-    def modifyRigaDel(self, index, color, direction):
-        adapted_index = index % self.nr
+    def modifyRigaDel(self, s):
+        adapted_index = s.index % self.nr
         if sum(self.RigheList[adapted_index]) > 0:
             valid_position = list()
             for x in range(0, self.nc):
                 if self.RigheList[adapted_index][x] != 0:
                     valid_position.append(x)
-            self.RigheList[adapted_index][valid_position[direction % len(valid_position)]] = 0
+            self.RigheList[adapted_index][valid_position[s.direction % len(valid_position)]] = 0
     
-    def modifyRigaMove(self, index, color, direction):
-        adapted_index = index % self.nr
-        adapted_pos = direction % self.nc
+    def modifyRigaMove(self, s):
+        adapted_index = s.index % self.nr
+        adapted_pos = s.direction % self.nc
         if adapted_pos == 0:
             tmp = self.RigheList[adapted_index][self.nc - 1]
             self.RigheList[adapted_index][self.nc - 1] = self.RigheList[adapted_index][adapted_pos]
