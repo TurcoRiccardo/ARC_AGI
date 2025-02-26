@@ -24,7 +24,7 @@ class pixelRepresentation:
 
     def movePixel(self, s):
         if len(self.pixelList) == 0:
-            return
+            return 1
         adapted_index = s.index % len(self.pixelList)
         if (s.direction % 4) == 0:
             if self.pixelList[adapted_index].x + 1 < self.nr:
@@ -36,6 +36,7 @@ class pixelRepresentation:
                         break
                 if ok == 0:
                     self.pixelList[adapted_index].x += 1
+                    return 0
         elif (s.direction % 4) == 1:
             if self.pixelList[adapted_index].x > 0:
                 #up
@@ -46,6 +47,7 @@ class pixelRepresentation:
                         break
                 if ok == 0:
                     self.pixelList[adapted_index].x -= 1
+                    return 0
         elif (s.direction % 4) == 2:
             if self.pixelList[adapted_index].y + 1 < self.nc:
                 #right
@@ -56,6 +58,7 @@ class pixelRepresentation:
                         break
                 if ok == 0:
                     self.pixelList[adapted_index].y += 1
+                    return 0
         elif (s.direction % 4) == 3:
             if self.pixelList[adapted_index].y > 0:
                 #left
@@ -66,95 +69,33 @@ class pixelRepresentation:
                         break
                 if ok == 0:
                     self.pixelList[adapted_index].y -= 1
-
-    def expandGrid(self, s):
-        if (s.direction % 4) == 0:
-            #down
-            self.nr += 1
-        elif (s.direction % 4) == 1:
-            #up
-            self.nr += 1
-            for pixel in self.pixelList:
-                pixel.x += 1
-        elif (s.direction % 4) == 2:
-            #right
-            self.nc += 1
-        elif (s.direction % 4) == 3:
-            #left
-            self.nc += 1
-            for pixel in self.pixelList:
-                pixel.y += 1
-
-    def reduceGrid(self, s):
-        if (s.direction % 4) == 0:
-            #down
-            self.nr -= 1
-            remove = list()
-            for x in range(0, len(self.pixelList)):
-                if self.pixelList[x].x == self.nr:
-                    remove.append(x)
-            remove.sort(reverse = True)
-            for x in remove:
-                self.pixelList.pop(x)
-        elif (s.direction % 4) == 1:
-            #up
-            self.nr -= 1
-            remove = list()
-            for x in range(0, len(self.pixelList)):
-                if self.pixelList[x].x == 0:
-                    remove.append(x)
-                else:
-                    self.pixelList[x].x -= 1
-            remove.sort(reverse = True)
-            for x in remove:
-                self.pixelList.pop(x)
-        elif (s.direction % 4) == 2:
-            #right
-            self.nc -= 1
-            remove = list()
-            for x in range(0, len(self.pixelList)):
-                if self.pixelList[x].y == self.nc:
-                    remove.append(x)
-            remove.sort(reverse = True)
-            for x in remove:
-                self.pixelList.pop(x)
-        elif (s.direction % 4) == 3:
-            #left
-            self.nc -= 1
-            remove = list()
-            for x in range(0, len(self.pixelList)):
-                if self.pixelList[x].y == 0:
-                    remove.append(x)
-                else:
-                    self.pixelList[x].y -= 1
-            remove.sort(reverse = True)
-            for x in remove:
-                self.pixelList.pop(x)
+                    return 0
+        return 1
 
     def changeColorPixel(self, s):
         if len(self.pixelList) == 0:
-            return
+            return 1
         adapted_index = s.index % len(self.pixelList)
         if s.color % 2 == 0:
-            if self.pixelList[adapted_index].color == 9:
-                self.pixelList[adapted_index].color = 1
-            else:
+            if self.pixelList[adapted_index].color != 9:
                 self.pixelList[adapted_index].color += 1
+                return 0
         else:
-            if self.pixelList[adapted_index].color == 1:
-                self.pixelList[adapted_index].color = 9
-            else:
+            if self.pixelList[adapted_index].color != 1:
                 self.pixelList[adapted_index].color -= 1
+                return 0
+        return 1
 
-    def RemovePixel(self, s):
+    def removePixel(self, s):
         if len(self.pixelList) == 0:
-            return
+            return 1
         adapted_index = s.index % len(self.pixelList)
         self.pixelList.pop(adapted_index)
+        return 0
 
-    def DuplicateNearPixel(self, s):
+    def duplicateNearPixel(self, s):
         if len(self.pixelList) == 0:
-            return
+            return 1
         adapted_index = s.index % len(self.pixelList)
         new_pixel = PixelNode(self.pixelList[adapted_index].x, self.pixelList[adapted_index].y, self.pixelList[adapted_index].color)
         if (s.direction % 4) == 0:
@@ -167,6 +108,8 @@ class pixelRepresentation:
                         break
                 if ok == 0:
                     new_pixel.x += 1
+                    self.pixelList.append(new_pixel)
+                    return 0
         elif (s.direction % 4) == 1:
             #up
             if new_pixel.x > 0:
@@ -177,6 +120,8 @@ class pixelRepresentation:
                         break
                 if ok == 0:
                     new_pixel.x -= 1
+                    self.pixelList.append(new_pixel)
+                    return 0
         elif (s.direction % 4) == 2:
             #right
             if new_pixel.y + 1 < self.nc:
@@ -187,6 +132,8 @@ class pixelRepresentation:
                         break
                 if ok == 0:
                     new_pixel.y += 1
+                    self.pixelList.append(new_pixel)
+                    return 0
         elif (s.direction % 4) == 3:
             #left
             if new_pixel.y > 0:
@@ -197,13 +144,96 @@ class pixelRepresentation:
                         break
                 if ok == 0:
                     new_pixel.y -= 1
-        self.pixelList.append(new_pixel)
+                    self.pixelList.append(new_pixel)
+                    return 0
+        return 1
+
+    def expandGrid(self, s):
+        if (s.direction % 4) == 0:
+            #down
+            if self.nr < 30:
+                self.nr += 1
+                return 0
+        elif (s.direction % 4) == 1:
+            #up
+            if self.nr < 30:
+                self.nr += 1
+                for pixel in self.pixelList:
+                    pixel.x += 1
+                return 0
+        elif (s.direction % 4) == 2:
+            #right
+            if self.nc < 30:
+                self.nc += 1
+                return 0
+        elif (s.direction % 4) == 3:
+            #left
+            if self.nc < 30:
+                self.nc += 1
+                for pixel in self.pixelList:
+                    pixel.y += 1
+                return 0
+        return 1
+
+    def reduceGrid(self, s):
+        if (s.direction % 4) == 0:
+            #down
+            if self.nr > 1:
+                self.nr -= 1
+                remove = list()
+                for x in range(0, len(self.pixelList)):
+                    if self.pixelList[x].x == self.nr:
+                        remove.append(x)
+                remove.sort(reverse = True)
+                for x in remove:
+                    self.pixelList.pop(x)
+                return 0
+        elif (s.direction % 4) == 1:
+            #up
+            if self.nr > 1:
+                self.nr -= 1
+                remove = list()
+                for x in range(0, len(self.pixelList)):
+                    if self.pixelList[x].x == 0:
+                        remove.append(x)
+                    else:
+                        self.pixelList[x].x -= 1
+                remove.sort(reverse = True)
+                for x in remove:
+                    self.pixelList.pop(x)
+                return 0
+        elif (s.direction % 4) == 2:
+            #right
+            if self.nc > 1:
+                self.nc -= 1
+                remove = list()
+                for x in range(0, len(self.pixelList)):
+                    if self.pixelList[x].y == self.nc:
+                        remove.append(x)
+                remove.sort(reverse = True)
+                for x in remove:
+                    self.pixelList.pop(x)
+                return 0
+        elif (s.direction % 4) == 3:
+            #left
+            if self.nc > 1:
+                self.nc -= 1
+                remove = list()
+                for x in range(0, len(self.pixelList)):
+                    if self.pixelList[x].y == 0:
+                        remove.append(x)
+                    else:
+                        self.pixelList[x].y -= 1
+                remove.sort(reverse = True)
+                for x in remove:
+                    self.pixelList.pop(x)
+                return 0
+        return 1
 
     def score(self, output):
         #-1 punti per posizione non giusta, proporzionale distanza per colore sbagliato, -2 punti dimensione griglia sbagliata per casella
         score = abs(output.nr - self.nr)*min(self.nc, output.nc)*2 + abs(output.nc - self.nc)*min(self.nr,  output.nr)*2 + abs(output.nr - self.nr)*abs(output.nc - self.nc)*2
         mask = [1 for _ in range(0, len(output.pixelList))]
-        ok = 0
         for px in self.pixelList:
             ok = 0
             c = 0

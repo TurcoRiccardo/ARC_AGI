@@ -13,6 +13,7 @@ from representation.pixelRepresentation import pixelRepresentation
 from representation.rowRepresentation import rowRepresentation
 from representation.columnsRepresentation import columnsRepresentation
 from representation.colorLayerRepresentation import colorLayerRepresentation
+from representation.rectangleRepresentation import rectangleRepresentation
 
 
 POPULATION_SIZE = 50
@@ -48,20 +49,24 @@ def parent_selection(population):
     return candidates[0]
     
 def mutation(p: Individual):
-    x = np.random.randint(0, len(p.available_actions))
-    action = p.available_actions[x]
     new_gen = copy.deepcopy(p.genome)
     index = 0
-    if len(p.performed_selection) > 0 and np.random.random() < 0.2:
-        s = copy.deepcopy(p.performed_selection[-1])
-    else:
-        #generate a new selector
-        if p.genome.getNElement() != 0:
+    while True:
+        x = np.random.randint(0, len(p.available_actions))
+        action = p.available_actions[x]
+        if len(p.performed_selection) > 0 and np.random.random() < 0.2 and False: #waaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa devo impedire per operazionji che modificano getNElement
+            s = copy.deepcopy(p.performed_selection[-1])
+        else:
+            #generate a new selector
+            if p.genome.getNElement() == 0:
+                break
             index = np.random.randint(0, p.genome.getNElement())
-        col = np.random.randint(0, 9)
-        pos = np.random.randint(0, 4)
-        s = Selector(index, col, pos)
-    action(new_gen, s)
+            color = np.random.randint(0, 9)
+            pos = np.random.randint(0, 4)
+            s = Selector(index, color, pos)
+        r = action(new_gen, s)
+        if r == 0:
+            break
     new_selection = p.performed_selection.copy()
     new_selection.append(s)
     new_paction = p.performed_actions.copy()
@@ -118,6 +123,14 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
         population.sort(key=lambda i: i.fitness, reverse = True)
         population = population[:POPULATION_SIZE]
     #Validazione: applico la miglior serie di azioni al secondo esempio e trovo l'error rate
+
+    #print(population[0].fitness)
+    #prediction = ArcIOPair(rappresentationX.rappToGrid(), rappresentationY.rappToGrid())
+    #prediction.plot(show=True, title=f"Input-Output")
+    #prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
+    #prediction.plot(show=True, title=f"Output-OutputGenerato")
+
+
     rappresentationX = rep(demo_pairs[i2].x)
     c = 0
     for action in population[0].performed_actions:
@@ -147,10 +160,11 @@ def generate_representation(rep, demo_pairs, act):
 #Classe in cui cerco la serie di azioni necessarie a risolvere il problema con un algoritmo evolutivo: addestro su esempio 1 e valido su esempio 2 e poi faccio viceversa
 class Agent(ArcAgent):
     def predict(self, demo_pairs: List[ArcIOPair], test_grids: List[ArcGrid]) -> List[ArcPrediction]:
-        actionsPR = [pixelRepresentation.movePixel, pixelRepresentation.changeColorPixel, pixelRepresentation.RemovePixel, pixelRepresentation.DuplicateNearPixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid]
+        actionsPR = [pixelRepresentation.movePixel, pixelRepresentation.changeColorPixel, pixelRepresentation.removePixel, pixelRepresentation.duplicateNearPixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid]
         actionsRR = [rowRepresentation.moveRiga, rowRepresentation.changeColorRiga, rowRepresentation.modifyRigaAdd, rowRepresentation.modifyRigaDel, rowRepresentation.modifyRigaMove, rowRepresentation.expandGrid, rowRepresentation.reduceGrid]
         actionsCR = [columnsRepresentation.moveColonna, columnsRepresentation.changeColorColonna, columnsRepresentation.modifyColonnaAdd, columnsRepresentation.modifyColonnaDel, columnsRepresentation.modifyColonnaMove, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
-        actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
+        actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
+        actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
 
         possibleSolutionRep = list()
 
@@ -158,7 +172,12 @@ class Agent(ArcAgent):
         possibleSolutionRep.append(generate_representation(rowRepresentation, demo_pairs, actionsRR))
         possibleSolutionRep.append(generate_representation(columnsRepresentation, demo_pairs, actionsCR))
         possibleSolutionRep.append(generate_representation(colorLayerRepresentation, demo_pairs, actionsCLR))
-
+        possibleSolutionRep.append(generate_representation(rectangleRepresentation, demo_pairs, actionsRER))
+        #rappresentazionePixelColore
+        #rappresentazioneColonneColore
+        #rappresentazioneRigheColore
+        #rappresentazioneColoreLine
+        #rappresentazioneColoreSquare
 
 
         #scelgo la miglior soluzione in base all'error rate e la applico alla griglia in input di test

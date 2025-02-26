@@ -46,6 +46,7 @@ if __name__ == '__main__':
         #    pair.plot(show=True, title=f"Task {numprob}: Demo {i}")
         for i, pair in enumerate(prob.test_pairs, start=1):
             pair.plot(show=True, title=f"Task {numprob}: Test {i}")
+        print(f"\nTrain problem number {numprob}")
 
         #trovo una soluzione outs
         agent = Agent()

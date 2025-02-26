@@ -26,6 +26,7 @@ class columnsRepresentation:
                 new_colonna.append(self.ColonneList[adapted_index][x])
             new_colonna.append(self.ColonneList[adapted_index][0])
             self.ColonneList[adapted_index] = new_colonna
+            return 0
         elif (s.direction % 4) == 1:
             #scalo la colonna verso il basso
             new_colonna = list()
@@ -33,87 +34,39 @@ class columnsRepresentation:
             for x in range(0, self.nr-1):
                 new_colonna.append(self.ColonneList[adapted_index][x])
             self.ColonneList[adapted_index] = new_colonna
+            return 0
         elif (s.direction % 4) == 2:
             #sposto la colonna a destra
             if adapted_index + 1 < self.nc:
                 colonnaDestra = self.ColonneList[adapted_index + 1]
                 self.ColonneList[adapted_index + 1] = self.ColonneList[adapted_index]
                 self.ColonneList[adapted_index] = colonnaDestra
+                return 0
         elif (s.direction % 4) == 3:
             #sposto la colonna a sinista
             if adapted_index > 0:
                 colonnaDestra = self.ColonneList[adapted_index]
                 self.ColonneList[adapted_index] = self.ColonneList[adapted_index - 1]
                 self.ColonneList[adapted_index - 1] = colonnaDestra
-    
-    def expandGrid(self, s):
-        adapted_index = s.index % self.nc
-        if (s.direction % 4) == 0:
-            #down
-            self.nr += 1
-            for x in range(0, self.nc):
-                self.ColonneList[x].append(0)
-        elif (s.direction % 4) == 1:
-            #up
-            self.nr += 1
-            for x in range(0, self.nc):
-                new_Colonna = list()
-                new_Colonna.append(0)
-                for element in self.ColonneList[x]:
-                    new_Colonna.append(element)
-                self.ColonneList[x] = new_Colonna
-        elif (s.direction % 4) == 2:
-            #right
-            self.nc += 1
-            new_Colonna = copy.deepcopy(self.ColonneList[adapted_index])
-            self.ColonneList.append(new_Colonna)
-        elif (s.direction % 4) == 3:
-            #left
-            self.nc += 1
-            new_Colonna = copy.deepcopy(self.ColonneList[adapted_index])
-            new_ColonneList = [new_Colonna]
-            for colonna in self.ColonneList:
-                new_ColonneList.append(colonna)
-            self.ColonneList = new_ColonneList
-
-    def reduceGrid(self, s):
-        if (s.direction % 4) == 0:
-            #down
-            if self.nr > 1:
-                self.nr -= 1
-                for colonna in self.ColonneList:
-                    colonna.pop()
-        elif (s.direction % 4) == 1:
-            #up
-            if self.nr > 1:
-                self.nr -= 1
-                for colonna in self.ColonneList:
-                    colonna.pop(0)
-        elif (s.direction % 4) == 2:
-            #right
-            if self.nc > 1:
-                self.nc -= 1
-                self.ColonneList.pop()
-        elif (s.direction % 4) == 3:
-            #left
-            if self.nc > 1:
-                self.nc -= 1
-                self.ColonneList.pop(0)
+                return 0
+        return 1
 
     def changeColorColonna(self, s):
         adapted_index = s.index % self.nc
+        ok = 0
         for element in self.ColonneList[adapted_index]:
             if element != 0:
                 if s.color % 2 == 0:
-                    if element == 9:
-                        element = 1
-                    else:
+                    if element != 9:
                         element += 1
+                        ok = 1
                 else:
-                    if element == 1:
-                        element = 9
-                    else:
+                    if element != 1:
                         element -= 1
+                        ok = 1
+        if ok == 1:
+            return 0
+        return 1
 
     def modifyColonnaAdd(self, s):
         adapted_index = s.index % self.nc
@@ -126,6 +79,8 @@ class columnsRepresentation:
                 color = self.ColonneList[adapted_index][x]
         if len(valid_position) != 0:
             self.ColonneList[adapted_index][valid_position[s.direction % len(valid_position)]] = color
+            return 0
+        return 1
 
     def modifyColonnaDel(self, s):
         adapted_index = s.index % self.nc
@@ -135,19 +90,92 @@ class columnsRepresentation:
                 if self.ColonneList[adapted_index][x] != 0:
                     valid_position.append(x)
             self.ColonneList[adapted_index][valid_position[s.direction % len(valid_position)]] = 0
+            return 0
+        return 1
 
     def modifyColonnaMove(self, s):
         adapted_index = s.index % self.nc
         adapted_pos = s.direction % self.nr
-        if adapted_pos == 0:
-            tmp = self.ColonneList[adapted_index][self.nr - 1]
-            self.ColonneList[adapted_index][self.nr - 1] = self.ColonneList[adapted_index][adapted_pos]
-            self.ColonneList[adapted_index][adapted_pos] = tmp
-        else:
-            tmp = self.ColonneList[adapted_index][adapted_pos - 1]
-            self.ColonneList[adapted_index][adapted_pos - 1] = self.ColonneList[adapted_index][adapted_pos]
-            self.ColonneList[adapted_index][adapted_pos] = tmp
+        if self.nr > 2:
+            if adapted_pos == 0:
+                tmp = self.ColonneList[adapted_index][self.nr - 1]
+                self.ColonneList[adapted_index][self.nr - 1] = self.ColonneList[adapted_index][adapted_pos]
+                self.ColonneList[adapted_index][adapted_pos] = tmp
+            else:
+                tmp = self.ColonneList[adapted_index][adapted_pos - 1]
+                self.ColonneList[adapted_index][adapted_pos - 1] = self.ColonneList[adapted_index][adapted_pos]
+                self.ColonneList[adapted_index][adapted_pos] = tmp
+            return 0
+        return 1
     
+    def expandGrid(self, s):
+        adapted_index = s.index % self.nc
+        if (s.direction % 4) == 0:
+            #down
+            if self.nr < 30:
+                self.nr += 1
+                for x in range(0, self.nc):
+                    self.ColonneList[x].append(0)
+                return 0
+        elif (s.direction % 4) == 1:
+            #up
+            if self.nr < 30:
+                self.nr += 1
+                for x in range(0, self.nc):
+                    new_Colonna = list()
+                    new_Colonna.append(0)
+                    for element in self.ColonneList[x]:
+                        new_Colonna.append(element)
+                    self.ColonneList[x] = new_Colonna
+                return 0
+        elif (s.direction % 4) == 2:
+            #right
+            if self.nc < 30:
+                self.nc += 1
+                new_Colonna = copy.deepcopy(self.ColonneList[adapted_index])
+                self.ColonneList.append(new_Colonna)
+                return 0
+        elif (s.direction % 4) == 3:
+            #left
+            if self.nc < 30:
+                self.nc += 1
+                new_Colonna = copy.deepcopy(self.ColonneList[adapted_index])
+                new_ColonneList = [new_Colonna]
+                for colonna in self.ColonneList:
+                    new_ColonneList.append(colonna)
+                self.ColonneList = new_ColonneList
+                return 0
+        return 1
+
+    def reduceGrid(self, s):
+        if (s.direction % 4) == 0:
+            #down
+            if self.nr > 1:
+                self.nr -= 1
+                for colonna in self.ColonneList:
+                    colonna.pop()
+                return 0
+        elif (s.direction % 4) == 1:
+            #up
+            if self.nr > 1:
+                self.nr -= 1
+                for colonna in self.ColonneList:
+                    colonna.pop(0)
+                return 0
+        elif (s.direction % 4) == 2:
+            #right
+            if self.nc > 1:
+                self.nc -= 1
+                self.ColonneList.pop()
+                return 0
+        elif (s.direction % 4) == 3:
+            #left
+            if self.nc > 1:
+                self.nc -= 1
+                self.ColonneList.pop(0)
+                return 0
+        return 1
+
     def score(self, output):
         score = abs(output.nr - self.nr)*min(self.nc, output.nc)*2 + abs(output.nc - self.nc)*min(self.nr,  output.nr)*2 + abs(output.nr - self.nr)*abs(output.nc - self.nc)*2
         if self.nr <= output.nr and self.nc <= output.nc:
