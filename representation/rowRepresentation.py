@@ -14,9 +14,15 @@ class rowRepresentation:
                 riga.append(y)
             self.RigheList.append(copy.deepcopy(riga))
 
+    #return the total number of row
     def getNElement(self):
         return self.nr
+    
+    #return the total number of column
+    def getElementComponent(self):
+        return self.nc
 
+    #moves the row index if possible based on the direction
     def moveRiga(self, s):
         adapted_index = s.index % self.nr
         if (s.direction % 4) == 0:
@@ -51,6 +57,7 @@ class rowRepresentation:
             return 0
         return 1
 
+    #changes the color of the colored pixel in the row index based on color
     def changeColorRiga(self, s):
         adapted_index = s.index % self.nr
         ok = 0
@@ -68,46 +75,50 @@ class rowRepresentation:
             return 0
         return 1
 
+    #add a new colored pixel in the row index
     def modifyRigaAdd(self, s):
         adapted_index = s.index % self.nr
-        valid_position = list()
-        color = 0
-        for x in range(0, self.nc):
-            if self.RigheList[adapted_index][x] == 0:
-                valid_position.append(x)
-            else:
-                color = self.RigheList[adapted_index][x]
-        if len(valid_position) != 0:
-            self.RigheList[adapted_index][valid_position[s.direction % len(valid_position)]] = color
+        adapted_component = s.component % self.nc
+        if self.RigheList[adapted_index][adapted_component] == 0:
+            color = 1
+            for p in self.RigheList[adapted_index]:
+                if p != 0:
+                    color = p
+                    break
+            self.RigheList[adapted_index][adapted_component] == color
             return 0
         return 1
         
+    #delete a colored pixel in the row index
     def modifyRigaDel(self, s):
         adapted_index = s.index % self.nr
-        if sum(self.RigheList[adapted_index]) > 0:
-            valid_position = list()
-            for x in range(0, self.nc):
-                if self.RigheList[adapted_index][x] != 0:
-                    valid_position.append(x)
-            self.RigheList[adapted_index][valid_position[s.direction % len(valid_position)]] = 0
+        adapted_component = s.component % self.nc
+        if self.RigheList[adapted_index][adapted_component] != 0:
+            self.RigheList[adapted_index][adapted_component] == 0
             return 0
         return 1
     
+    #swap two pixel based on direction in the row index
     def modifyRigaMove(self, s):
         adapted_index = s.index % self.nr
-        adapted_pos = s.direction % self.nc
-        if self.nc > 2:
-            if adapted_pos == 0:
-                tmp = self.RigheList[adapted_index][self.nc - 1]
-                self.RigheList[adapted_index][self.nc - 1] = self.RigheList[adapted_index][adapted_pos]
-                self.RigheList[adapted_index][adapted_pos] = tmp
-            else:
-                tmp = self.RigheList[adapted_index][adapted_pos - 1]
-                self.RigheList[adapted_index][adapted_pos - 1] = self.RigheList[adapted_index][adapted_pos]
-                self.RigheList[adapted_index][adapted_pos] = tmp
-            return 0     
+        adapted_component = s.component % self.nc
+        if (s.direction % 4) == 0:
+            #swappo andando verso destra
+            if adapted_component + 1 < self.nc:
+                tmp = self.RigheList[adapted_index][adapted_component + 1]
+                self.RigheList[adapted_index][adapted_component + 1] = self.RigheList[adapted_index][adapted_component]
+                self.RigheList[adapted_index][adapted_component] = tmp
+                return 0
+        elif (s.direction % 4) == 1:
+            #swappo andando verso sinistra
+            if adapted_component - 1 >= 0:
+                tmp = self.RigheList[adapted_index][adapted_component - 1]
+                self.RigheList[adapted_index][adapted_component - 1] = self.RigheList[adapted_index][adapted_component]
+                self.RigheList[adapted_index][adapted_component] = tmp
+                return 0  
         return 1
 
+    #expand the grid in the direction direction
     def expandGrid(self, s):
         adapted_index = s.index % self.nr
         if (s.direction % 4) == 0:
@@ -147,6 +158,7 @@ class rowRepresentation:
                 return 0
         return 1
 
+    #reduce the grid in the direction direction
     def reduceGrid(self, s):
         if (s.direction % 4) == 0:
             #down

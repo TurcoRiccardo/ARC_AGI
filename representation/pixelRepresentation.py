@@ -19,9 +19,15 @@ class pixelRepresentation:
                 if input_grid[x][y] != 0:
                     self.pixelList.append(PixelNode(x, y, input_grid[x][y]))
 
+    #return the total number of colored pixels
     def getNElement(self):
         return len(self.pixelList)
+    
+    #return the total number of pixel
+    def getElementComponent(self):
+        return self.nr * self.nc
 
+    #moves the pixel index if possible based on the direction
     def movePixel(self, s):
         if len(self.pixelList) == 0:
             return 1
@@ -72,6 +78,7 @@ class pixelRepresentation:
                     return 0
         return 1
 
+    #changes the color of the pixel index based on color
     def changeColorPixel(self, s):
         if len(self.pixelList) == 0:
             return 1
@@ -86,6 +93,7 @@ class pixelRepresentation:
                 return 0
         return 1
 
+    #remove the pixel index
     def removePixel(self, s):
         if len(self.pixelList) == 0:
             return 1
@@ -93,6 +101,7 @@ class pixelRepresentation:
         self.pixelList.pop(adapted_index)
         return 0
 
+    #generate a copy of the pixel index in the direction direction
     def duplicateNearPixel(self, s):
         if len(self.pixelList) == 0:
             return 1
@@ -148,6 +157,7 @@ class pixelRepresentation:
                     return 0
         return 1
 
+    #expand the grid in the direction direction
     def expandGrid(self, s):
         if (s.direction % 4) == 0:
             #down
@@ -175,6 +185,7 @@ class pixelRepresentation:
                 return 0
         return 1
 
+    #reduce the grid in the direction direction
     def reduceGrid(self, s):
         if (s.direction % 4) == 0:
             #down

@@ -51,7 +51,7 @@ def parent_selection(population):
 def mutation(p: Individual):
     new_gen = copy.deepcopy(p.genome)
     index = 0
-    while True:
+    for _ in range(0, 10):
         x = np.random.randint(0, len(p.available_actions))
         action = p.available_actions[x]
         if len(p.performed_selection) > 0 and np.random.random() < 0.2 and False: #waaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa devo impedire per operazionji che modificano getNElement
@@ -61,9 +61,10 @@ def mutation(p: Individual):
             if p.genome.getNElement() == 0:
                 break
             index = np.random.randint(0, p.genome.getNElement())
+            component = np.random.randint(0, p.genome.getElementComponent())
             color = np.random.randint(0, 9)
-            pos = np.random.randint(0, 4)
-            s = Selector(index, color, pos)
+            direction = np.random.randint(0, 4)
+            s = Selector(index, component, color, direction)
         r = action(new_gen, s)
         if r == 0:
             break
@@ -170,9 +171,9 @@ class Agent(ArcAgent):
 
         possibleSolutionRep.append(generate_representation(pixelRepresentation, demo_pairs, actionsPR))
         possibleSolutionRep.append(generate_representation(rowRepresentation, demo_pairs, actionsRR))
-        possibleSolutionRep.append(generate_representation(columnsRepresentation, demo_pairs, actionsCR))
-        possibleSolutionRep.append(generate_representation(colorLayerRepresentation, demo_pairs, actionsCLR))
-        possibleSolutionRep.append(generate_representation(rectangleRepresentation, demo_pairs, actionsRER))
+        #possibleSolutionRep.append(generate_representation(columnsRepresentation, demo_pairs, actionsCR))
+        #possibleSolutionRep.append(generate_representation(colorLayerRepresentation, demo_pairs, actionsCLR))
+        #possibleSolutionRep.append(generate_representation(rectangleRepresentation, demo_pairs, actionsRER))
         #rappresentazionePixelColore
         #rappresentazioneColonneColore
         #rappresentazioneRigheColore
