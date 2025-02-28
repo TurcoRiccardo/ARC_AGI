@@ -22,9 +22,16 @@ class colorLayerRepresentation:
                         figure.append(PixelNode(x, y))
             self.FigureListLayer.append(figure)
 
+    #return the total number of layer (one layer for each color)
     def getNElement(self):
         return 9
+    
+    #return the total number of pixel in the layer index
+    def getElementComponent(self, index):
+        adapted_index = (index - 1) % 9
+        return len(self.FigureListLayer[adapted_index])
 
+    #moves all the pixel in the layer index based on the direction
     def moveLayer(self, s):
         adapted_index = (s.index - 1) % 9
         if len(self.FigureListLayer[adapted_index]) == 0:
@@ -68,6 +75,7 @@ class colorLayerRepresentation:
             return 0
         return 1
 
+    #move the pixel of the layer index in another layer based on the color 
     def layerUnion(self, s):
         adapted_index = (s.index - 1) % 9
         if s.color % 2 == 0:
@@ -94,19 +102,21 @@ class colorLayerRepresentation:
                 return 0
         return 1
 
+    #remove a pixel from the layer index
     def delPixelLayer(self, s):
         adapted_index = (s.index - 1) % 9
         if len(self.FigureListLayer[adapted_index]) == 0:
             return 1
-        pixel_index = s.color % len(self.FigureListLayer[adapted_index])
+        pixel_index = s.component % len(self.FigureListLayer[adapted_index])
         self.FigureListLayer[adapted_index].pop(pixel_index)
         return 0
 
+    #add a pixel in the layer index near the pixel component in the direction direction
     def addPixelLayer(self, s):
         adapted_index = (s.index - 1) % 9
         if len(self.FigureListLayer[adapted_index]) == 0:
             return 1
-        pixel_index = s.color % len(self.FigureListLayer[adapted_index])
+        pixel_index = s.component % len(self.FigureListLayer[adapted_index])
         if (s.direction % 4) == 0:
             #down
             if self.FigureListLayer[adapted_index][pixel_index].x + 1 < self.nr:
@@ -129,6 +139,7 @@ class colorLayerRepresentation:
                 return 0
         return 1
 
+    #expand the grid in the direction direction
     def expandGrid(self, s):
         if (s.direction % 4) == 0:
             #down
@@ -158,6 +169,7 @@ class colorLayerRepresentation:
                 return 0
         return 1
 
+    #reduce the grid in the direction direction
     def reduceGrid(self, s):
         if (s.direction % 4) == 0:
             #down

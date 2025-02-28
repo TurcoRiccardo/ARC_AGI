@@ -50,7 +50,6 @@ def parent_selection(population):
     
 def mutation(p: Individual):
     new_gen = copy.deepcopy(p.genome)
-    index = 0
     for _ in range(0, 10):
         x = np.random.randint(0, len(p.available_actions))
         action = p.available_actions[x]
@@ -58,11 +57,13 @@ def mutation(p: Individual):
             s = copy.deepcopy(p.performed_selection[-1])
         else:
             #generate a new selector
-            if p.genome.getNElement() == 0:
-                break
-            index = np.random.randint(0, p.genome.getNElement())
-            component = np.random.randint(0, p.genome.getElementComponent())
-            color = np.random.randint(0, 9)
+            index = 0
+            component = 0
+            if p.genome.getNElement() != 0:
+                index = np.random.randint(0, p.genome.getNElement())
+                if p.genome.getElementComponent(index) != 0:
+                    component = np.random.randint(0, p.genome.getElementComponent(index))
+            color = np.random.randint(0, 1)
             direction = np.random.randint(0, 4)
             s = Selector(index, component, color, direction)
         r = action(new_gen, s)
@@ -165,15 +166,15 @@ class Agent(ArcAgent):
         actionsRR = [rowRepresentation.moveRiga, rowRepresentation.changeColorRiga, rowRepresentation.modifyRigaAdd, rowRepresentation.modifyRigaDel, rowRepresentation.modifyRigaMove, rowRepresentation.expandGrid, rowRepresentation.reduceGrid]
         actionsCR = [columnsRepresentation.moveColonna, columnsRepresentation.changeColorColonna, columnsRepresentation.modifyColonnaAdd, columnsRepresentation.modifyColonnaDel, columnsRepresentation.modifyColonnaMove, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
         actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
-        actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
+        actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
 
         possibleSolutionRep = list()
 
         possibleSolutionRep.append(generate_representation(pixelRepresentation, demo_pairs, actionsPR))
         possibleSolutionRep.append(generate_representation(rowRepresentation, demo_pairs, actionsRR))
-        #possibleSolutionRep.append(generate_representation(columnsRepresentation, demo_pairs, actionsCR))
-        #possibleSolutionRep.append(generate_representation(colorLayerRepresentation, demo_pairs, actionsCLR))
-        #possibleSolutionRep.append(generate_representation(rectangleRepresentation, demo_pairs, actionsRER))
+        possibleSolutionRep.append(generate_representation(columnsRepresentation, demo_pairs, actionsCR))
+        possibleSolutionRep.append(generate_representation(colorLayerRepresentation, demo_pairs, actionsCLR))
+        possibleSolutionRep.append(generate_representation(rectangleRepresentation, demo_pairs, actionsRER))
         #rappresentazionePixelColore
         #rappresentazioneColonneColore
         #rappresentazioneRigheColore

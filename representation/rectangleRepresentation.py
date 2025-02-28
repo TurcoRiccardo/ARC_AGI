@@ -42,9 +42,16 @@ class rectangleRepresentation:
                             mask[j][k] = 0
                     self.rectangleList.append(newRectangle)
     
+    #return the total number of rectangle
     def getNElement(self):
         return len(self.rectangleList)
     
+    #return the total number of pixel in the rectangle
+    def getElementComponent(self, index):
+        adapted_index = index % len(self.rectangleList)
+        return self.rectangleList[adapted_index].h * self.rectangleList[adapted_index].w
+    
+    #moves the rectangle index based on the direction
     def moveRectangle(self, s):
         if len(self.rectangleList) == 0:
             return 1
@@ -71,6 +78,7 @@ class rectangleRepresentation:
                 return 0
         return 1
     
+    #changes the color of the rectangle index based on color
     def changeColorRectangle(self, s):
         if len(self.rectangleList) == 0:
             return
@@ -85,6 +93,7 @@ class rectangleRepresentation:
                 return 0
         return 1
 
+    #remove the rectangle index
     def removeRectangle(self, s):
         if len(self.rectangleList) == 0:
             return 1
@@ -92,6 +101,7 @@ class rectangleRepresentation:
         self.rectangleList.pop(adapted_index)
         return 0
 
+    #generate a new rectangle near the rectangle index in the direction direction
     def duplicateNearRectangle(self, s):
         if len(self.rectangleList) == 0:
             return 1
@@ -123,6 +133,7 @@ class rectangleRepresentation:
                 return 0
         return 1
 
+    #change the order of the rectangle based on color in the rectangle list
     def changeOrder(self, s):
         if len(self.rectangleList) == 0:
             return 1
@@ -137,7 +148,8 @@ class rectangleRepresentation:
                 return 0
         return 1
 
-    def scaleRectangle(self, s):
+    #scale up the rectangle index in the direction direction
+    def scaleUpRectangle(self, s):
         if len(self.rectangleList) == 0:
             return 1
         adapted_index = s.index % len(self.rectangleList)
@@ -149,6 +161,7 @@ class rectangleRepresentation:
         elif (s.direction % 4) == 1:
             #up
             if self.rectangleList[adapted_index].x > 0:
+                self.rectangleList[adapted_index].x -= 1
                 self.rectangleList[adapted_index].h += 1
                 return 0
         elif (s.direction % 4) == 2:
@@ -159,10 +172,41 @@ class rectangleRepresentation:
         elif (s.direction % 4) == 3:
             #left
             if self.rectangleList[adapted_index].y > 0:
+                self.rectangleList[adapted_index].y -= 1
+                self.rectangleList[adapted_index].w += 1
+                return 0
+        return 1
+    
+    #scale down the rectangle index in the direction direction
+    def scaleDownRectangle(self, s):
+        if len(self.rectangleList) == 0:
+            return 1
+        adapted_index = s.index % len(self.rectangleList)
+        if (s.direction % 4) == 0:
+            #down
+            if self.rectangleList[adapted_index].h > 1:
+                self.rectangleList[adapted_index].h -= 1
+                return 0
+        elif (s.direction % 4) == 1:
+            #up
+            if self.rectangleList[adapted_index].h > 1:
+                self.rectangleList[adapted_index].x += 1
+                self.rectangleList[adapted_index].h -= 1
+                return 0
+        elif (s.direction % 4) == 2:
+            #right
+            if self.rectangleList[adapted_index].w > 1:
+                self.rectangleList[adapted_index].w -= 1
+                return 0
+        elif (s.direction % 4) == 3:
+            #left
+            if self.rectangleList[adapted_index].w > 1:
+                self.rectangleList[adapted_index].y += 1
                 self.rectangleList[adapted_index].w -= 1
                 return 0
         return 1
 
+    #expand the grid in the direction direction
     def expandGrid(self, s):
         if (s.direction % 4) == 0:
             #down
@@ -190,6 +234,7 @@ class rectangleRepresentation:
                 return 0
         return 1
 
+    #reduce the grid in the direction direction
     def reduceGrid(self, s):
         if (s.direction % 4) == 0:
             #down

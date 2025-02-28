@@ -19,7 +19,7 @@ class rowRepresentation:
         return self.nr
     
     #return the total number of column
-    def getElementComponent(self):
+    def getElementComponent(self, index):
         return self.nc
 
     #moves the row index if possible based on the direction
@@ -102,14 +102,14 @@ class rowRepresentation:
     def modifyRigaMove(self, s):
         adapted_index = s.index % self.nr
         adapted_component = s.component % self.nc
-        if (s.direction % 4) == 0:
+        if (s.direction % 2) == 0:
             #swappo andando verso destra
             if adapted_component + 1 < self.nc:
                 tmp = self.RigheList[adapted_index][adapted_component + 1]
                 self.RigheList[adapted_index][adapted_component + 1] = self.RigheList[adapted_index][adapted_component]
                 self.RigheList[adapted_index][adapted_component] = tmp
                 return 0
-        elif (s.direction % 4) == 1:
+        elif (s.direction % 2) == 1:
             #swappo andando verso sinistra
             if adapted_component - 1 >= 0:
                 tmp = self.RigheList[adapted_index][adapted_component - 1]

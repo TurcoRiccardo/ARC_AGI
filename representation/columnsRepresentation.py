@@ -14,9 +14,15 @@ class columnsRepresentation:
                 colonna.append(y)
             self.ColonneList.append(copy.deepcopy(colonna))
 
+    #return the total number of column
     def getNElement(self):
         return self.nc
+    
+    #return the total number of row 
+    def getElementComponent(self, index):
+        return self.nr
 
+    #moves the column index if possible based on the direction
     def moveColonna(self, s):
         adapted_index = s.index % self.nc
         if (s.direction % 4) == 0:
@@ -51,6 +57,7 @@ class columnsRepresentation:
                 return 0
         return 1
 
+    #changes the color of the colored pixel in the column index based on color
     def changeColorColonna(self, s):
         adapted_index = s.index % self.nc
         ok = 0
@@ -68,46 +75,50 @@ class columnsRepresentation:
             return 0
         return 1
 
+    #add a new colored pixel in the column index
     def modifyColonnaAdd(self, s):
         adapted_index = s.index % self.nc
-        valid_position = list()
-        color = 0
-        for x in range(0, self.nr):
-            if self.ColonneList[adapted_index][x] == 0:
-                valid_position.append(x)
-            else:
-                color = self.ColonneList[adapted_index][x]
-        if len(valid_position) != 0:
-            self.ColonneList[adapted_index][valid_position[s.direction % len(valid_position)]] = color
+        adapted_component = s.component % self.nr
+        if self.ColonneList[adapted_index][adapted_component] == 0:
+            color = 1
+            for p in self.ColonneList[adapted_index]:
+                if p != 0:
+                    color = p
+                    break
+            self.ColonneList[adapted_index][adapted_component] == color
             return 0
         return 1
 
+    #delete a colored pixel in the row index
     def modifyColonnaDel(self, s):
         adapted_index = s.index % self.nc
-        if sum(self.ColonneList[adapted_index]) > 0:
-            valid_position = list()
-            for x in range(0, self.nr):
-                if self.ColonneList[adapted_index][x] != 0:
-                    valid_position.append(x)
-            self.ColonneList[adapted_index][valid_position[s.direction % len(valid_position)]] = 0
+        adapted_component = s.component % self.nr
+        if self.ColonneList[adapted_index][adapted_component] != 0:
+            self.ColonneList[adapted_index][adapted_component] == 0
             return 0
         return 1
 
+    #swap two pixel based on direction in the row index
     def modifyColonnaMove(self, s):
         adapted_index = s.index % self.nc
-        adapted_pos = s.direction % self.nr
-        if self.nr > 2:
-            if adapted_pos == 0:
-                tmp = self.ColonneList[adapted_index][self.nr - 1]
-                self.ColonneList[adapted_index][self.nr - 1] = self.ColonneList[adapted_index][adapted_pos]
-                self.ColonneList[adapted_index][adapted_pos] = tmp
-            else:
-                tmp = self.ColonneList[adapted_index][adapted_pos - 1]
-                self.ColonneList[adapted_index][adapted_pos - 1] = self.ColonneList[adapted_index][adapted_pos]
-                self.ColonneList[adapted_index][adapted_pos] = tmp
-            return 0
+        adapted_component = s.component % self.nr
+        if (s.direction % 2) == 0:
+            #swappo andando verso il basso
+            if adapted_component + 1 < self.nr:
+                tmp = self.ColonneList[adapted_index][adapted_component + 1]
+                self.ColonneList[adapted_index][adapted_component + 1] = self.ColonneList[adapted_index][adapted_component]
+                self.ColonneList[adapted_index][adapted_component] = tmp
+                return 0
+        elif (s.direction % 2) == 1:
+            #swappo andando verso l'alto
+            if adapted_component - 1 >= 0:
+                tmp = self.ColonneList[adapted_index][adapted_component - 1]
+                self.ColonneList[adapted_index][adapted_component - 1] = self.ColonneList[adapted_index][adapted_component]
+                self.ColonneList[adapted_index][adapted_component] = tmp
+                return 0  
         return 1
     
+    #expand the grid in the direction direction
     def expandGrid(self, s):
         adapted_index = s.index % self.nc
         if (s.direction % 4) == 0:
@@ -147,6 +158,7 @@ class columnsRepresentation:
                 return 0
         return 1
 
+    #reduce the grid in the direction direction
     def reduceGrid(self, s):
         if (s.direction % 4) == 0:
             #down
