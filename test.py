@@ -5,6 +5,7 @@ from arc.types import verify_is_arc_grid, ArcIOPair, ArcGrid, ArcPrediction
 from arc.agents import ArcAgent
 from arc.evaluation import evaluate_agent
 from agent import Agent
+from tqdm.auto import tqdm
 
 
 #Classe in cui calcolo l'error rate semplicemente confrontando la grizioa di input e quella di output ed ogni differenza conta 1
@@ -37,24 +38,35 @@ def error_rate(input: ArcGrid, output: ArcGrid):
 
 if __name__ == '__main__':
     describe_task_group(train_problems)
+    c = 0
+    tsc = 0
     #apply the agent to every problem in the loop
-    for numprob in range(3, 4):
+    for numprob in tqdm(range(3, 4)):
         prob : ArcProblem = train_problems[numprob]
 
         #visualizzo il problema prob in esame
         #for i, pair in enumerate(prob.train_pairs, start=1):
         #    pair.plot(show=True, title=f"Task {numprob}: Demo {i}")
-        for i, pair in enumerate(prob.test_pairs, start=1):
-            pair.plot(show=True, title=f"Task {numprob}: Test {i}")
+        #for i, pair in enumerate(prob.test_pairs, start=1):
+            #pair.plot(show=True, title=f"Task {numprob}: Test {i}")
         print(f"\nTrain problem number {numprob}")
 
         #trovo una soluzione outs
         agent = Agent()
         outs = agent.predict(prob.train_pairs, prob.test_inputs)
 
+        i = 1
         #visualizzo soluzione del nostro agent
         for test_pair, predictions in zip(prob.test_pairs, outs):
             for p in predictions:
                 prediction = ArcIOPair(test_pair.x, p)
-                print("Error on the test: " + str(error_rate(test_pair.y, p)))
-                prediction.plot(show=True, title=f"Task {numprob}: Solution {1}")
+                err = error_rate(test_pair.y, p)
+                print("Error on the test: " + str(err))
+                if err == 0:
+                    tsc += 1
+                #prediction.plot(show=True, title=f"Task {numprob}: Solution {i}")
+            i += 1
+        c += 1
+    #statistiche sul test set
+    print("number of tasks executed: " + str(c))
+    print("Number of Task solved correctly: " + str(tsc))
