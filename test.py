@@ -47,8 +47,8 @@ if __name__ == '__main__':
         #visualizzo il problema prob in esame
         #for i, pair in enumerate(prob.train_pairs, start=1):
         #    pair.plot(show=True, title=f"Task {numprob}: Demo {i}")
-        #for i, pair in enumerate(prob.test_pairs, start=1):
-            #pair.plot(show=True, title=f"Task {numprob}: Test {i}")
+        for i, pair in enumerate(prob.test_pairs, start=1):
+            pair.plot(show=True, title=f"Task {numprob}: Test {i}")
         print(f"\nTrain problem number {numprob}")
 
         #trovo una soluzione outs
@@ -64,7 +64,7 @@ if __name__ == '__main__':
                 print("Error on the test: " + str(err))
                 if err == 0:
                     tsc += 1
-                #prediction.plot(show=True, title=f"Task {numprob}: Solution {i}")
+                prediction.plot(show=True, title=f"Task {numprob}: Solution {i}")
             i += 1
         c += 1
     #statistiche sul test set

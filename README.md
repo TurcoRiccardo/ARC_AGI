@@ -24,8 +24,8 @@ A grid can have any height or width between 1x1 and 30x30 inclusive (average hei
 - 2: Red
 - 3: Green
 - 4: Yellow
-- 5: Cyan
+- 5: Grey
 - 6: Magenta
-- 7: Grey
-- 8: Brown
-- 9: Orange
+- 7: Orange
+- 8: Cyan
+- 9: Brown
