@@ -19,7 +19,7 @@ from representation.figureRepresentation import figureRepresentation
 
 POPULATION_SIZE = 50
 OFFSPRING_SIZE = 10
-MAX_GENERATIONS = 1000
+MAX_GENERATIONS = 1200
 
 @dataclass
 class Individual:
@@ -52,21 +52,20 @@ def parent_selection(population):
 def mutation(p: Individual):
     new_gen = copy.deepcopy(p.genome)
     for _ in range(0, 10):
+        #take a random action
         x = np.random.randint(0, len(p.available_actions))
         action = p.available_actions[x]
-        if len(p.performed_selection) > 0 and np.random.random() < 0.2 and False: #waaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa devo impedire per operazionji che modificano getNElement
-            s = copy.deepcopy(p.performed_selection[-1])
-        else:
-            #generate a new selector
-            index = 0
-            component = 0
-            if p.genome.getNElement() != 0:
-                index = np.random.randint(0, p.genome.getNElement())
-                if p.genome.getElementComponent(index) != 0:
-                    component = np.random.randint(0, p.genome.getElementComponent(index))
-            color = np.random.randint(0, 1)
-            direction = np.random.randint(0, 4)
-            s = Selector(index, component, color, direction)
+        #generate a new selector
+        index = 0
+        component = 0
+        if p.genome.getNElement() != 0:
+            index = np.random.randint(0, p.genome.getNElement())
+            if p.genome.getElementComponent(index) != 0:
+                component = np.random.randint(0, p.genome.getElementComponent(index))
+        color = np.random.randint(0, 1)
+        direction = np.random.randint(0, 4)
+        s = Selector(index, component, color, direction)
+        #execute the action with the selector
         r = action(new_gen, s)
         if r == 0:
             break
@@ -169,7 +168,7 @@ class Agent(ArcAgent):
         actionsCR = [columnsRepresentation.moveColonna, columnsRepresentation.changeColorColonna, columnsRepresentation.modifyColonnaAdd, columnsRepresentation.modifyColonnaDel, columnsRepresentation.modifyColonnaMove, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
         actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
-        actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure]
+        actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.equalColorFigure, figureRepresentation.addElementFigure, figureRepresentation.removeElementFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
 
         possibleSolutionRep = list()
 
