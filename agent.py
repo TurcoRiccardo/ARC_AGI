@@ -19,7 +19,7 @@ from representation.figureRepresentation import figureRepresentation
 
 POPULATION_SIZE = 50
 OFFSPRING_SIZE = 10
-MAX_GENERATIONS = 1200
+MAX_GENERATIONS = 2000
 
 @dataclass
 class Individual:
@@ -126,12 +126,12 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
         population = population[:POPULATION_SIZE]
     #Validazione: applico la miglior serie di azioni al secondo esempio e trovo l'error rate
 
-    print(population[0].fitness)
-    print(population[0].genome.scoresc(rappresentationY))
-    prediction = ArcIOPair(rappresentationX.rappToGrid(), rappresentationY.rappToGrid())
-    prediction.plot(show=True, title=f"Input-Output")
-    prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
-    prediction.plot(show=True, title=f"Output-OutputGenerato")
+    #print(population[0].fitness)
+    #print(population[0].genome.scoresc(rappresentationY))
+    #prediction = ArcIOPair(rappresentationX.rappToGrid(), rappresentationY.rappToGrid())
+    #prediction.plot(show=True, title=f"Input-Output")
+    #prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
+    #prediction.plot(show=True, title=f"Output-OutputGenerato")
 
 
     rappresentationX = rep(demo_pairs[i2].x)
@@ -172,11 +172,11 @@ class Agent(ArcAgent):
 
         possibleSolutionRep = list()
 
-        #possibleSolutionRep.append(generate_representation(pixelRepresentation, demo_pairs, actionsPR))
-        #possibleSolutionRep.append(generate_representation(rowRepresentation, demo_pairs, actionsRR))
-        #possibleSolutionRep.append(generate_representation(columnsRepresentation, demo_pairs, actionsCR))
-        #possibleSolutionRep.append(generate_representation(colorLayerRepresentation, demo_pairs, actionsCLR))
-        #possibleSolutionRep.append(generate_representation(rectangleRepresentation, demo_pairs, actionsRER))
+        possibleSolutionRep.append(generate_representation(pixelRepresentation, demo_pairs, actionsPR))
+        possibleSolutionRep.append(generate_representation(rowRepresentation, demo_pairs, actionsRR))
+        possibleSolutionRep.append(generate_representation(columnsRepresentation, demo_pairs, actionsCR))
+        possibleSolutionRep.append(generate_representation(colorLayerRepresentation, demo_pairs, actionsCLR))
+        possibleSolutionRep.append(generate_representation(rectangleRepresentation, demo_pairs, actionsRER))
         possibleSolutionRep.append(generate_representation(figureRepresentation, demo_pairs, actionsFR))
         #rappresentazionePixelColore
         #rappresentazioneColonneColore

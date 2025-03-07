@@ -221,13 +221,16 @@ class figureRepresentation:
                                 if p1.x+1 == p2.x and p1.y == p2.y:
                                     indexFigure.add(f2)
             if len(indexFigure) > 0:
+                existing_pixels = {(p.x, p.y) for p in self.figureList[adapted_index].l}
                 newPixel = list()
                 for f in sorted(indexFigure, reverse=True):
-                    for p1 in self.figureList[adapted_index].l:
-                        for p2 in self.figureList[f].l:
-                            if not(p1.x == p2.x and p1.y == p2.y):
-                                newPixel.append(p2)
-                    self.figureList[adapted_index].l.extend(newPixel)
+                    figureToMerge = self.figureList[f]
+                    for p2 in figureToMerge.l:
+                        if (p2.x, p2.y) not in existing_pixels:
+                            newPixel.append(p2)
+                            existing_pixels.add((p2.x, p2.y))
+                self.figureList[adapted_index].l.extend(newPixel)
+                for f in sorted(indexFigure, reverse=True):
                     self.figureList.pop(f)
                 return 0
         elif (s.direction % 4) == 1:
@@ -241,13 +244,16 @@ class figureRepresentation:
                                 if p1.x-1 == p2.x and p1.y == p2.y:
                                     indexFigure.add(f2)
             if len(indexFigure) > 0:
+                existing_pixels = {(p.x, p.y) for p in self.figureList[adapted_index].l}
                 newPixel = list()
                 for f in sorted(indexFigure, reverse=True):
-                    for p1 in self.figureList[adapted_index].l:
-                        for p2 in self.figureList[f].l:
-                            if not(p1.x == p2.x and p1.y == p2.y):
-                                newPixel.append(p2)
-                    self.figureList[adapted_index].l.extend(newPixel)
+                    figureToMerge = self.figureList[f]
+                    for p2 in figureToMerge.l:
+                        if (p2.x, p2.y) not in existing_pixels:
+                            newPixel.append(p2)
+                            existing_pixels.add((p2.x, p2.y))
+                self.figureList[adapted_index].l.extend(newPixel)
+                for f in sorted(indexFigure, reverse=True):
                     self.figureList.pop(f)
                 return 0
         elif (s.direction % 4) == 2:
@@ -261,13 +267,16 @@ class figureRepresentation:
                                 if p1.x == p2.x and p1.y+1 == p2.y:
                                     indexFigure.add(f2)
             if len(indexFigure) > 0:
+                existing_pixels = {(p.x, p.y) for p in self.figureList[adapted_index].l}
                 newPixel = list()
                 for f in sorted(indexFigure, reverse=True):
-                    for p1 in self.figureList[adapted_index].l:
-                        for p2 in self.figureList[f].l:
-                            if not(p1.x == p2.x and p1.y == p2.y):
-                                newPixel.append(p2)
-                    self.figureList[adapted_index].l.extend(newPixel)
+                    figureToMerge = self.figureList[f]
+                    for p2 in figureToMerge.l:
+                        if (p2.x, p2.y) not in existing_pixels:
+                            newPixel.append(p2)
+                            existing_pixels.add((p2.x, p2.y))
+                self.figureList[adapted_index].l.extend(newPixel)
+                for f in sorted(indexFigure, reverse=True):
                     self.figureList.pop(f)
                 return 0
         elif (s.direction % 4) == 3:
@@ -281,13 +290,16 @@ class figureRepresentation:
                                 if p1.x == p2.x and p1.y-1 == p2.y:
                                     indexFigure.add(f2)
             if len(indexFigure) > 0:
+                existing_pixels = {(p.x, p.y) for p in self.figureList[adapted_index].l}
                 newPixel = list()
                 for f in sorted(indexFigure, reverse=True):
-                    for p1 in self.figureList[adapted_index].l:
-                        for p2 in self.figureList[f].l:
-                            if not(p1.x == p2.x and p1.y == p2.y):
-                                newPixel.append(p2)
-                    self.figureList[adapted_index].l.extend(newPixel)
+                    figureToMerge = self.figureList[f]
+                    for p2 in figureToMerge.l:
+                        if (p2.x, p2.y) not in existing_pixels:
+                            newPixel.append(p2)
+                            existing_pixels.add((p2.x, p2.y))
+                self.figureList[adapted_index].l.extend(newPixel)
+                for f in sorted(indexFigure, reverse=True):
                     self.figureList.pop(f)
                 return 0
         return 1
@@ -509,57 +521,43 @@ class figureRepresentation:
         score = abs(output.nr - self.nr)*min(self.nc, output.nc)*2 + abs(output.nc - self.nc)*min(self.nr,  output.nr)*2 + abs(output.nr - self.nr)*abs(output.nc - self.nc)*2
         for z in range(0, len(self.figureList)):
             if z < len(output.figureList):
-                mask = [1 for _ in range(0, len(output.figureList[z].l))]
+                #normalizza le coordinate rispetto al punto in alto a sinistra (anche esterno dalla figura)
+                pxminx = 100
+                pxminy = 100
+                for p in self.figureList[z].l:
+                    if pxminx > p.x:
+                        pxminx = p.x
+                    if pxminy > p.y:
+                        pxminy = p.y
+                pyminx = 100
+                pyminy = 100
+                for p in output.figureList[z].l:
+                    if pyminx > p.x:
+                        pyminx = p.x
+                    if pyminy > p.y:
+                        pyminy = p.y
+                #Verifica se due figure hanno la stessa forma
+                pxmask = [1 for _ in range(0, len(self.figureList[z].l))]
+                pymask = [1 for _ in range(0, len(output.figureList[z].l))]
+                colorPenality = 0
+                cx = 0
                 for px in self.figureList[z].l:
-                    ok = 0
-                    c = 0
+                    cy = 0
                     for py in output.figureList[z].l:
-                        if px.x == py.x and px.y == py.y and mask[c] == 1:
-                            score += abs(int(px.color) - int(py.color))/10
-                            mask[c] = 0
-                            ok = 1
+                        if (px.x - pxminx) == (py.x - pyminx) and (px.y - pxminy) == (py.y - pyminy) and pymask[cy] == 1:
+                            colorPenality += abs(int(px.color) - int(py.color))/10
+                            pxmask[cx] = 0
+                            pymask[cy] = 0
                             break
-                        c += 1
-                    if ok != 1:
-                        score += 1
-                score += sum(mask)
+                        cy += 1
+                    cx += 1
+                #aggiorno lo score per la figura z: colore, distanza, pixel non coperti * 2
+                score += colorPenality + abs(int(pxminx) - int(pyminx))/10 + abs(int(pxminy) - int(pyminy))/10 + sum(pxmask) + sum(pymask)
             else:
                 score += len(self.figureList[z].l)
         if len(output.figureList) - len(self.figureList) > 0:
             for z in range(len(self.figureList), len(output.figureList)):
                 score += len(output.figureList[z].l)
-        return -score
-    
-    def scoresc(self, output):
-        score = abs(output.nr - self.nr)*min(self.nc, output.nc)*2 + abs(output.nc - self.nc)*min(self.nr,  output.nr)*2 + abs(output.nr - self.nr)*abs(output.nc - self.nc)*2
-        print("start")
-        print(score)
-        print(output.figureList)
-        for z in range(0, len(self.figureList)):
-            if z < len(output.figureList):
-                mask = [1 for _ in range(0, len(output.figureList[z].l))]
-                for px in self.figureList[z].l:
-                    ok = 0
-                    c = 0
-                    for py in output.figureList[z].l:
-                        if px.x == py.x and px.y == py.y and mask[c] == 1:
-                            score += abs(int(px.color) - int(py.color))/10
-                            mask[c] = 0
-                            ok = 1
-                            break
-                        c += 1
-                    if ok != 1:
-                        score += 1
-                score += sum(mask)
-            else:
-                score += len(self.figureList[z].l)
-        print("prefin")
-        print(len(output.figureList) - len(self.figureList))
-        print(score)
-        if len(output.figureList) - len(self.figureList) > 0:
-            for z in range(len(self.figureList), len(output.figureList)):
-                score += len(output.figureList[z].l)
-        print("fin")
         return -score
 
     def rappToGrid(self):
