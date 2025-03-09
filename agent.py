@@ -15,6 +15,7 @@ from representation.columnsRepresentation import columnsRepresentation
 from representation.colorLayerRepresentation import colorLayerRepresentation
 from representation.rectangleRepresentation import rectangleRepresentation
 from representation.figureRepresentation import figureRepresentation
+from representation.borderRepresentation import borderRepresentation
 
 
 POPULATION_SIZE = 50
@@ -134,6 +135,9 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
     #prediction.plot(show=True, title=f"Output-OutputGenerato")
 
 
+    #mi serve qualcosa che mi aiuta a generalizzare la lista di azioni-selettore ad altri esempi dello stesso problema
+    #posso provare ad utilizzare un algoritmo evolutivo con mutazioni solo sul selettore e la possibilita di dupricare o cancellare coppie azioni-selettore
+
     rappresentationX = rep(demo_pairs[i2].x)
     c = 0
     for action in population[0].performed_actions:
@@ -169,15 +173,17 @@ class Agent(ArcAgent):
         actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.equalColorFigure, figureRepresentation.addElementFigure, figureRepresentation.removeElementFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
+        actionsBR = []
 
         possibleSolutionRep = list()
 
-        possibleSolutionRep.append(generate_representation(pixelRepresentation, demo_pairs, actionsPR))
-        possibleSolutionRep.append(generate_representation(rowRepresentation, demo_pairs, actionsRR))
-        possibleSolutionRep.append(generate_representation(columnsRepresentation, demo_pairs, actionsCR))
-        possibleSolutionRep.append(generate_representation(colorLayerRepresentation, demo_pairs, actionsCLR))
-        possibleSolutionRep.append(generate_representation(rectangleRepresentation, demo_pairs, actionsRER))
-        possibleSolutionRep.append(generate_representation(figureRepresentation, demo_pairs, actionsFR))
+        #possibleSolutionRep.append(generate_representation(pixelRepresentation, demo_pairs, actionsPR))
+        #possibleSolutionRep.append(generate_representation(rowRepresentation, demo_pairs, actionsRR))
+        #possibleSolutionRep.append(generate_representation(columnsRepresentation, demo_pairs, actionsCR))
+        #possibleSolutionRep.append(generate_representation(colorLayerRepresentation, demo_pairs, actionsCLR))
+        #possibleSolutionRep.append(generate_representation(rectangleRepresentation, demo_pairs, actionsRER))
+        #possibleSolutionRep.append(generate_representation(figureRepresentation, demo_pairs, actionsFR))
+        possibleSolutionRep.append(generate_representation(borderRepresentation, demo_pairs, actionsBR))
         #rappresentazionePixelColore
         #rappresentazioneColonneColore
         #rappresentazioneRigheColore
