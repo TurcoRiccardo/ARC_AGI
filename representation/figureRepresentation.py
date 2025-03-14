@@ -39,8 +39,7 @@ class figureRepresentation:
         self.nr = input_grid.shape[0]
         self.nc = input_grid.shape[1]
         self.figureList = list()
-        m = [1 for _ in range(0, self.nc)]
-        mask = [m.copy() for _ in range(0, self.nr)]
+        mask = np.ones((self.nr, self.nc), dtype=int)
         for x in range(0, self.nr):
             for y in range(0, self.nc):
                 if input_grid[x][y] != 0 and mask[x][y] == 1:

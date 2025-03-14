@@ -173,7 +173,7 @@ class Agent(ArcAgent):
         actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.equalColorFigure, figureRepresentation.addElementFigure, figureRepresentation.removeElementFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
-        actionsBR = []
+        actionsBR = [borderRepresentation.moveFigure, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
 
         possibleSolutionRep = list()
 
