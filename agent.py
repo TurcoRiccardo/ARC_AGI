@@ -127,12 +127,12 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
         population = population[:POPULATION_SIZE]
     #Validazione: applico la miglior serie di azioni al secondo esempio e trovo l'error rate
 
-    #print(population[0].fitness)
-    #print(population[0].genome.scoresc(rappresentationY))
-    #prediction = ArcIOPair(rappresentationX.rappToGrid(), rappresentationY.rappToGrid())
-    #prediction.plot(show=True, title=f"Input-Output")
-    #prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
-    #prediction.plot(show=True, title=f"Output-OutputGenerato")
+    print(population[0].fitness)
+    print(population[0].genome.scoresc(rappresentationY))
+    prediction = ArcIOPair(rappresentationX.rappToGrid(), rappresentationY.rappToGrid())
+    prediction.plot(show=True, title=f"Input-Output")
+    prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
+    prediction.plot(show=True, title=f"Output-OutputGenerato")
 
 
     #mi serve qualcosa che mi aiuta a generalizzare la lista di azioni-selettore ad altri esempi dello stesso problema
@@ -173,7 +173,7 @@ class Agent(ArcAgent):
         actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.equalColorFigure, figureRepresentation.addElementFigure, figureRepresentation.removeElementFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
-        actionsBR = [borderRepresentation.moveFigure, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
+        actionsBR = [borderRepresentation.moveFigure, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
 
         possibleSolutionRep = list()
 
