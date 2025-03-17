@@ -42,7 +42,7 @@ class PossibleSolution:
 class PossibleSolutionRepresentation:
     classe: classmethod
     list: List[PossibleSolution]
-    errTot: int
+    errAvg: int
     errMin: int
     indMin: int
 
@@ -127,12 +127,12 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
         population = population[:POPULATION_SIZE]
     #Validazione: applico la miglior serie di azioni al secondo esempio e trovo l'error rate
 
-    print(population[0].fitness)
-    print(population[0].genome.scoresc(rappresentationY))
-    prediction = ArcIOPair(rappresentationX.rappToGrid(), rappresentationY.rappToGrid())
-    prediction.plot(show=True, title=f"Input-Output")
-    prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
-    prediction.plot(show=True, title=f"Output-OutputGenerato")
+    #print(population[0].fitness)
+    #print(population[0].genome.scoresc(rappresentationY))
+    #prediction = ArcIOPair(rappresentationX.rappToGrid(), rappresentationY.rappToGrid())
+    #prediction.plot(show=True, title=f"Input-Output")
+    #prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
+    #prediction.plot(show=True, title=f"Output-OutputGenerato")
 
 
     #mi serve qualcosa che mi aiuta a generalizzare la lista di azioni-selettore ad altri esempi dello stesso problema
@@ -151,18 +151,20 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
 #svolgo le operazioni su tutte le combinazioni degli esempi ricevuti
 def generate_representation(rep, demo_pairs, act):
     possibleSolution = list()
-    errTot = 0
+    errAvg = 0
     errMin = 1000
     indMin = 0
+    c = 0
     for x in range(0, len(demo_pairs)):
         for y in range(0, len(demo_pairs)):
             if x != y:
                 possibleSolution.append(generate_representation_solution(rep, demo_pairs, act, x, y))
-                errTot += possibleSolution[-1].err
+                errAvg += possibleSolution[-1].err
                 if possibleSolution[-1].err < errMin:
                     errMin = possibleSolution[-1].err
                     indMin = len(possibleSolution) - 1
-    return PossibleSolutionRepresentation(rep, possibleSolution, errTot, errMin, indMin)
+                c += 1
+    return PossibleSolutionRepresentation(rep, possibleSolution, errAvg/c, errMin, indMin)
 
 #Classe in cui cerco la serie di azioni necessarie a risolvere il problema con un algoritmo evolutivo: addestro su esempio 1 e valido su esempio 2 e poi faccio viceversa
 class Agent(ArcAgent):
@@ -173,7 +175,7 @@ class Agent(ArcAgent):
         actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.equalColorFigure, figureRepresentation.addElementFigure, figureRepresentation.removeElementFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
-        actionsBR = [borderRepresentation.moveFigure, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
+        actionsBR = [borderRepresentation.moveFigure, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter2, borderRepresentation.changeColorCenter3, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
 
         possibleSolutionRep = list()
 
@@ -193,9 +195,9 @@ class Agent(ArcAgent):
 
         #scelgo la miglior soluzione in base all'error rate e la applico alla griglia in input di test
         outputs = []
-        possibleSolutionRep.sort(key=lambda i: i.errTot, reverse = False)
+        possibleSolutionRep.sort(key=lambda i: i.errAvg, reverse = False)
         print("Representation 1: " + str(possibleSolutionRep[0].classe))
-        print("Tot Error: " + str(possibleSolutionRep[0].errTot))
+        print("Avg Error: " + str(possibleSolutionRep[0].errAvg))
         print("Min Error: " + str(possibleSolutionRep[0].errMin))
         for x in range(0, len(test_grids)):
             rappInput = possibleSolutionRep[0].classe(copy.deepcopy(test_grids[x]))

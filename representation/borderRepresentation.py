@@ -119,6 +119,10 @@ class borderRepresentation:
                                 okMinY = 1
                         if okMaxX == 0 or okMinX == 0 or okMaxY == 0 or okMinY == 0:
                             fb.border.append(p1)
+                    #adding center colored pixel
+                    for p in pixel:
+                        if p not in fb.border:
+                            fb.center.append(p)
                     #creating a grid with border = 1, center colored pixel = 2, center pixel = 3
                     for p in fb.border:
                         fb.grid[p.x - fb.x][p.y - fb.y] = 1
@@ -128,11 +132,7 @@ class borderRepresentation:
                         for y in range(1, fb.grid.shape[1] - 1):
                             if fb.grid[x][y] == 0 and ricEscapeLine(fb.grid.copy(), x, y, 0) == 0:
                                 fb.grid[x][y] = 3
-                    #adding center colored pixel
-                    for p in pixel:
-                        if p not in fb.border:
-                            fb.center.append(p)
-                    #adding center pixel
+                    #adding center pixel empty
                     for x in range(0, fb.grid.shape[0]):
                         for y in range(0, fb.grid.shape[1]):
                             if fb.grid[x][y] == 3:
@@ -206,25 +206,42 @@ class borderRepresentation:
                     p.color -= 1
             return 0
         
-    #changes the color of the figure center index based on color
-    def changeColorCenter(self, s):
+    #changes the color of the pixel (2) in the center of the figure index based on color
+    def changeColorCenter2(self, s):
+        if len(self.borderList) == 0:
+            return 1
+        adapted_index = s.index % len(self.borderList)
+        if s.color % 2 == 0:
+            for p in self.borderList[adapted_index].center:
+                if p.color != 9 and self.borderList[adapted_index].grid[p.x - self.borderList[adapted_index].x][p.y - self.borderList[adapted_index].y] == 2:
+                    p.color += 1
+            return 0
+        else:
+            for p in self.borderList[adapted_index].center:
+                if p.color != 0 and self.borderList[adapted_index].grid[p.x - self.borderList[adapted_index].x][p.y - self.borderList[adapted_index].y] == 2:
+                    p.color -= 1
+            return 0
+        
+    #changes the color of the pixel (3) in the center of the figure index based on color
+    def changeColorCenter3(self, s):
         if len(self.borderList) == 0:
             return 1
         adapted_index = s.index % len(self.borderList)
         if s.color % 2 == 0:
             if self.borderList[adapted_index].centerColor != 9:
                 for p in self.borderList[adapted_index].center:
-                    if self.borderList[adapted_index].centerColor == p.color:
+                    if self.borderList[adapted_index].grid[p.x - self.borderList[adapted_index].x][p.y - self.borderList[adapted_index].y] == 3:
                         p.color += 1
                 self.borderList[adapted_index].centerColor += 1
-            return 0
+                return 0
         else:
-            if self.borderList[adapted_index].centerColor != 1:
+            if self.borderList[adapted_index].centerColor != 0:
                 for p in self.borderList[adapted_index].center:
-                    if self.borderList[adapted_index].centerColor == p.color:
+                    if self.borderList[adapted_index].grid[p.x - self.borderList[adapted_index].x][p.y - self.borderList[adapted_index].y] == 3:
                         p.color -= 1
                 self.borderList[adapted_index].centerColor -= 1
-            return 0
+                return 0
+        return 1
     
     #modify the pixel of the border component on the figure border index based on the direction
     def modifyBorderFigure(self, s):
@@ -263,13 +280,13 @@ class borderRepresentation:
                     xgrid = self.borderList[adapted_index].border[adapted_component].x - self.borderList[adapted_index].x
                     ygrid = self.borderList[adapted_index].border[adapted_component].y - self.borderList[adapted_index].y
                     grid = self.borderList[adapted_index].grid.copy()
-                    if xgrid+1 == self.borderList[adapted_index].grid.shape[0]:
-                        grid = np.vstack([self.borderList[adapted_index].grid, np.zeros((1, self.borderList[adapted_index].grid.shape[1]), dtype=int)])
+                    if xgrid+1 >= grid.shape[0]:
+                        grid = np.vstack([grid, np.zeros((1, grid.shape[1]), dtype=int)])
                     #modifico grid e center
                     grid[xgrid+1][ygrid] = 1
                     if ricEscapeLine(grid.copy(), xgrid, ygrid, 0) == 0:
                         grid[xgrid][ygrid] = 3
-                        self.borderList[adapted_index].grid = grid
+                        self.borderList[adapted_index].grid = grid.copy()
                         self.borderList[adapted_index].border[adapted_component].x += 1
                         self.borderList[adapted_index].center.append(PixelNode(self.borderList[adapted_index].border[adapted_component].x, self.borderList[adapted_index].border[adapted_component].y, self.borderList[adapted_index].centerColor))
                     else:
@@ -285,7 +302,7 @@ class borderRepresentation:
                                 ok = 1
                         if ok == 1:
                             return 1
-                        self.borderList[adapted_index].grid = grid
+                        self.borderList[adapted_index].grid = grid.copy()
                         self.borderList[adapted_index].border[adapted_component].x += 1
                         #riduco griglia se troppo grande
                         ok = 0
@@ -334,31 +351,35 @@ class borderRepresentation:
                     xgrid = self.borderList[adapted_index].border[adapted_component].x - self.borderList[adapted_index].x
                     ygrid = self.borderList[adapted_index].border[adapted_component].y - self.borderList[adapted_index].y
                     grid = self.borderList[adapted_index].grid.copy()
+                    isIncremented = 0
                     if xgrid == 0:
-                        self.borderList[adapted_index].x -= 1
-                        grid = np.vstack([np.zeros((1, self.borderList[adapted_index].grid.shape[1]), dtype=int), self.borderList[adapted_index].grid])
-                        xgrid += 1
+                        grid = np.vstack([np.zeros((1, grid.shape[1]), dtype=int), grid])
+                        isIncremented = 1
                     #modifico grid e center
-                    grid[xgrid-1][ygrid] = 1
-                    if ricEscapeLine(self.borderList[adapted_index].grid.copy(), xgrid, ygrid, 0) == 0:
-                        grid[xgrid][ygrid] = 3
-                        self.borderList[adapted_index].grid = grid
+                    grid[xgrid-1+isIncremented][ygrid] = 1
+                    if ricEscapeLine(grid.copy(), xgrid+isIncremented, ygrid, 0) == 0:
+                        grid[xgrid+isIncremented][ygrid] = 3
+                        if isIncremented == 1:
+                            self.borderList[adapted_index].x -= 1
+                        self.borderList[adapted_index].grid = grid.copy()
                         self.borderList[adapted_index].border[adapted_component].x -= 1
                         self.borderList[adapted_index].center.append(PixelNode(self.borderList[adapted_index].border[adapted_component].x, self.borderList[adapted_index].border[adapted_component].y, self.borderList[adapted_index].centerColor))
                     else:
                         #guardo se buca il bordo
                         ok = 0
-                        grid[xgrid][ygrid] = 0
+                        grid[xgrid+isIncremented][ygrid] = 0
                         controlGird = grid.copy()
                         for value in controlGird.flat:
                             if value != 1:
                                 value = 0
                         if len(self.borderList[adapted_index].center) > 0:
-                            if ricEscapeLine(controlGird, self.borderList[adapted_index].center[0].x - self.borderList[adapted_index].x, self.borderList[adapted_index].center[0].y - self.borderList[adapted_index].y, 0) != 0:
+                            if ricEscapeLine(controlGird, self.borderList[adapted_index].center[0].x - self.borderList[adapted_index].x+isIncremented, self.borderList[adapted_index].center[0].y - self.borderList[adapted_index].y, 0) != 0:
                                 ok = 1
                         if ok == 1:
                             return 1
-                        self.borderList[adapted_index].grid = grid
+                        if isIncremented == 1:
+                            self.borderList[adapted_index].x -= 1
+                        self.borderList[adapted_index].grid = grid.copy()
                         self.borderList[adapted_index].border[adapted_component].x -= 1
                         #riduco griglia se troppo grande
                         ok = 0
@@ -406,13 +427,13 @@ class borderRepresentation:
                     xgrid = self.borderList[adapted_index].border[adapted_component].x - self.borderList[adapted_index].x
                     ygrid = self.borderList[adapted_index].border[adapted_component].y - self.borderList[adapted_index].y
                     grid = self.borderList[adapted_index].grid.copy()
-                    if ygrid+1 >= self.borderList[adapted_index].grid.shape[1]:
-                        grid = np.hstack([self.borderList[adapted_index].grid, np.zeros((1, self.borderList[adapted_index].grid.shape[0]), dtype=int).reshape(self.borderList[adapted_index].grid.shape[0], 1)])
+                    if ygrid+1 >= grid.shape[1]:
+                        grid = np.hstack([grid, np.zeros((1, grid.shape[0]), dtype=int).reshape(grid.shape[0], 1)])
                     #modifico grid e center
                     grid[xgrid][ygrid+1] = 1
                     if ricEscapeLine(grid.copy(), xgrid, ygrid, 0) == 0:
                         grid[xgrid][ygrid] = 3
-                        self.borderList[adapted_index].grid = grid
+                        self.borderList[adapted_index].grid = grid.copy()
                         self.borderList[adapted_index].border[adapted_component].y += 1
                         self.borderList[adapted_index].center.append(PixelNode(self.borderList[adapted_index].border[adapted_component].x, self.borderList[adapted_index].border[adapted_component].y, self.borderList[adapted_index].centerColor))
                     else:
@@ -428,7 +449,7 @@ class borderRepresentation:
                                 ok = 1
                         if ok == 1:
                             return 1
-                        self.borderList[adapted_index].grid = grid
+                        self.borderList[adapted_index].grid = grid.copy()
                         self.borderList[adapted_index].border[adapted_component].y += 1
                         #riduco griglia se troppo grande
                         ok = 0
@@ -477,31 +498,35 @@ class borderRepresentation:
                     xgrid = self.borderList[adapted_index].border[adapted_component].x - self.borderList[adapted_index].x
                     ygrid = self.borderList[adapted_index].border[adapted_component].y - self.borderList[adapted_index].y
                     grid = self.borderList[adapted_index].grid.copy()
+                    isIncremented = 0
                     if ygrid == 0:
-                        self.borderList[adapted_index].y -= 1
-                        grid = np.hstack([np.zeros((1, self.borderList[adapted_index].grid.shape[0]), dtype=int).reshape(self.borderList[adapted_index].grid.shape[0], 1), self.borderList[adapted_index].grid])
-                        ygrid += 1
+                        grid = np.hstack([np.zeros((1, grid.shape[0]), dtype=int).reshape(grid.shape[0], 1), grid])
+                        isIncremented =  1
                     #modifico grid e center
-                    grid[xgrid][ygrid-1] = 1
-                    if ricEscapeLine(self.borderList[adapted_index].grid.copy(), xgrid, ygrid, 0) == 0:
-                        grid[xgrid][ygrid] = 3
-                        self.borderList[adapted_index].grid = grid
+                    grid[xgrid][ygrid-1+isIncremented] = 1
+                    if ricEscapeLine(grid.copy(), xgrid, ygrid+isIncremented, 0) == 0:
+                        grid[xgrid][ygrid+isIncremented] = 3
+                        if isIncremented == 1:
+                            self.borderList[adapted_index].y -= 1
+                        self.borderList[adapted_index].grid = grid.copy()
                         self.borderList[adapted_index].border[adapted_component].y -= 1
                         self.borderList[adapted_index].center.append(PixelNode(self.borderList[adapted_index].border[adapted_component].x, self.borderList[adapted_index].border[adapted_component].y, self.borderList[adapted_index].centerColor))
                     else:
                         #guardo se buca il bordo
                         ok = 0
-                        grid[xgrid][ygrid] = 0
+                        grid[xgrid][ygrid+isIncremented] = 0
                         controlGird = grid.copy()
                         for value in controlGird.flat:
                             if value != 1:
                                 value = 0
                         if len(self.borderList[adapted_index].center) > 0:
-                            if ricEscapeLine(controlGird, self.borderList[adapted_index].center[0].x - self.borderList[adapted_index].x, self.borderList[adapted_index].center[0].y - self.borderList[adapted_index].y, 0) != 0:
+                            if ricEscapeLine(controlGird, self.borderList[adapted_index].center[0].x - self.borderList[adapted_index].x, self.borderList[adapted_index].center[0].y - self.borderList[adapted_index].y+isIncremented, 0) != 0:
                                 ok = 1
                         if ok == 1:
                             return 1
-                        self.borderList[adapted_index].grid = grid
+                        if isIncremented == 1:
+                            self.borderList[adapted_index].y -= 1
+                        self.borderList[adapted_index].grid = grid.copy()
                         self.borderList[adapted_index].border[adapted_component].y -= 1
                         #riduco griglia se troppo grande
                         ok = 0
