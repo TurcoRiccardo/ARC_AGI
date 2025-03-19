@@ -674,60 +674,8 @@ class borderRepresentation:
                 score += len(self.borderList[z].center)
         if len(output.borderList) - len(self.borderList) > 0:
             for z in range(len(self.borderList), len(output.borderList)):
-                score += len(self.borderList[z].border)
-                score += len(self.borderList[z].center)
-        return -score
-
-    def scoresc(self, output):
-        score = abs(output.nr - self.nr)*min(self.nc, output.nc)*2 + abs(output.nc - self.nc)*min(self.nr,  output.nr)*2 + abs(output.nr - self.nr)*abs(output.nc - self.nc)*2
-        print("start")
-        print(score)
-        print(self.borderList)
-        for z in range(0, len(self.borderList)):
-            if z < len(output.borderList):
-                #penalita distanza
-                score += abs(int(self.borderList[z].x) - int(output.borderList[z].x))/10 + abs(int(self.borderList[z].y) - int(output.borderList[z].y))/10
-                #Verifica se due figure hanno la stessa dimensione
-                score += abs(output.borderList[z].grid.shape[0] - self.borderList[z].grid.shape[0])*min(self.borderList[z].grid.shape[1], output.borderList[z].grid.shape[1]) + abs(output.borderList[z].grid.shape[1] - self.borderList[z].grid.shape[1])*min(self.borderList[z].grid.shape[0],  output.borderList[z].grid.shape[0]) + abs(output.borderList[z].grid.shape[0] - self.borderList[z].grid.shape[0])*abs(output.borderList[z].grid.shape[1] - self.borderList[z].grid.shape[1])
-                #penalita colore bordi
-                pxmask = [1 for _ in range(0, len(self.borderList[z].border))]
-                pymask = [1 for _ in range(0, len(output.borderList[z].border))]
-                colorPenality = 0
-                cx = 0
-                for px in self.borderList[z].border:
-                    cy = 0
-                    for py in output.borderList[z].border:
-                        if (px.x - self.borderList[z].x) == (py.x - output.borderList[z].x) and (px.y - self.borderList[z].y) == (py.y - output.borderList[z].y) and pymask[cy] == 1:
-                            colorPenality += abs(int(px.color) - int(py.color))/10
-                            pxmask[cx] = 0
-                            pymask[cy] = 0
-                            break
-                        cy += 1
-                    cx += 1
-                score += colorPenality + sum(pxmask) + sum(pymask)
-                #penalita colore centro
-                pxmask = [1 for _ in range(0, len(self.borderList[z].center))]
-                pymask = [1 for _ in range(0, len(output.borderList[z].center))]
-                colorPenality = 0
-                cx = 0
-                for px in self.borderList[z].center:
-                    cy = 0
-                    for py in output.borderList[z].center:
-                        if (px.x - self.borderList[z].x) == (py.x - output.borderList[z].x) and (px.y - self.borderList[z].y) == (py.y - output.borderList[z].y) and pymask[cy] == 1:
-                            colorPenality += abs(int(px.color) - int(py.color))/10
-                            pxmask[cx] = 0
-                            pymask[cy] = 0
-                            break
-                        cy += 1
-                    cx += 1
-                score += colorPenality + sum(pxmask) + sum(pymask)
-            else:
-                score += len(self.borderList[z].border)
-                score += len(self.borderList[z].center)
-        if len(output.borderList) - len(self.borderList) > 0:
-            for z in range(len(self.borderList), len(output.borderList)):
-                score += len(self.borderList[z].border)
-                score += len(self.borderList[z].center)
+                score += len(output.borderList[z].border)
+                score += len(output.borderList[z].center)
         return -score
 
     def rappToGrid(self):

@@ -8,6 +8,7 @@ from typing import List
 from dataclasses import dataclass
 import copy
 from selection.selector import Selector
+from concurrent.futures import ProcessPoolExecutor
 
 from representation.pixelRepresentation import pixelRepresentation
 from representation.rowRepresentation import rowRepresentation
@@ -128,7 +129,7 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
     #Validazione: applico la miglior serie di azioni al secondo esempio e trovo l'error rate
 
     #print(population[0].fitness)
-    #print(population[0].genome.scoresc(rappresentationY))
+    #print(population[0].genome.score(rappresentationY))
     #prediction = ArcIOPair(rappresentationX.rappToGrid(), rappresentationY.rappToGrid())
     #prediction.plot(show=True, title=f"Input-Output")
     #prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
@@ -137,6 +138,24 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
 
     #mi serve qualcosa che mi aiuta a generalizzare la lista di azioni-selettore ad altri esempi dello stesso problema
     #posso provare ad utilizzare un algoritmo evolutivo con mutazioni solo sul selettore e la possibilita di dupricare o cancellare coppie azioni-selettore
+
+    new_action = list()
+    num_element = rappresentationX.getNElement()
+    #mask = [[0 for _ in range(0, num_element)] for _ in range(0, len(population[0].performed_actions))]
+    #print(mask)
+    #for x in range(0, len(population[0].performed_actions)):
+        #act
+
+        #for y in range(0, len(population[0].performed_actions)):
+
+        #population[0].performed_actions[x]
+
+        #action(rappresentationX, population[0].performed_selection[c])
+        #c += 1
+
+
+
+
 
     rappresentationX = rep(demo_pairs[i2].x)
     c = 0
@@ -155,8 +174,9 @@ def generate_representation(rep, demo_pairs, act):
     errMin = 1000
     indMin = 0
     c = 0
-    for x in range(0, len(demo_pairs)):
-        for y in range(0, len(demo_pairs)):
+    #len(demo_pairs)
+    for x in range(0, 2):
+        for y in range(0, 2):
             if x != y:
                 possibleSolution.append(generate_representation_solution(rep, demo_pairs, act, x, y))
                 errAvg += possibleSolution[-1].err
@@ -176,27 +196,30 @@ class Agent(ArcAgent):
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.equalColorFigure, figureRepresentation.addElementFigure, figureRepresentation.removeElementFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
         actionsBR = [borderRepresentation.moveFigure, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter2, borderRepresentation.changeColorCenter3, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
-
-        possibleSolutionRep = list()
-
-        #possibleSolutionRep.append(generate_representation(pixelRepresentation, demo_pairs, actionsPR))
-        #possibleSolutionRep.append(generate_representation(rowRepresentation, demo_pairs, actionsRR))
-        #possibleSolutionRep.append(generate_representation(columnsRepresentation, demo_pairs, actionsCR))
-        #possibleSolutionRep.append(generate_representation(colorLayerRepresentation, demo_pairs, actionsCLR))
-        #possibleSolutionRep.append(generate_representation(rectangleRepresentation, demo_pairs, actionsRER))
-        #possibleSolutionRep.append(generate_representation(figureRepresentation, demo_pairs, actionsFR))
-        possibleSolutionRep.append(generate_representation(borderRepresentation, demo_pairs, actionsBR))
         #rappresentazionePixelColore
         #rappresentazioneColonneColore
         #rappresentazioneRigheColore
         #rappresentazioneColoreLine
         #rappresentazioneColoreSquare
+        possibleSolutionRep = list()
+        reps = [
+            (pixelRepresentation, actionsPR),
+            (rowRepresentation, actionsRR),
+            (columnsRepresentation, actionsCR),
+            (colorLayerRepresentation, actionsCLR),
+            (rectangleRepresentation, actionsRER),
+            (figureRepresentation, actionsFR),
+            #(borderRepresentation, actionsBR)
+        ]
 
+        with ProcessPoolExecutor() as executor:
+            futures = [executor.submit(generate_representation, rep, demo_pairs, actions) for rep, actions in reps]
+            possibleSolutionRep = [f.result() for f in futures]
 
         #scelgo la miglior soluzione in base all'error rate e la applico alla griglia in input di test
         outputs = []
         possibleSolutionRep.sort(key=lambda i: i.errAvg, reverse = False)
-        print("Representation 1: " + str(possibleSolutionRep[0].classe))
+        print("\nRepresentation: " + str(possibleSolutionRep[0].classe))
         print("Avg Error: " + str(possibleSolutionRep[0].errAvg))
         print("Min Error: " + str(possibleSolutionRep[0].errMin))
         for x in range(0, len(test_grids)):
