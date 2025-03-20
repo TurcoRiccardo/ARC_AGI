@@ -78,6 +78,73 @@ class pixelRepresentation:
                     return 0
         return 1
 
+    #moves the pixel of the same color index if possible based on the direction
+    def moveColoredPixel(self, s):
+        if len(self.pixelList) == 0:
+            return 1
+        adapted_index = s.index % len(self.pixelList)
+        if (s.direction % 4) == 0:
+            #down
+            c = 0
+            for pixel in self.pixelList.sort(key=lambda node: node.x, reverse=True):
+                if pixel.color == s.color and pixel.x + 1 < self.nr:
+                    ok = 0
+                    for p in self.pixelList:
+                        if pixel.x + 1 == p.x and pixel.y == p.y:
+                            ok = 1
+                        break
+                    if ok == 0:
+                        pixel.x += 1
+                        c += 1
+            if c > 0:
+                return 0
+        elif (s.direction % 4) == 1:
+            #up
+            c = 0
+            for pixel in self.pixelList:
+                if pixel.color == s.color and pixel.x > 0:
+                    ok = 0
+                    for p in self.pixelList:
+                        if pixel.x - 1 == p.x and pixel.y == p.y:
+                            ok = 1
+                        break
+                    if ok == 0:
+                        pixel.x -= 1
+                        c += 1
+            if c > 0:
+                return 0
+        elif (s.direction % 4) == 2:
+            #right
+            c = 0
+            for pixel in self.pixelList.sort(key=lambda node: node.y, reverse=True):
+                if pixel.color == s.color and pixel.y + 1 < self.nc:
+                    ok = 0
+                    for p in self.pixelList:
+                        if pixel.x == p.x and pixel.y + 1 == p.y:
+                            ok = 1
+                        break
+                    if ok == 0:
+                        pixel.y += 1
+                        c += 1
+            if c > 0:
+                return 0
+        elif (s.direction % 4) == 3:
+            #left
+            c = 0
+            for pixel in self.pixelList:
+                if pixel.color == s.color and pixel.y > 0:
+                    ok = 0
+                    for p in self.pixelList:
+                        if pixel.x == p.x and pixel.y - 1 == p.y:
+                            ok = 1
+                        break
+                    if ok == 0:
+                        pixel.y -= 1
+                        c += 1
+            if c > 0:
+                return 0
+        return 1
+
     #changes the color of the pixel index based on color
     def changeColorPixel(self, s):
         if len(self.pixelList) == 0:
@@ -265,3 +332,44 @@ class pixelRepresentation:
         for pixel in self.pixelList:
             grid[pixel.x][pixel.y] = pixel.color
         return grid
+    
+    def optimizer(performed_actions, performed_selection):
+        new_selection = list()
+        new_action = list()
+        mask = [1 for _ in range(0, len(performed_actions))]
+        for x in range(0, len(performed_actions)):
+            if performed_actions[x] == pixelRepresentation.changeColorPixel and mask[x] == 1:
+                #changeColorPixel of a removePixel
+                indexController = 0
+                for y in range(x, len(performed_actions)):
+                    if performed_actions[y] == pixelRepresentation.removePixel:
+                        if performed_selection[y].index < performed_selection[x].index + indexController:
+                            indexController -= 1
+                        elif performed_selection[x].index + indexController == performed_selection[y].index:
+                            mask[x] = 0
+                            break
+            
+
+
+
+
+            '''
+            for y in range(0, len(performed_actions)):
+                if performed_actions[x] == pixelRepresentation.changeColorPixel and performed_actions[y] == pixelRepresentation.changeColorPixel and mask[x] == 1 and mask[y] == 1:
+                    #double changeColorPixel
+                    if performed_selection[x].index == performed_selection[y].index and performed_selection[x].color % 2 != performed_selection[y].color % 2:
+                        #index si muove se duplico o rimuovo pixel
+                        
+                        mask[x] = 0
+                        mask[y] = 0
+                elif performed_actions[x] == pixelRepresentation.removePixel and performed_actions[y] == pixelRepresentation.changeColorPixel and mask[x] == 1 and mask[y] == 1:
+                    #changeColorPixel of a removePixel
+                    if performed_selection[x].index == performed_selection[y].index:
+                        mask[y] = 0
+            '''
+
+            if mask[x] == 1:
+                new_selection.append(performed_selection[x])
+                new_action.append(performed_actions[x])
+        return new_action, new_selection
+    

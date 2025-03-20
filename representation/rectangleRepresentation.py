@@ -299,7 +299,12 @@ class rectangleRepresentation:
                 #distanza tra le h piu distanza tra le w
                 score += abs(self.rectangleList[z].h - output.rectangleList[z].h) + abs(self.rectangleList[z].w - output.rectangleList[z].w)
                 #distanza tra il colore
-                score += abs(int(self.rectangleList[z].color) - int(output.rectangleList[z].color))
+                if self.rectangleList[z].color != 0 and output.rectangleList[z].color != 0:
+                    score += abs(int(self.rectangleList[z].color) - int(output.rectangleList[z].color))
+                elif self.rectangleList[z].color == 0 and output.rectangleList[z].color == 0:
+                    score += 0
+                else:
+                    score += 1
             else:
                 score += self.rectangleList[z].h * self.rectangleList[z].w
         if len(output.rectangleList) - len(self.rectangleList) > 0:

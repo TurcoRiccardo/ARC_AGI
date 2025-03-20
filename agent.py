@@ -26,7 +26,6 @@ MAX_GENERATIONS = 2000
 @dataclass
 class Individual:
     genome: object
-    available_actions: list
     performed_selection: list
     performed_actions: list
     fitness: tuple = (None, 0)
@@ -51,12 +50,12 @@ def parent_selection(population):
     candidates = sorted(np.random.choice(population, 2), key=lambda e: e.fitness, reverse = True)
     return candidates[0]
     
-def mutation(p: Individual):
+def mutation(p: Individual, available_actions):
     new_gen = copy.deepcopy(p.genome)
     for _ in range(0, 10):
         #take a random action
-        x = np.random.randint(0, len(p.available_actions))
-        action = p.available_actions[x]
+        x = np.random.randint(0, len(available_actions))
+        action = available_actions[x]
         #generate a new selector
         index = 0
         component = 0
@@ -64,7 +63,7 @@ def mutation(p: Individual):
             index = np.random.randint(0, p.genome.getNElement())
             if p.genome.getElementComponent(index) != 0:
                 component = np.random.randint(0, p.genome.getElementComponent(index))
-        color = np.random.randint(0, 1)
+        color = np.random.randint(1, 10)
         direction = np.random.randint(0, 4)
         s = Selector(index, component, color, direction)
         #execute the action with the selector
@@ -75,7 +74,7 @@ def mutation(p: Individual):
     new_selection.append(s)
     new_paction = p.performed_actions.copy()
     new_paction.append(action)
-    return Individual(new_gen, p.available_actions, new_selection, new_paction)
+    return Individual(new_gen, new_selection, new_paction)
 
 #Classe in cui calcolo l'error rate semplicemente confrontando la grizioa di input e quella di output ed ogni differenza conta 1
 def error_rate(input: ArcGrid, output: ArcGrid):
@@ -110,14 +109,18 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
     rappresentationX = rep(demo_pairs[i1].x)
     rappresentationY = rep(demo_pairs[i1].y)
     population = list()
-    population.append(Individual(copy.deepcopy(rappresentationX), act, [], [], (rappresentationX.score(rappresentationY), 0)))
-    population.append(Individual(copy.deepcopy(rappresentationX), act, [], [], (rappresentationX.score(rappresentationY), 0)))
+    population.append(Individual(copy.deepcopy(rappresentationX), [], [], (rappresentationX.score(rappresentationY), 0)))
+    population.append(Individual(copy.deepcopy(rappresentationX), [], [], (rappresentationX.score(rappresentationY), 0)))
+    action = act[0]
     for _ in range(MAX_GENERATIONS):
         #genero gli offspring
         offspring = list()
+        #prima uso solo azioni grandi e poi passo ad azioni piu specifiche
+        if MAX_GENERATIONS > MAX_GENERATIONS/4:
+            action = act[1]
         for _ in range(OFFSPRING_SIZE):
             p = parent_selection(population)
-            o: Individual = mutation(p)
+            o: Individual = mutation(p, action)
             offspring.append(o)
         #valuto il genome calcolando fitness
         for i in offspring:
@@ -128,34 +131,34 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
         population = population[:POPULATION_SIZE]
     #Validazione: applico la miglior serie di azioni al secondo esempio e trovo l'error rate
 
-    #print(population[0].fitness)
-    #print(population[0].genome.score(rappresentationY))
-    #prediction = ArcIOPair(rappresentationX.rappToGrid(), rappresentationY.rappToGrid())
-    #prediction.plot(show=True, title=f"Input-Output")
-    #prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
-    #prediction.plot(show=True, title=f"Output-OutputGenerato")
+    #Optimizer: cerco di eliminare le azioni inutili
+    new_action, new_selection = pixelRepresentation.optimizer(population[0].performed_actions, population[0].performed_selection)
+    
+    print("vecchie nuove")
+    print(population[0].performed_actions)
+    print(len(population[0].performed_actions))
+    print(population[0].genome.score(rappresentationY))
+    
+    print("azioni nuove")
+    print(new_action)
+    print(len(new_action))
+    rapp = rep(demo_pairs[i1].x)
+    c = 0
+    for action in new_action:
+        action(rapp, new_selection[c])
+        c += 1
+    print(rapp.score(rappresentationY))
+
+    prediction = ArcIOPair(rappresentationX.rappToGrid(), rappresentationY.rappToGrid())
+    prediction.plot(show=True, title=f"Input-Output")
+    prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
+    prediction.plot(show=True, title=f"Output-OutputGenerato")
+    prediction = ArcIOPair(rappresentationY.rappToGrid(), rapp.rappToGrid())
+    prediction.plot(show=True, title=f"Output-new")
 
 
     #mi serve qualcosa che mi aiuta a generalizzare la lista di azioni-selettore ad altri esempi dello stesso problema
     #posso provare ad utilizzare un algoritmo evolutivo con mutazioni solo sul selettore e la possibilita di dupricare o cancellare coppie azioni-selettore
-
-    new_action = list()
-    num_element = rappresentationX.getNElement()
-    #mask = [[0 for _ in range(0, num_element)] for _ in range(0, len(population[0].performed_actions))]
-    #print(mask)
-    #for x in range(0, len(population[0].performed_actions)):
-        #act
-
-        #for y in range(0, len(population[0].performed_actions)):
-
-        #population[0].performed_actions[x]
-
-        #action(rappresentationX, population[0].performed_selection[c])
-        #c += 1
-
-
-
-
 
     rappresentationX = rep(demo_pairs[i2].x)
     c = 0
@@ -189,7 +192,7 @@ def generate_representation(rep, demo_pairs, act):
 #Classe in cui cerco la serie di azioni necessarie a risolvere il problema con un algoritmo evolutivo: addestro su esempio 1 e valido su esempio 2 e poi faccio viceversa
 class Agent(ArcAgent):
     def predict(self, demo_pairs: List[ArcIOPair], test_grids: List[ArcGrid]) -> List[ArcPrediction]:
-        actionsPR = [pixelRepresentation.movePixel, pixelRepresentation.changeColorPixel, pixelRepresentation.removePixel, pixelRepresentation.duplicateNearPixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid]
+        actionsPR = [[pixelRepresentation.moveColoredPixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid], [pixelRepresentation.movePixel, pixelRepresentation.changeColorPixel, pixelRepresentation.removePixel, pixelRepresentation.duplicateNearPixel]]
         actionsRR = [rowRepresentation.moveRiga, rowRepresentation.changeColorRiga, rowRepresentation.modifyRigaAdd, rowRepresentation.modifyRigaDel, rowRepresentation.modifyRigaMove, rowRepresentation.expandGrid, rowRepresentation.reduceGrid]
         actionsCR = [columnsRepresentation.moveColonna, columnsRepresentation.changeColorColonna, columnsRepresentation.modifyColonnaAdd, columnsRepresentation.modifyColonnaDel, columnsRepresentation.modifyColonnaMove, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
         actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
@@ -204,11 +207,11 @@ class Agent(ArcAgent):
         possibleSolutionRep = list()
         reps = [
             (pixelRepresentation, actionsPR),
-            (rowRepresentation, actionsRR),
-            (columnsRepresentation, actionsCR),
-            (colorLayerRepresentation, actionsCLR),
-            (rectangleRepresentation, actionsRER),
-            (figureRepresentation, actionsFR),
+            #(rowRepresentation, actionsRR),
+            #(columnsRepresentation, actionsCR),
+            #(colorLayerRepresentation, actionsCLR),
+            #(rectangleRepresentation, actionsRER),
+            #(figureRepresentation, actionsFR),
             #(borderRepresentation, actionsBR)
         ]
 
