@@ -82,11 +82,10 @@ class pixelRepresentation:
     def moveColoredPixel(self, s):
         if len(self.pixelList) == 0:
             return 1
-        adapted_index = s.index % len(self.pixelList)
         if (s.direction % 4) == 0:
             #down
             c = 0
-            for pixel in self.pixelList.sort(key=lambda node: node.x, reverse=True):
+            for pixel in sorted(self.pixelList, key=lambda p: p.x, reverse=True):
                 if pixel.color == s.color and pixel.x + 1 < self.nr:
                     ok = 0
                     for p in self.pixelList:
@@ -116,7 +115,7 @@ class pixelRepresentation:
         elif (s.direction % 4) == 2:
             #right
             c = 0
-            for pixel in self.pixelList.sort(key=lambda node: node.y, reverse=True):
+            for pixel in sorted(self.pixelList, key=lambda p: p.y, reverse=True):
                 if pixel.color == s.color and pixel.y + 1 < self.nc:
                     ok = 0
                     for p in self.pixelList:
@@ -333,43 +332,33 @@ class pixelRepresentation:
             grid[pixel.x][pixel.y] = pixel.color
         return grid
     
-    def optimizer(performed_actions, performed_selection):
+    '''
+    def generalizer(performed_actions, performed_selection):
         new_selection = list()
         new_action = list()
         mask = [1 for _ in range(0, len(performed_actions))]
+        indexScale = list()
         for x in range(0, len(performed_actions)):
-            if performed_actions[x] == pixelRepresentation.changeColorPixel and mask[x] == 1:
-                #changeColorPixel of a removePixel
-                indexController = 0
-                for y in range(x, len(performed_actions)):
-                    if performed_actions[y] == pixelRepresentation.removePixel:
-                        if performed_selection[y].index < performed_selection[x].index + indexController:
-                            indexController -= 1
-                        elif performed_selection[x].index + indexController == performed_selection[y].index:
+            if performed_actions[x] == pixelRepresentation.removePixel:
+                indexScale.append((x, performed_selection[x].index))
+        for x in range(0, len(performed_actions)-1):
+            for y in range(x+1, len(performed_actions)):
+                if mask[x] == 1 and mask[y] == 1:
+                    if performed_actions[x] == pixelRepresentation.changeColorPixel and performed_actions[y] == pixelRepresentation.removePixel:
+                        #changeColorPixel of a removePixel
+                        modifier = 0
+                        for i in indexScale:
+                            if i[0] < y and i[0] > x and performed_selection[y].index >= i[1]:
+                                modifier += 1
+                        if performed_selection[x].index == performed_selection[y].index + modifier:
+
                             mask[x] = 0
                             break
-            
-
-
-
-
-            '''
-            for y in range(0, len(performed_actions)):
-                if performed_actions[x] == pixelRepresentation.changeColorPixel and performed_actions[y] == pixelRepresentation.changeColorPixel and mask[x] == 1 and mask[y] == 1:
-                    #double changeColorPixel
-                    if performed_selection[x].index == performed_selection[y].index and performed_selection[x].color % 2 != performed_selection[y].color % 2:
-                        #index si muove se duplico o rimuovo pixel
-                        
-                        mask[x] = 0
-                        mask[y] = 0
-                elif performed_actions[x] == pixelRepresentation.removePixel and performed_actions[y] == pixelRepresentation.changeColorPixel and mask[x] == 1 and mask[y] == 1:
-                    #changeColorPixel of a removePixel
-                    if performed_selection[x].index == performed_selection[y].index:
-                        mask[y] = 0
-            '''
-
             if mask[x] == 1:
                 new_selection.append(performed_selection[x])
                 new_action.append(performed_actions[x])
+        if mask[len(performed_actions)-1] == 1:
+            new_selection.append(performed_selection[len(performed_actions)-1])
+            new_action.append(performed_actions[len(performed_actions)-1])
         return new_action, new_selection
-    
+    '''

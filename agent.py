@@ -109,18 +109,14 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
     rappresentationX = rep(demo_pairs[i1].x)
     rappresentationY = rep(demo_pairs[i1].y)
     population = list()
-    population.append(Individual(copy.deepcopy(rappresentationX), [], [], (rappresentationX.score(rappresentationY), 0)))
-    population.append(Individual(copy.deepcopy(rappresentationX), [], [], (rappresentationX.score(rappresentationY), 0)))
-    action = act[0]
+    for _ in range(0, 10):
+        population.append(Individual(copy.deepcopy(rappresentationX), [], [], (rappresentationX.score(rappresentationY), 0)))
     for _ in range(MAX_GENERATIONS):
         #genero gli offspring
         offspring = list()
-        #prima uso solo azioni grandi e poi passo ad azioni piu specifiche
-        if MAX_GENERATIONS > MAX_GENERATIONS/4:
-            action = act[1]
         for _ in range(OFFSPRING_SIZE):
             p = parent_selection(population)
-            o: Individual = mutation(p, action)
+            o: Individual = mutation(p, act)
             offspring.append(o)
         #valuto il genome calcolando fitness
         for i in offspring:
@@ -129,37 +125,25 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
         population.extend(offspring)
         population.sort(key=lambda i: i.fitness, reverse = True)
         population = population[:POPULATION_SIZE]
-    #Validazione: applico la miglior serie di azioni al secondo esempio e trovo l'error rate
-
-    #Optimizer: cerco di eliminare le azioni inutili
-    new_action, new_selection = pixelRepresentation.optimizer(population[0].performed_actions, population[0].performed_selection)
     
-    print("vecchie nuove")
+    '''
+    print("azioni")
     print(population[0].performed_actions)
     print(len(population[0].performed_actions))
     print(population[0].genome.score(rappresentationY))
-    
-    print("azioni nuove")
-    print(new_action)
-    print(len(new_action))
-    rapp = rep(demo_pairs[i1].x)
-    c = 0
-    for action in new_action:
-        action(rapp, new_selection[c])
-        c += 1
-    print(rapp.score(rappresentationY))
-
     prediction = ArcIOPair(rappresentationX.rappToGrid(), rappresentationY.rappToGrid())
     prediction.plot(show=True, title=f"Input-Output")
     prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
-    prediction.plot(show=True, title=f"Output-OutputGenerato")
-    prediction = ArcIOPair(rappresentationY.rappToGrid(), rapp.rappToGrid())
-    prediction.plot(show=True, title=f"Output-new")
-
+    prediction.plot(show=True, title=f"Output-OutputGenerato")'
+    '''
 
     #mi serve qualcosa che mi aiuta a generalizzare la lista di azioni-selettore ad altri esempi dello stesso problema
     #posso provare ad utilizzare un algoritmo evolutivo con mutazioni solo sul selettore e la possibilita di dupricare o cancellare coppie azioni-selettore
+    #Generalizer: 
+    #new_action, new_selection = pixelRepresentation.generalizer(population[0].performed_actions, population[0].performed_selection)
 
+
+    #Validazione: applico la miglior serie di azioni al secondo esempio e trovo l'error rate
     rappresentationX = rep(demo_pairs[i2].x)
     c = 0
     for action in population[0].performed_actions:
@@ -192,26 +176,21 @@ def generate_representation(rep, demo_pairs, act):
 #Classe in cui cerco la serie di azioni necessarie a risolvere il problema con un algoritmo evolutivo: addestro su esempio 1 e valido su esempio 2 e poi faccio viceversa
 class Agent(ArcAgent):
     def predict(self, demo_pairs: List[ArcIOPair], test_grids: List[ArcGrid]) -> List[ArcPrediction]:
-        actionsPR = [[pixelRepresentation.moveColoredPixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid], [pixelRepresentation.movePixel, pixelRepresentation.changeColorPixel, pixelRepresentation.removePixel, pixelRepresentation.duplicateNearPixel]]
+        actionsPR = [pixelRepresentation.movePixel, pixelRepresentation.moveColoredPixel, pixelRepresentation.movePixel, pixelRepresentation.changeColorPixel, pixelRepresentation.removePixel, pixelRepresentation.duplicateNearPixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid]
         actionsRR = [rowRepresentation.moveRiga, rowRepresentation.changeColorRiga, rowRepresentation.modifyRigaAdd, rowRepresentation.modifyRigaDel, rowRepresentation.modifyRigaMove, rowRepresentation.expandGrid, rowRepresentation.reduceGrid]
         actionsCR = [columnsRepresentation.moveColonna, columnsRepresentation.changeColorColonna, columnsRepresentation.modifyColonnaAdd, columnsRepresentation.modifyColonnaDel, columnsRepresentation.modifyColonnaMove, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
         actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.equalColorFigure, figureRepresentation.addElementFigure, figureRepresentation.removeElementFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
         actionsBR = [borderRepresentation.moveFigure, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter2, borderRepresentation.changeColorCenter3, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
-        #rappresentazionePixelColore
-        #rappresentazioneColonneColore
-        #rappresentazioneRigheColore
-        #rappresentazioneColoreLine
-        #rappresentazioneColoreSquare
         possibleSolutionRep = list()
         reps = [
             (pixelRepresentation, actionsPR),
-            #(rowRepresentation, actionsRR),
-            #(columnsRepresentation, actionsCR),
-            #(colorLayerRepresentation, actionsCLR),
-            #(rectangleRepresentation, actionsRER),
-            #(figureRepresentation, actionsFR),
+            (rowRepresentation, actionsRR),
+            (columnsRepresentation, actionsCR),
+            (colorLayerRepresentation, actionsCLR),
+            (rectangleRepresentation, actionsRER),
+            (figureRepresentation, actionsFR),
             #(borderRepresentation, actionsBR)
         ]
 
