@@ -31,132 +31,98 @@ class pixelRepresentation:
     def movePixel(self, s):
         if len(self.pixelList) == 0:
             return 1
-        adapted_index = s.index % len(self.pixelList)
+        l = list()
+        count = 0
+        if s.allElement == 1:
+            l = [x for x in range(0, len(self.pixelList))]
+        elif s.allElement == 2:
+            for x in range(0, len(self.pixelList)):
+                if self.pixelList[x].color == s.color:
+                    l.append(x)
+        else:
+            l.append(s.index % len(self.pixelList))
         if (s.direction % 4) == 0:
-            if self.pixelList[adapted_index].x + 1 < self.nr:
-                #down
-                ok = 0
-                for pixel in self.pixelList:
-                    if self.pixelList[adapted_index].x + 1 == pixel.x and self.pixelList[adapted_index].y == pixel.y:
-                        ok = 1
-                        break
-                if ok == 0:
-                    self.pixelList[adapted_index].x += 1
-                    return 0
+            l.sort(key=lambda i: self.pixelList[i].x, reverse=True)
         elif (s.direction % 4) == 1:
-            if self.pixelList[adapted_index].x > 0:
-                #up
-                ok = 0
-                for pixel in self.pixelList:
-                    if self.pixelList[adapted_index].x - 1 == pixel.x and self.pixelList[adapted_index].y == pixel.y:
-                        ok = 1
-                        break
-                if ok == 0:
-                    self.pixelList[adapted_index].x -= 1
-                    return 0
+            l.sort(key=lambda i: self.pixelList[i].x, reverse=False)
         elif (s.direction % 4) == 2:
-            if self.pixelList[adapted_index].y + 1 < self.nc:
-                #right
-                ok = 0
-                for pixel in self.pixelList:
-                    if self.pixelList[adapted_index].x == pixel.x and self.pixelList[adapted_index].y + 1 == pixel.y:
-                        ok = 1
-                        break
-                if ok == 0:
-                    self.pixelList[adapted_index].y += 1
-                    return 0
+            l.sort(key=lambda i: self.pixelList[i].y, reverse=True)
         elif (s.direction % 4) == 3:
-            if self.pixelList[adapted_index].y > 0:
-                #left
-                ok = 0
-                for pixel in self.pixelList:
-                    if self.pixelList[adapted_index].x == pixel.x and self.pixelList[adapted_index].y - 1 == pixel.y:
-                        ok = 1
-                        break
-                if ok == 0:
-                    self.pixelList[adapted_index].y -= 1
-                    return 0
-        return 1
-
-    #moves the pixel of the same color index if possible based on the direction
-    def moveColoredPixel(self, s):
-        if len(self.pixelList) == 0:
-            return 1
-        if (s.direction % 4) == 0:
-            #down
-            c = 0
-            for pixel in sorted(self.pixelList, key=lambda p: p.x, reverse=True):
-                if pixel.color == s.color and pixel.x + 1 < self.nr:
+            l.sort(key=lambda i: self.pixelList[i].y, reverse=False)
+        for adapted_index in l:
+            if (s.direction % 4) == 0:
+                if self.pixelList[adapted_index].x + 1 < self.nr:
+                    #down
                     ok = 0
-                    for p in self.pixelList:
-                        if pixel.x + 1 == p.x and pixel.y == p.y:
+                    for pixel in self.pixelList:
+                        if self.pixelList[adapted_index].x + 1 == pixel.x and self.pixelList[adapted_index].y == pixel.y:
                             ok = 1
-                        break
+                            break
                     if ok == 0:
-                        pixel.x += 1
-                        c += 1
-            if c > 0:
-                return 0
-        elif (s.direction % 4) == 1:
-            #up
-            c = 0
-            for pixel in self.pixelList:
-                if pixel.color == s.color and pixel.x > 0:
+                        self.pixelList[adapted_index].x += 1
+                        return 0
+            elif (s.direction % 4) == 1:
+                if self.pixelList[adapted_index].x > 0:
+                    #up
                     ok = 0
-                    for p in self.pixelList:
-                        if pixel.x - 1 == p.x and pixel.y == p.y:
+                    for pixel in self.pixelList:
+                        if self.pixelList[adapted_index].x - 1 == pixel.x and self.pixelList[adapted_index].y == pixel.y:
                             ok = 1
-                        break
+                            break
                     if ok == 0:
-                        pixel.x -= 1
-                        c += 1
-            if c > 0:
-                return 0
-        elif (s.direction % 4) == 2:
-            #right
-            c = 0
-            for pixel in sorted(self.pixelList, key=lambda p: p.y, reverse=True):
-                if pixel.color == s.color and pixel.y + 1 < self.nc:
+                        self.pixelList[adapted_index].x -= 1
+                        return 0
+            elif (s.direction % 4) == 2:
+                if self.pixelList[adapted_index].y + 1 < self.nc:
+                    #right
                     ok = 0
-                    for p in self.pixelList:
-                        if pixel.x == p.x and pixel.y + 1 == p.y:
+                    for pixel in self.pixelList:
+                        if self.pixelList[adapted_index].x == pixel.x and self.pixelList[adapted_index].y + 1 == pixel.y:
                             ok = 1
-                        break
+                            break
                     if ok == 0:
-                        pixel.y += 1
-                        c += 1
-            if c > 0:
-                return 0
-        elif (s.direction % 4) == 3:
-            #left
-            c = 0
-            for pixel in self.pixelList:
-                if pixel.color == s.color and pixel.y > 0:
+                        self.pixelList[adapted_index].y += 1
+                        return 0
+            elif (s.direction % 4) == 3:
+                if self.pixelList[adapted_index].y > 0:
+                    #left
                     ok = 0
-                    for p in self.pixelList:
-                        if pixel.x == p.x and pixel.y - 1 == p.y:
+                    for pixel in self.pixelList:
+                        if self.pixelList[adapted_index].x == pixel.x and self.pixelList[adapted_index].y - 1 == pixel.y:
                             ok = 1
-                        break
+                            break
                     if ok == 0:
-                        pixel.y -= 1
-                        c += 1
-            if c > 0:
-                return 0
+                        self.pixelList[adapted_index].y -= 1
+                        return 0
+        if count != 0:
+            return 0
         return 1
 
     #changes the color of the pixel index based on color
     def changeColorPixel(self, s):
         if len(self.pixelList) == 0:
             return 1
-        adapted_index = s.index % len(self.pixelList)
-        if s.color % 2 == 0:
-            if self.pixelList[adapted_index].color != 9:
-                self.pixelList[adapted_index].color += 1
-                return 0
+        l = list()
+        count = 0
+        if s.allElement == 1:
+            l = [x for x in range(0, len(self.pixelList))]
+        elif s.allElement == 2:
+            for x in range(0, len(self.pixelList)):
+                if self.pixelList[x].color == s.color:
+                    l.append(x)
         else:
-            if self.pixelList[adapted_index].color != 1:
-                self.pixelList[adapted_index].color -= 1
-                return 0
+            l.append(s.index % len(self.pixelList))
+        for adapted_index in l:
+            if s.color % 2 == 0:
+                if self.pixelList[adapted_index].color != 9:
+                    self.pixelList[adapted_index].color += 1
+                    count += 1
+            else:
+                if self.pixelList[adapted_index].color != 1:
+                    self.pixelList[adapted_index].color -= 1
+                    count += 1
+        if count != 0:
+            return 0
         return 1
 
     #remove the pixel index
@@ -171,56 +137,68 @@ class pixelRepresentation:
     def duplicateNearPixel(self, s):
         if len(self.pixelList) == 0:
             return 1
-        adapted_index = s.index % len(self.pixelList)
-        new_pixel = PixelNode(self.pixelList[adapted_index].x, self.pixelList[adapted_index].y, self.pixelList[adapted_index].color)
-        if (s.direction % 4) == 0:
-            #down
-            if new_pixel.x + 1 < self.nr:
-                ok = 0
-                for pixel in self.pixelList:
-                    if new_pixel.x + 1 == pixel.x and new_pixel.y == pixel.y:
-                        ok = 1
-                        break
-                if ok == 0:
-                    new_pixel.x += 1
-                    self.pixelList.append(new_pixel)
-                    return 0
-        elif (s.direction % 4) == 1:
-            #up
-            if new_pixel.x > 0:
-                ok = 0
-                for pixel in self.pixelList:
-                    if new_pixel.x - 1 == pixel.x and new_pixel.y == pixel.y:
-                        ok = 1
-                        break
-                if ok == 0:
-                    new_pixel.x -= 1
-                    self.pixelList.append(new_pixel)
-                    return 0
-        elif (s.direction % 4) == 2:
-            #right
-            if new_pixel.y + 1 < self.nc:
-                ok = 0
-                for pixel in self.pixelList:
-                    if new_pixel.x == pixel.x and new_pixel.y + 1 == pixel.y:
-                        ok = 1
-                        break
-                if ok == 0:
-                    new_pixel.y += 1
-                    self.pixelList.append(new_pixel)
-                    return 0
-        elif (s.direction % 4) == 3:
-            #left
-            if new_pixel.y > 0:
-                ok = 0
-                for pixel in self.pixelList:
-                    if new_pixel.x == pixel.x and new_pixel.y - 1 == pixel.y:
-                        ok = 1
-                        break
-                if ok == 0:
-                    new_pixel.y -= 1
-                    self.pixelList.append(new_pixel)
-                    return 0
+        l = list()
+        count = 0
+        if s.allElement == 1:
+            l = [x for x in range(0, len(self.pixelList))]
+        elif s.allElement == 2:
+            for x in range(0, len(self.pixelList)):
+                if self.pixelList[x].color == s.color:
+                    l.append(x)
+        else:
+            l.append(s.index % len(self.pixelList))
+        for adapted_index in l:
+            new_pixel = PixelNode(self.pixelList[adapted_index].x, self.pixelList[adapted_index].y, self.pixelList[adapted_index].color)
+            if (s.direction % 4) == 0:
+                #down
+                if new_pixel.x + 1 < self.nr:
+                    ok = 0
+                    for pixel in self.pixelList:
+                        if new_pixel.x + 1 == pixel.x and new_pixel.y == pixel.y:
+                            ok = 1
+                            break
+                    if ok == 0:
+                        new_pixel.x += 1
+                        self.pixelList.append(new_pixel)
+                        count += 1
+            elif (s.direction % 4) == 1:
+                #up
+                if new_pixel.x > 0:
+                    ok = 0
+                    for pixel in self.pixelList:
+                        if new_pixel.x - 1 == pixel.x and new_pixel.y == pixel.y:
+                            ok = 1
+                            break
+                    if ok == 0:
+                        new_pixel.x -= 1
+                        self.pixelList.append(new_pixel)
+                        count += 1
+            elif (s.direction % 4) == 2:
+                #right
+                if new_pixel.y + 1 < self.nc:
+                    ok = 0
+                    for pixel in self.pixelList:
+                        if new_pixel.x == pixel.x and new_pixel.y + 1 == pixel.y:
+                            ok = 1
+                            break
+                    if ok == 0:
+                        new_pixel.y += 1
+                        self.pixelList.append(new_pixel)
+                        count += 1
+            elif (s.direction % 4) == 3:
+                #left
+                if new_pixel.y > 0:
+                    ok = 0
+                    for pixel in self.pixelList:
+                        if new_pixel.x == pixel.x and new_pixel.y - 1 == pixel.y:
+                            ok = 1
+                            break
+                    if ok == 0:
+                        new_pixel.y -= 1
+                        self.pixelList.append(new_pixel)
+                        count += 1
+        if count != 0:
+            return 0
         return 1
 
     #expand the grid in the direction direction
@@ -332,33 +310,14 @@ class pixelRepresentation:
             grid[pixel.x][pixel.y] = pixel.color
         return grid
     
-    '''
-    def generalizer(performed_actions, performed_selection):
-        new_selection = list()
-        new_action = list()
-        mask = [1 for _ in range(0, len(performed_actions))]
-        indexScale = list()
+    def scoreAction(performed_actions, performed_selection):
+        score = 0
         for x in range(0, len(performed_actions)):
-            if performed_actions[x] == pixelRepresentation.removePixel:
-                indexScale.append((x, performed_selection[x].index))
-        for x in range(0, len(performed_actions)-1):
-            for y in range(x+1, len(performed_actions)):
-                if mask[x] == 1 and mask[y] == 1:
-                    if performed_actions[x] == pixelRepresentation.changeColorPixel and performed_actions[y] == pixelRepresentation.removePixel:
-                        #changeColorPixel of a removePixel
-                        modifier = 0
-                        for i in indexScale:
-                            if i[0] < y and i[0] > x and performed_selection[y].index >= i[1]:
-                                modifier += 1
-                        if performed_selection[x].index == performed_selection[y].index + modifier:
-
-                            mask[x] = 0
-                            break
-            if mask[x] == 1:
-                new_selection.append(performed_selection[x])
-                new_action.append(performed_actions[x])
-        if mask[len(performed_actions)-1] == 1:
-            new_selection.append(performed_selection[len(performed_actions)-1])
-            new_action.append(performed_actions[len(performed_actions)-1])
-        return new_action, new_selection
-    '''
+            if performed_actions[x] == pixelRepresentation.duplicateNearPixel:
+                score += 0.7
+            elif performed_actions[x] == pixelRepresentation.removePixel:
+                score += 0.7
+            elif performed_selection[x].allElement == 0 and performed_actions[x] != pixelRepresentation.reduceGrid and  performed_actions[x] != pixelRepresentation.expandGrid:
+                score += 0.5
+            score += 1
+        return -score

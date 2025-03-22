@@ -7,7 +7,7 @@ from arc.evaluation import evaluate_agent
 from typing import List
 from dataclasses import dataclass
 import copy
-from selection.selector import Selector
+from selection.selector import Selector, generateNewSelector
 from concurrent.futures import ProcessPoolExecutor
 
 from representation.pixelRepresentation import pixelRepresentation
@@ -57,15 +57,7 @@ def mutation(p: Individual, available_actions):
         x = np.random.randint(0, len(available_actions))
         action = available_actions[x]
         #generate a new selector
-        index = 0
-        component = 0
-        if p.genome.getNElement() != 0:
-            index = np.random.randint(0, p.genome.getNElement())
-            if p.genome.getElementComponent(index) != 0:
-                component = np.random.randint(0, p.genome.getElementComponent(index))
-        color = np.random.randint(1, 10)
-        direction = np.random.randint(0, 4)
-        s = Selector(index, component, color, direction)
+        s = generateNewSelector(p.genome)
         #execute the action with the selector
         r = action(new_gen, s)
         if r == 0:
@@ -109,7 +101,7 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
     rappresentationX = rep(demo_pairs[i1].x)
     rappresentationY = rep(demo_pairs[i1].y)
     population = list()
-    for _ in range(0, 10):
+    for _ in range(0, POPULATION_SIZE//2):
         population.append(Individual(copy.deepcopy(rappresentationX), [], [], (rappresentationX.score(rappresentationY), 0)))
     for _ in range(MAX_GENERATIONS):
         #genero gli offspring
@@ -120,30 +112,31 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
             offspring.append(o)
         #valuto il genome calcolando fitness
         for i in offspring:
-            i.fitness = (i.genome.score(rappresentationY), -len(i.performed_actions))  
+            i.fitness = (i.genome.score(rappresentationY), rep.scoreAction(i.performed_actions, i.performed_selection))  
         #reinserisco gli offspring nella popolazione e tengo solo i primi POPULATION_SIZE individui
         population.extend(offspring)
         population.sort(key=lambda i: i.fitness, reverse = True)
         population = population[:POPULATION_SIZE]
     
-    '''
+    
     print("azioni")
     print(population[0].performed_actions)
+    print(population[0].performed_selection)
     print(len(population[0].performed_actions))
-    print(population[0].genome.score(rappresentationY))
+    print(population[0].fitness)
     prediction = ArcIOPair(rappresentationX.rappToGrid(), rappresentationY.rappToGrid())
     prediction.plot(show=True, title=f"Input-Output")
     prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
-    prediction.plot(show=True, title=f"Output-OutputGenerato")'
-    '''
+    prediction.plot(show=True, title=f"Output-OutputGenerato")
+    
 
     #mi serve qualcosa che mi aiuta a generalizzare la lista di azioni-selettore ad altri esempi dello stesso problema
     #posso provare ad utilizzare un algoritmo evolutivo con mutazioni solo sul selettore e la possibilita di dupricare o cancellare coppie azioni-selettore
     #Generalizer: 
-    #new_action, new_selection = pixelRepresentation.generalizer(population[0].performed_actions, population[0].performed_selection)
+    #new_action, new_selection = borderRepresentation.generalizer(population[0].performed_actions, population[0].performed_selection)
 
 
-    #Validazione: applico la miglior serie di azioni al secondo esempio e trovo l'error rate
+    ''#Validazione: applico la miglior serie di azioni al secondo esempio e trovo l'error rate
     rappresentationX = rep(demo_pairs[i2].x)
     c = 0
     for action in population[0].performed_actions:
@@ -173,10 +166,10 @@ def generate_representation(rep, demo_pairs, act):
                 c += 1
     return PossibleSolutionRepresentation(rep, possibleSolution, errAvg/c, errMin, indMin)
 
-#Classe in cui cerco la serie di azioni necessarie a risolvere il problema con un algoritmo evolutivo: addestro su esempio 1 e valido su esempio 2 e poi faccio viceversa
+#Classe in cui confronto i risultati ricevuti dalle varie rappresentazioni ed applico il migliore alla griglia di test
 class Agent(ArcAgent):
     def predict(self, demo_pairs: List[ArcIOPair], test_grids: List[ArcGrid]) -> List[ArcPrediction]:
-        actionsPR = [pixelRepresentation.movePixel, pixelRepresentation.moveColoredPixel, pixelRepresentation.movePixel, pixelRepresentation.changeColorPixel, pixelRepresentation.removePixel, pixelRepresentation.duplicateNearPixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid]
+        actionsPR = [pixelRepresentation.movePixel, pixelRepresentation.movePixel, pixelRepresentation.changeColorPixel, pixelRepresentation.removePixel, pixelRepresentation.duplicateNearPixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid]
         actionsRR = [rowRepresentation.moveRiga, rowRepresentation.changeColorRiga, rowRepresentation.modifyRigaAdd, rowRepresentation.modifyRigaDel, rowRepresentation.modifyRigaMove, rowRepresentation.expandGrid, rowRepresentation.reduceGrid]
         actionsCR = [columnsRepresentation.moveColonna, columnsRepresentation.changeColorColonna, columnsRepresentation.modifyColonnaAdd, columnsRepresentation.modifyColonnaDel, columnsRepresentation.modifyColonnaMove, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
         actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
@@ -186,11 +179,11 @@ class Agent(ArcAgent):
         possibleSolutionRep = list()
         reps = [
             (pixelRepresentation, actionsPR),
-            (rowRepresentation, actionsRR),
-            (columnsRepresentation, actionsCR),
-            (colorLayerRepresentation, actionsCLR),
-            (rectangleRepresentation, actionsRER),
-            (figureRepresentation, actionsFR),
+            #(rowRepresentation, actionsRR),
+            #(columnsRepresentation, actionsCR),
+            #(colorLayerRepresentation, actionsCLR),
+            #(rectangleRepresentation, actionsRER),
+            #(figureRepresentation, actionsFR),
             #(borderRepresentation, actionsBR)
         ]
 

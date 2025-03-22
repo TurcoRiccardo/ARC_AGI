@@ -59,11 +59,13 @@ def main(args):
         outs = agent.predict(prob.train_pairs, prob.test_inputs)
 
         i = 1
+        avg = 0
         #visualizzo soluzione del nostro agent
         for test_pair, predictions in zip(prob.test_pairs, outs):
             for p in predictions:
                 prediction = ArcIOPair(test_pair.x, p)
                 err = error_rate(test_pair.y, p)
+                avg += err
                 print("Error on the test: " + str(err))
                 if err == 0:
                     tsc += 1
@@ -73,6 +75,7 @@ def main(args):
         c += 1
     #statistiche sul test set
     print("number of tasks executed: " + str(c))
+    print("Average error per task: " + str(avg/c))
     print("Number of Task solved correctly: " + str(tsc))
 
 if __name__ == '__main__':
