@@ -136,7 +136,7 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
     #new_action, new_selection = borderRepresentation.generalizer(population[0].performed_actions, population[0].performed_selection)
 
 
-    ''#Validazione: applico la miglior serie di azioni al secondo esempio e trovo l'error rate
+    #Validazione: applico la miglior serie di azioni al secondo esempio e trovo l'error rate
     rappresentationX = rep(demo_pairs[i2].x)
     c = 0
     for action in population[0].performed_actions:

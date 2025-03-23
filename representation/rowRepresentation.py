@@ -24,98 +24,232 @@ class rowRepresentation:
 
     #moves the row index if possible based on the direction
     def moveRiga(self, s):
-        adapted_index = s.index % self.nr
-        if (s.direction % 4) == 0:
-            #sposto riga sopra
-            if adapted_index > 0:
-                rigaSopra = self.RigheList[adapted_index - 1]
-                self.RigheList[adapted_index - 1] = self.RigheList[adapted_index]
-                self.RigheList[adapted_index] = rigaSopra
-                return 0
-        elif (s.direction % 4) == 1:
-            #sposto riga sotto
-            if adapted_index + 1 < self.nr:
-                rigaSopra = self.RigheList[adapted_index]
-                self.RigheList[adapted_index] = self.RigheList[adapted_index + 1]
-                self.RigheList[adapted_index + 1] = rigaSopra
-                return 0
-        elif (s.direction % 4) == 2:
-            #scalo la riga verso destra
-            new_riga = list()
-            new_riga.append(self.RigheList[adapted_index][self.nc-1])
-            for x in range(0, self.nc-1):
-                new_riga.append(self.RigheList[adapted_index][x])
-            self.RigheList[adapted_index] = new_riga
-            return 0
-        elif (s.direction % 4) == 3:
-            #scalo la riga verso sinistra
-            new_riga = list()
-            for x in range(1, self.nc):
-                new_riga.append(self.RigheList[adapted_index][x])
-            new_riga.append(self.RigheList[adapted_index][0])
-            self.RigheList[adapted_index] = new_riga
+        l = list()
+        count = 0
+        if s.allElement == 1:
+            l = [x for x in range(0, self.nr)]
+        elif s.allElement == 2:
+            for x in range(0, self.nr):
+                color = 0
+                for p in self.RigheList[x]:
+                    if p != 0:
+                        color = p
+                if color == s.color:
+                    l.append(x)
+        else:
+            l.append(s.index % self.nr)
+        
+        
+        if (s.direction % 4) == 0 and s.allElement == 2 and len(l) > 1:
+            #sposto le righe colorate sotto    
+            l.sort(key=lambda i: i, reverse=False)
+            for x in range(0, len(l)-1):
+                if x + 1 < len(l):
+                    rigaSopra = self.RigheList[l[x]]
+                    self.RigheList[l[x]] = self.RigheList[l[x + 1]]
+                    self.RigheList[l[x + 1]] = rigaSopra
+                    count += 1
+                elif x + 1 == len(l):
+                    rigaSopra = self.RigheList[l[x]]
+                    self.RigheList[l[x]] = self.RigheList[l[0]]
+                    self.RigheList[l[0]] = rigaSopra
+                    count += 1
+        elif (s.direction % 4) == 1 and s.allElement == 2 and len(l) > 1:
+            #sposto le righe colorate sopra
+            l.sort(key=lambda i: i, reverse=True)
+            for x in range(0, len(l)-1):
+                if x > 0:
+                    rigaSopra = self.RigheList[l[x - 1]]
+                    self.RigheList[l[x - 1]] = self.RigheList[l[x]]
+                    self.RigheList[l[x]] = rigaSopra
+                    count += 1
+                elif x == 0:
+                    rigaSopra = self.RigheList[l[-1]]
+                    self.RigheList[l[-1]] = self.RigheList[l[x]]
+                    self.RigheList[l[x]] = rigaSopra
+                    count += 1
+        else:
+            if (s.direction % 4) == 0 and s.allElement == 1:
+                l.sort(key=lambda i: i, reverse=False)
+                l.pop(-1)
+            elif (s.direction % 4) == 1 and s.allElement == 1:
+                l.sort(key=lambda i: i, reverse=True)
+                l.pop(-1)
+            for adapted_index in l:
+                if (s.direction % 4) == 0:
+                    #sposto riga sotto
+                    if adapted_index + 1 < self.nr:
+                        rigaSopra = self.RigheList[adapted_index]
+                        self.RigheList[adapted_index] = self.RigheList[adapted_index + 1]
+                        self.RigheList[adapted_index + 1] = rigaSopra
+                        count += 1
+                    elif adapted_index + 1 == self.nr:
+                        rigaSopra = self.RigheList[0]
+                        self.RigheList[0] = self.RigheList[adapted_index]
+                        self.RigheList[adapted_index] = rigaSopra
+                        count += 1
+                elif (s.direction % 4) == 1:
+                    #sposto riga sopra
+                    if adapted_index > 0:
+                        rigaSopra = self.RigheList[adapted_index - 1]
+                        self.RigheList[adapted_index - 1] = self.RigheList[adapted_index]
+                        self.RigheList[adapted_index] = rigaSopra
+                        count += 1
+                    elif adapted_index == 0:
+                        rigaSopra = self.RigheList[self.nr - 1]
+                        self.RigheList[self.nr - 1] = self.RigheList[adapted_index]
+                        self.RigheList[adapted_index] = rigaSopra
+                        count += 1
+                elif (s.direction % 4) == 2:
+                    #scalo la riga verso destra
+                    new_riga = list()
+                    new_riga.append(self.RigheList[adapted_index][self.nc-1])
+                    for x in range(0, self.nc-1):
+                        new_riga.append(self.RigheList[adapted_index][x])
+                    self.RigheList[adapted_index] = new_riga
+                    count += 1
+                elif (s.direction % 4) == 3:
+                    #scalo la riga verso sinistra
+                    new_riga = list()
+                    for x in range(1, self.nc):
+                        new_riga.append(self.RigheList[adapted_index][x])
+                    new_riga.append(self.RigheList[adapted_index][0])
+                    self.RigheList[adapted_index] = new_riga
+                    count += 1
+        if count != 0:
             return 0
         return 1
 
     #changes the color of the colored pixel in the row index based on color
     def changeColorRiga(self, s):
-        adapted_index = s.index % self.nr
-        ok = 0
-        for element in self.RigheList[adapted_index]:
-            if element != 0:
-                if s.color % 2 == 0:
-                    if element != 9:
-                        element += 1
-                        ok = 1
-                else:
-                    if element != 1:
-                        element -= 1
-                        ok = 1
-        if ok == 1:
+        l = list()
+        count = 0
+        if s.allElement == 1:
+            l = [x for x in range(0, self.nr)]
+        elif s.allElement == 2:
+            for x in range(0, self.nr):
+                color = 0
+                for p in self.RigheList[x]:
+                    if p != 0:
+                        color = p
+                if color == s.color:
+                    l.append(x)
+        else:
+            l.append(s.index % self.nr)
+        for adapted_index in l:
+            for element in self.RigheList[adapted_index]:
+                if element != 0:
+                    if s.color % 2 == 0:
+                        if element != 9:
+                            element += 1
+                            count += 1
+                    else:
+                        if element != 1:
+                            element -= 1
+                            count += 1
+        if count != 0:
             return 0
         return 1
 
     #add a new colored pixel in the row index
     def modifyRigaAdd(self, s):
-        adapted_index = s.index % self.nr
+        l = list()
+        count = 0
+        if s.allElement == 1:
+            l = [x for x in range(0, self.nr)]
+        elif s.allElement == 2:
+            for x in range(0, self.nr):
+                color = 0
+                for p in self.RigheList[x]:
+                    if p != 0:
+                        color = p
+                if color == s.color:
+                    l.append(x)
+        else:
+            l.append(s.index % self.nr)
         adapted_component = s.component % self.nc
-        if self.RigheList[adapted_index][adapted_component] == 0:
-            color = 1
-            for p in self.RigheList[adapted_index]:
-                if p != 0:
-                    color = p
-                    break
-            self.RigheList[adapted_index][adapted_component] == color
+        for adapted_index in l:
+            if self.RigheList[adapted_index][adapted_component] == 0:
+                color = 1
+                for p in self.RigheList[adapted_index]:
+                    if p != 0:
+                        color = p
+                        break
+                self.RigheList[adapted_index][adapted_component] == color
+                count += 1
+        if count != 0:
             return 0
         return 1
         
     #delete a colored pixel in the row index
     def modifyRigaDel(self, s):
-        adapted_index = s.index % self.nr
+        l = list()
+        count = 0
+        if s.allElement == 1:
+            l = [x for x in range(0, self.nr)]
+        elif s.allElement == 2:
+            for x in range(0, self.nr):
+                color = 0
+                for p in self.RigheList[x]:
+                    if p != 0:
+                        color = p
+                if color == s.color:
+                    l.append(x)
+        else:
+            l.append(s.index % self.nr)
         adapted_component = s.component % self.nc
-        if self.RigheList[adapted_index][adapted_component] != 0:
-            self.RigheList[adapted_index][adapted_component] == 0
+        for adapted_index in l:
+            if self.RigheList[adapted_index][adapted_component] != 0:
+                self.RigheList[adapted_index][adapted_component] == 0
+                count += 1
+        if count != 0:
             return 0
         return 1
     
     #swap two pixel based on direction in the row index
     def modifyRigaMove(self, s):
-        adapted_index = s.index % self.nr
+        l = list()
+        count = 0
+        if s.allElement == 1:
+            l = [x for x in range(0, self.nr)]
+        elif s.allElement == 2:
+            for x in range(0, self.nr):
+                color = 0
+                for p in self.RigheList[x]:
+                    if p != 0:
+                        color = p
+                if color == s.color:
+                    l.append(x)
+        else:
+            l.append(s.index % self.nr)
         adapted_component = s.component % self.nc
-        if (s.direction % 2) == 0:
-            #swappo andando verso destra
-            if adapted_component + 1 < self.nc:
-                tmp = self.RigheList[adapted_index][adapted_component + 1]
-                self.RigheList[adapted_index][adapted_component + 1] = self.RigheList[adapted_index][adapted_component]
-                self.RigheList[adapted_index][adapted_component] = tmp
-                return 0
-        elif (s.direction % 2) == 1:
-            #swappo andando verso sinistra
-            if adapted_component - 1 >= 0:
-                tmp = self.RigheList[adapted_index][adapted_component - 1]
-                self.RigheList[adapted_index][adapted_component - 1] = self.RigheList[adapted_index][adapted_component]
-                self.RigheList[adapted_index][adapted_component] = tmp
-                return 0  
+        for adapted_index in l:
+            if (s.direction % 2) == 0:
+                #swappo andando verso destra
+                if adapted_component + 1 < self.nc:
+                    tmp = self.RigheList[adapted_index][adapted_component + 1]
+                    self.RigheList[adapted_index][adapted_component + 1] = self.RigheList[adapted_index][adapted_component]
+                    self.RigheList[adapted_index][adapted_component] = tmp
+                    count += 1
+                elif adapted_component + 1 == self.nc:
+                    tmp = self.RigheList[adapted_index][0]
+                    self.RigheList[adapted_index][0] = self.RigheList[adapted_index][adapted_component]
+                    self.RigheList[adapted_index][adapted_component] = tmp
+                    count += 1
+            elif (s.direction % 2) == 1:
+                #swappo andando verso sinistra
+                if adapted_component - 1 >= 0:
+                    tmp = self.RigheList[adapted_index][adapted_component - 1]
+                    self.RigheList[adapted_index][adapted_component - 1] = self.RigheList[adapted_index][adapted_component]
+                    self.RigheList[adapted_index][adapted_component] = tmp
+                    count += 1 
+                elif adapted_component == 0:
+                    tmp = self.RigheList[adapted_index][self.nc - 1]
+                    self.RigheList[adapted_index][self.nc - 1] = self.RigheList[adapted_index][adapted_component]
+                    self.RigheList[adapted_index][adapted_component] = tmp
+                    count += 1 
+        if count != 0:
+            return 0
         return 1
 
     #expand the grid in the direction direction
@@ -230,3 +364,11 @@ class rowRepresentation:
             for y in range(0, self.nc):
                 grid[x][y] = self.RigheList[x][y]
         return grid
+    
+    def scoreAction(performed_actions, performed_selection):
+        score = 0
+        for x in range(0, len(performed_actions)):
+            if performed_selection[x].allElement == 0:
+                score += 0.5
+            score += 1
+        return -score

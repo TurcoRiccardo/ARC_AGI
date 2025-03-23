@@ -60,7 +60,7 @@ class pixelRepresentation:
                             break
                     if ok == 0:
                         self.pixelList[adapted_index].x += 1
-                        return 0
+                        count += 1
             elif (s.direction % 4) == 1:
                 if self.pixelList[adapted_index].x > 0:
                     #up
@@ -71,7 +71,7 @@ class pixelRepresentation:
                             break
                     if ok == 0:
                         self.pixelList[adapted_index].x -= 1
-                        return 0
+                        count += 1
             elif (s.direction % 4) == 2:
                 if self.pixelList[adapted_index].y + 1 < self.nc:
                     #right
@@ -82,7 +82,7 @@ class pixelRepresentation:
                             break
                     if ok == 0:
                         self.pixelList[adapted_index].y += 1
-                        return 0
+                        count += 1
             elif (s.direction % 4) == 3:
                 if self.pixelList[adapted_index].y > 0:
                     #left
@@ -93,7 +93,7 @@ class pixelRepresentation:
                             break
                     if ok == 0:
                         self.pixelList[adapted_index].y -= 1
-                        return 0
+                        count += 1
         if count != 0:
             return 0
         return 1

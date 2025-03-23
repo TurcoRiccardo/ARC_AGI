@@ -24,98 +24,230 @@ class columnsRepresentation:
 
     #moves the column index if possible based on the direction
     def moveColonna(self, s):
-        adapted_index = s.index % self.nc
-        if (s.direction % 4) == 0:
-            #scalo la colonna verso l'alto
-            new_colonna = list()
-            for x in range(1, self.nr):
-                new_colonna.append(self.ColonneList[adapted_index][x])
-            new_colonna.append(self.ColonneList[adapted_index][0])
-            self.ColonneList[adapted_index] = new_colonna
+        l = list()
+        count = 0
+        if s.allElement == 1:
+            l = [y for y in range(0, self.nc)]
+        elif s.allElement == 2:
+            for y in range(0, self.nc):
+                color = 0
+                for p in self.ColonneList[y]:
+                    if p != 0:
+                        color = p
+                if color == s.color:
+                    l.append(y)
+        else:
+            l.append(s.index % self.nc)
+        if (s.direction % 4) == 2 and s.allElement == 2 and len(l) > 1:
+            #sposto le colonne colorate a destra    
+            l.sort(key=lambda i: i, reverse=True)
+            for x in range(0, len(l)-1):
+                if x + 1 < len(l):
+                    colonnaDestra = self.ColonneList[l[x + 1]]
+                    self.ColonneList[l[x + 1]] = self.ColonneList[l[x]]
+                    self.ColonneList[l[x]] = colonnaDestra
+                    count += 1
+                elif x + 1 == len(l):
+                    colonnaDestra = self.ColonneList[l[0]]
+                    self.ColonneList[l[0]] = self.ColonneList[l[x]]
+                    self.ColonneList[l[x]] = colonnaDestra
+                    count += 1
+        elif (s.direction % 4) == 3 and s.allElement == 2 and len(l) > 1:
+            #sposto le colonne colorate a sinista
+            l.sort(key=lambda i: i, reverse=False)
+            for x in range(0, len(l)-1):
+                if x > 0:
+                    colonnaDestra = self.ColonneList[l[x]]
+                    self.ColonneList[l[x]] = self.ColonneList[l[x - 1]]
+                    self.ColonneList[l[x - 1]] = colonnaDestra
+                    count += 1
+                elif x == 0:
+                    colonnaDestra = self.ColonneList[l[x]]
+                    self.ColonneList[l[x]] = self.ColonneList[l[-1]]
+                    self.ColonneList[l[-1]] = colonnaDestra
+                    count += 1
+        else:
+            if (s.direction % 4) == 2 and s.allElement == 1:
+                l.sort(key=lambda i: i, reverse=True)
+                l.pop(-1)
+            elif (s.direction % 4) == 3 and s.allElement == 1:
+                l.sort(key=lambda i: i, reverse=False)
+                l.pop(-1)
+            for adapted_index in l:
+                if (s.direction % 4) == 0:
+                    #scalo la colonna verso il basso
+                    new_colonna = list()
+                    new_colonna.append(self.ColonneList[adapted_index][self.nr-1])
+                    for x in range(0, self.nr-1):
+                        new_colonna.append(self.ColonneList[adapted_index][x])
+                    self.ColonneList[adapted_index] = new_colonna
+                    count += 1
+                elif (s.direction % 4) == 1:
+                    #scalo la colonna verso l'alto
+                    new_colonna = list()
+                    for x in range(1, self.nr):
+                        new_colonna.append(self.ColonneList[adapted_index][x])
+                    new_colonna.append(self.ColonneList[adapted_index][0])
+                    self.ColonneList[adapted_index] = new_colonna
+                    count += 1
+                elif (s.direction % 4) == 2:
+                    #sposto la colonna a destra      
+                    if adapted_index + 1 < self.nc:
+                        colonnaDestra = self.ColonneList[adapted_index + 1]
+                        self.ColonneList[adapted_index + 1] = self.ColonneList[adapted_index]
+                        self.ColonneList[adapted_index] = colonnaDestra
+                        count += 1
+                    elif adapted_index + 1 == self.nc:
+                        colonnaDestra = self.ColonneList[0]
+                        self.ColonneList[0] = self.ColonneList[adapted_index]
+                        self.ColonneList[adapted_index] = colonnaDestra
+                        count += 1
+                elif (s.direction % 4) == 3:
+                    #sposto la colonna a sinista
+                    if adapted_index > 0:
+                        colonnaDestra = self.ColonneList[adapted_index]
+                        self.ColonneList[adapted_index] = self.ColonneList[adapted_index - 1]
+                        self.ColonneList[adapted_index - 1] = colonnaDestra
+                        count += 1
+                    elif adapted_index == 0:
+                        colonnaDestra = self.ColonneList[self.nc - 1]
+                        self.ColonneList[self.nc - 1] = self.ColonneList[adapted_index]
+                        self.ColonneList[adapted_index] = colonnaDestra
+                        count += 1
+        if count != 0:
             return 0
-        elif (s.direction % 4) == 1:
-            #scalo la colonna verso il basso
-            new_colonna = list()
-            new_colonna.append(self.ColonneList[adapted_index][self.nr-1])
-            for x in range(0, self.nr-1):
-                new_colonna.append(self.ColonneList[adapted_index][x])
-            self.ColonneList[adapted_index] = new_colonna
-            return 0
-        elif (s.direction % 4) == 2:
-            #sposto la colonna a destra
-            if adapted_index + 1 < self.nc:
-                colonnaDestra = self.ColonneList[adapted_index + 1]
-                self.ColonneList[adapted_index + 1] = self.ColonneList[adapted_index]
-                self.ColonneList[adapted_index] = colonnaDestra
-                return 0
-        elif (s.direction % 4) == 3:
-            #sposto la colonna a sinista
-            if adapted_index > 0:
-                colonnaDestra = self.ColonneList[adapted_index]
-                self.ColonneList[adapted_index] = self.ColonneList[adapted_index - 1]
-                self.ColonneList[adapted_index - 1] = colonnaDestra
-                return 0
         return 1
 
     #changes the color of the colored pixel in the column index based on color
     def changeColorColonna(self, s):
-        adapted_index = s.index % self.nc
-        ok = 0
-        for element in self.ColonneList[adapted_index]:
-            if element != 0:
-                if s.color % 2 == 0:
-                    if element != 9:
-                        element += 1
-                        ok = 1
-                else:
-                    if element != 1:
-                        element -= 1
-                        ok = 1
-        if ok == 1:
+        l = list()
+        count = 0
+        if s.allElement == 1:
+            l = [y for y in range(0, self.nc)]
+        elif s.allElement == 2:
+            for y in range(0, self.nc):
+                color = 0
+                for p in self.ColonneList[y]:
+                    if p != 0:
+                        color = p
+                if color == s.color:
+                    l.append(y)
+        else:
+            l.append(s.index % self.nc)
+        for adapted_index in l:
+            for element in self.ColonneList[adapted_index]:
+                if element != 0:
+                    if s.color % 2 == 0:
+                        if element != 9:
+                            element += 1
+                            count += 1
+                    else:
+                        if element != 1:
+                            element -= 1
+                            count += 1
+        if count != 0:
             return 0
         return 1
 
     #add a new colored pixel in the column index
     def modifyColonnaAdd(self, s):
-        adapted_index = s.index % self.nc
+        l = list()
+        count = 0
+        if s.allElement == 1:
+            l = [y for y in range(0, self.nc)]
+        elif s.allElement == 2:
+            for y in range(0, self.nc):
+                color = 0
+                for p in self.ColonneList[y]:
+                    if p != 0:
+                        color = p
+                if color == s.color:
+                    l.append(y)
+        else:
+            l.append(s.index % self.nc)
         adapted_component = s.component % self.nr
-        if self.ColonneList[adapted_index][adapted_component] == 0:
-            color = 1
-            for p in self.ColonneList[adapted_index]:
-                if p != 0:
-                    color = p
-                    break
-            self.ColonneList[adapted_index][adapted_component] == color
+        for adapted_index in l:
+            if self.ColonneList[adapted_index][adapted_component] == 0:
+                color = 1
+                for p in self.ColonneList[adapted_index]:
+                    if p != 0:
+                        color = p
+                        break
+                self.ColonneList[adapted_index][adapted_component] == color
+                count += 1
+        if count != 0:
             return 0
         return 1
 
     #delete a colored pixel in the row index
     def modifyColonnaDel(self, s):
-        adapted_index = s.index % self.nc
+        l = list()
+        count = 0
+        if s.allElement == 1:
+            l = [y for y in range(0, self.nc)]
+        elif s.allElement == 2:
+            for y in range(0, self.nc):
+                color = 0
+                for p in self.ColonneList[y]:
+                    if p != 0:
+                        color = p
+                if color == s.color:
+                    l.append(y)
+        else:
+            l.append(s.index % self.nc)
         adapted_component = s.component % self.nr
-        if self.ColonneList[adapted_index][adapted_component] != 0:
-            self.ColonneList[adapted_index][adapted_component] == 0
+        for adapted_index in l:
+            if self.ColonneList[adapted_index][adapted_component] != 0:
+                self.ColonneList[adapted_index][adapted_component] == 0
+                count += 1
+        if count != 0:
             return 0
         return 1
 
     #swap two pixel based on direction in the row index
     def modifyColonnaMove(self, s):
-        adapted_index = s.index % self.nc
+        l = list()
+        count = 0
+        if s.allElement == 1:
+            l = [y for y in range(0, self.nc)]
+        elif s.allElement == 2:
+            for y in range(0, self.nc):
+                color = 0
+                for p in self.ColonneList[y]:
+                    if p != 0:
+                        color = p
+                if color == s.color:
+                    l.append(y)
+        else:
+            l.append(s.index % self.nc)
         adapted_component = s.component % self.nr
-        if (s.direction % 2) == 0:
-            #swappo andando verso il basso
-            if adapted_component + 1 < self.nr:
-                tmp = self.ColonneList[adapted_index][adapted_component + 1]
-                self.ColonneList[adapted_index][adapted_component + 1] = self.ColonneList[adapted_index][adapted_component]
-                self.ColonneList[adapted_index][adapted_component] = tmp
-                return 0
-        elif (s.direction % 2) == 1:
-            #swappo andando verso l'alto
-            if adapted_component - 1 >= 0:
-                tmp = self.ColonneList[adapted_index][adapted_component - 1]
-                self.ColonneList[adapted_index][adapted_component - 1] = self.ColonneList[adapted_index][adapted_component]
-                self.ColonneList[adapted_index][adapted_component] = tmp
-                return 0  
+        for adapted_index in l:
+            if (s.direction % 2) == 0:
+                #swappo andando verso il basso
+                if adapted_component + 1 < self.nr:
+                    tmp = self.ColonneList[adapted_index][adapted_component + 1]
+                    self.ColonneList[adapted_index][adapted_component + 1] = self.ColonneList[adapted_index][adapted_component]
+                    self.ColonneList[adapted_index][adapted_component] = tmp
+                    count += 1
+                elif adapted_component + 1 == self.nr:
+                    tmp = self.ColonneList[adapted_index][0]
+                    self.ColonneList[adapted_index][0] = self.ColonneList[adapted_index][adapted_component]
+                    self.ColonneList[adapted_index][adapted_component] = tmp
+                    count += 1
+            elif (s.direction % 2) == 1:
+                #swappo andando verso l'alto
+                if adapted_component - 1 >= 0:
+                    tmp = self.ColonneList[adapted_index][adapted_component - 1]
+                    self.ColonneList[adapted_index][adapted_component - 1] = self.ColonneList[adapted_index][adapted_component]
+                    self.ColonneList[adapted_index][adapted_component] = tmp
+                    count += 1  
+                elif adapted_component == 0:
+                    tmp = self.ColonneList[adapted_index][self.nr - 1]
+                    self.ColonneList[adapted_index][self.nr - 1] = self.ColonneList[adapted_index][adapted_component]
+                    self.ColonneList[adapted_index][adapted_component] = tmp
+                    count += 1  
+        if count != 0:
+            return 0
         return 1
     
     #expand the grid in the direction direction
@@ -230,3 +362,11 @@ class columnsRepresentation:
             for y in range(0, self.nc):
                 grid[x][y] = self.ColonneList[y][x]
         return grid
+    
+    def scoreAction(performed_actions, performed_selection):
+        score = 0
+        for x in range(0, len(performed_actions)):
+            if performed_selection[x].allElement == 0:
+                score += 0.5
+            score += 1
+        return -score

@@ -151,14 +151,21 @@ class borderRepresentation:
     def moveFigure(self, s):
         if len(self.borderList) == 0:
             return 1
+        l = list()
         count = 0
         if s.allElement > 0:
-            init = 0
-            fin = len(self.borderList)
+            l = [x for x in range(0, len(self.borderList))]
         else:
-            init = s.index % len(self.borderList)
-            fin = init + 1
-        for adapted_index in range(init, fin):
+            l.append(s.index % len(self.borderList))
+        if (s.direction % 4) == 0:
+            l.sort(key=lambda i: self.borderList[i].x, reverse=True)
+        elif (s.direction % 4) == 1:
+            l.sort(key=lambda i: self.borderList[i].x, reverse=False)
+        elif (s.direction % 4) == 2:
+            l.sort(key=lambda i: self.borderList[i].y, reverse=True)
+        elif (s.direction % 4) == 3:
+            l.sort(key=lambda i: self.borderList[i].y, reverse=False)
+        for adapted_index in l:
             if (s.direction % 4) == 0:
                 #down
                 if self.borderList[adapted_index].grid.shape[0] + self.borderList[adapted_index].x < self.nr:
@@ -203,14 +210,13 @@ class borderRepresentation:
     def changeColorBorder(self, s):
         if len(self.borderList) == 0:
             return 1
+        l = list()
         count = 0
         if s.allElement > 0:
-            init = 0
-            fin = len(self.borderList)
+            l = [x for x in range(0, len(self.borderList))]
         else:
-            init = s.index % len(self.borderList)
-            fin = init + 1
-        for adapted_index in range(init, fin):
+            l.append(s.index % len(self.borderList))
+        for adapted_index in l:
             if s.color % 2 == 0:
                 for p in self.borderList[adapted_index].border:
                     if p.color != 9:
@@ -229,14 +235,13 @@ class borderRepresentation:
     def changeColorCenter2(self, s):
         if len(self.borderList) == 0:
             return 1
+        l = list()
         count = 0
         if s.allElement > 0:
-            init = 0
-            fin = len(self.borderList)
+            l = [x for x in range(0, len(self.borderList))]
         else:
-            init = s.index % len(self.borderList)
-            fin = init + 1
-        for adapted_index in range(init, fin):
+            l.append(s.index % len(self.borderList))
+        for adapted_index in l:
             if s.color % 2 == 0:
                 for p in self.borderList[adapted_index].center:
                     if p.color != 9 and self.borderList[adapted_index].grid[p.x - self.borderList[adapted_index].x][p.y - self.borderList[adapted_index].y] == 2:
@@ -255,14 +260,13 @@ class borderRepresentation:
     def changeColorCenter3(self, s):
         if len(self.borderList) == 0:
             return 1
+        l = list()
         count = 0
         if s.allElement > 0:
-            init = 0
-            fin = len(self.borderList)
+            l = [x for x in range(0, len(self.borderList))]
         else:
-            init = s.index % len(self.borderList)
-            fin = init + 1
-        for adapted_index in range(init, fin):
+            l.append(s.index % len(self.borderList))
+        for adapted_index in l:
             if s.color % 2 == 0:
                 if self.borderList[adapted_index].centerColor != 9:
                     for p in self.borderList[adapted_index].center:
@@ -285,14 +289,25 @@ class borderRepresentation:
     def modifyBorderFigure(self, s):
         if len(self.borderList) == 0:
             return 1
+        l = list()
         count = 0
-        if s.allElement > 0:
-            init = 0
-            fin = len(self.borderList)
+        if s.allElement == 1:
+            l = [x for x in range(0, len(self.borderList))]
+        elif s.allElement == 2:
+            for x in range(0, len(self.borderList)):
+                if self.borderList[x].centerColor == s.color:
+                    l.append(x)
         else:
-            init = s.index % len(self.borderList)
-            fin = init + 1
-        for adapted_index in range(init, fin):
+            l.append(s.index % len(self.borderList))
+        if (s.direction % 4) == 0:
+            l.sort(key=lambda i: self.borderList[i].x, reverse=True)
+        elif (s.direction % 4) == 1:
+            l.sort(key=lambda i: self.borderList[i].x, reverse=False)
+        elif (s.direction % 4) == 2:
+            l.sort(key=lambda i: self.borderList[i].y, reverse=True)
+        elif (s.direction % 4) == 3:
+            l.sort(key=lambda i: self.borderList[i].y, reverse=False)
+        for adapted_index in l:
             adapted_component = s.component % len(self.borderList[adapted_index].border)
             if (s.direction % 4) == 0:
                 #down
