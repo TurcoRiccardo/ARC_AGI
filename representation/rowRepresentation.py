@@ -368,7 +368,11 @@ class rowRepresentation:
     def scoreAction(performed_actions, performed_selection):
         score = 0
         for x in range(0, len(performed_actions)):
-            if performed_selection[x].allElement == 0:
+            if performed_actions[x] == rowRepresentation.modifyRigaAdd:
+                score += 0.7
+            elif performed_actions[x] == rowRepresentation.modifyRigaDel:
+                score += 0.7
+            elif performed_selection[x].allElement == 0 and performed_actions[x] != rowRepresentation.reduceGrid and  performed_actions[x] != rowRepresentation.expandGrid:
                 score += 0.5
             score += 1
         return -score

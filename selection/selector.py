@@ -10,6 +10,7 @@ class Selector:
     direction: int
     allElement: int #0 index, 1 all, 2 color
 
+#ha senso una nn per generare i selettori ??????
 
 def generateNewSelector(rappresentation):
     index = 0
