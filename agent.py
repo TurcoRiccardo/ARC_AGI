@@ -33,7 +33,6 @@ class Individual:
 @dataclass
 class PossibleSolution:
     train: int
-    validation: int
     actions: list
     selectors: List[Selector]
     err: int
@@ -96,10 +95,10 @@ def error_rate(input: ArcGrid, output: ArcGrid):
     val += abs(output.shape[0] - input.shape[0])*min(input.shape[1], output.shape[1]) + abs(output.shape[1] - input.shape[1])*min(input.shape[0], output.shape[0]) + abs(output.shape[0] - input.shape[0])*abs(output.shape[1] - input.shape[1])
     return val
 
-#Algoritmo evolutivo sulla rappresentazione rep: addestro su esempio i1 e valido su esempio i2
-def generate_representation_solution(rep, demo_pairs, act, i1, i2):
-    rappresentationX = rep(demo_pairs[i1].x)
-    rappresentationY = rep(demo_pairs[i1].y)
+#Algoritmo evolutivo sulla rappresentazione rep: addestro su esempio i e restituisco il miglior individuo
+def generate_representation_solution(rep, demo_pairs, act, indice):
+    rappresentationX = rep(demo_pairs[indice].x)
+    rappresentationY = rep(demo_pairs[indice].y)
     population = list()
     for _ in range(0, POPULATION_SIZE//2):
         population.append(Individual(copy.deepcopy(rappresentationX), [], [], (rappresentationX.score(rappresentationY), 0)))
@@ -117,18 +116,18 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
         population.extend(offspring)
         population.sort(key=lambda i: i.fitness, reverse = True)
         population = population[:POPULATION_SIZE]
-    
-    
+
+    '''
     print("azioni")
     print(population[0].performed_actions)
-    print(population[0].performed_selection)
     print(len(population[0].performed_actions))
+    print(population[0].performed_selection)
     print(population[0].fitness)
     prediction = ArcIOPair(rappresentationX.rappToGrid(), rappresentationY.rappToGrid())
     prediction.plot(show=True, title=f"Input-Output")
     prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
     prediction.plot(show=True, title=f"Output-OutputGenerato")
-    
+    '''
 
     #mi serve qualcosa che mi aiuta a generalizzare la lista di azioni-selettore ad altri esempi dello stesso problema
     #posso provare ad utilizzare un algoritmo evolutivo con mutazioni solo sul selettore e la possibilita di dupricare o cancellare coppie azioni-selettore
@@ -136,35 +135,38 @@ def generate_representation_solution(rep, demo_pairs, act, i1, i2):
     #new_action, new_selection = borderRepresentation.generalizer(population[0].performed_actions, population[0].performed_selection)
 
 
-    #Validazione: applico la miglior serie di azioni al secondo esempio e trovo l'error rate
-    rappresentationX = rep(demo_pairs[i2].x)
+    return population[0]
+
+#Validazione: applico la miglior serie di azioni all esempio e trovo l'error rate
+def evaluate_representation(rep, bestIndividual, inputGrid, outputGrid):
+    rappresentationX = rep(inputGrid)
     c = 0
-    for action in population[0].performed_actions:
-        action(rappresentationX, population[0].performed_selection[c])
+    for action in bestIndividual.performed_actions:
+        action(rappresentationX, bestIndividual.performed_selection[c])
         c += 1
-    err = error_rate(demo_pairs[i2].y, rappresentationX.rappToGrid())
-    actions = copy.deepcopy(population[0].performed_actions)
-    selections = copy.deepcopy(population[0].performed_selection)
-    return PossibleSolution(i1, i2, actions, selections, err)
+    err = error_rate(outputGrid, rappresentationX.rappToGrid())
+    return err + c/10
 
 #svolgo le operazioni su tutte le combinazioni degli esempi ricevuti
 def generate_representation(rep, demo_pairs, act):
     possibleSolution = list()
-    errAvg = 0
+    AvgTot = 0
     errMin = 1000
     indMin = 0
-    c = 0
-    #len(demo_pairs)
-    for x in range(0, 2):
-        for y in range(0, 2):
+    bestIndividual = None
+    for x in range(0, len(demo_pairs)):
+        errAvg = 0
+        bestIndividual = generate_representation_solution(rep, demo_pairs, act, x)
+        for y in range(0, len(demo_pairs)):
             if x != y:
-                possibleSolution.append(generate_representation_solution(rep, demo_pairs, act, x, y))
-                errAvg += possibleSolution[-1].err
-                if possibleSolution[-1].err < errMin:
-                    errMin = possibleSolution[-1].err
-                    indMin = len(possibleSolution) - 1
-                c += 1
-    return PossibleSolutionRepresentation(rep, possibleSolution, errAvg/c, errMin, indMin)
+                errAvg += evaluate_representation(rep, bestIndividual, demo_pairs[y].x, demo_pairs[y].y)
+        if len(demo_pairs) > 1:
+            possibleSolution.append(PossibleSolution(x, copy.deepcopy(bestIndividual.performed_actions), copy.deepcopy(bestIndividual.performed_selection), errAvg/(len(demo_pairs)-1)))
+            AvgTot += possibleSolution[-1].err
+            if possibleSolution[-1].err < errMin:
+                errMin = possibleSolution[-1].err
+                indMin = x
+    return PossibleSolutionRepresentation(rep, possibleSolution, AvgTot/len(demo_pairs), errMin, indMin)
 
 #Classe in cui confronto i risultati ricevuti dalle varie rappresentazioni ed applico il migliore alla griglia di test
 class Agent(ArcAgent):

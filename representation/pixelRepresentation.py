@@ -26,13 +26,10 @@ class pixelRepresentation:
     #return the total number of pixel
     def getElementComponent(self, index):
         return self.nr * self.nc
-
-    #moves the pixel index if possible based on the direction
-    def movePixel(self, s):
-        if len(self.pixelList) == 0:
-            return 1
+    
+    #return the list of pixel index
+    def generateIndexList(self, s):
         l = list()
-        count = 0
         if s.allElement == 1:
             l = [x for x in range(0, len(self.pixelList))]
         elif s.allElement == 2:
@@ -41,6 +38,14 @@ class pixelRepresentation:
                     l.append(x)
         else:
             l.append(s.index % len(self.pixelList))
+        return l
+
+    #moves the pixel index if possible based on the direction
+    def movePixel(self, s):
+        if len(self.pixelList) == 0:
+            return 1
+        count = 0
+        l = self.generateIndexList(s)
         if (s.direction % 4) == 0:
             l.sort(key=lambda i: self.pixelList[i].x, reverse=True)
         elif (s.direction % 4) == 1:
@@ -102,16 +107,8 @@ class pixelRepresentation:
     def changeColorPixel(self, s):
         if len(self.pixelList) == 0:
             return 1
-        l = list()
         count = 0
-        if s.allElement == 1:
-            l = [x for x in range(0, len(self.pixelList))]
-        elif s.allElement == 2:
-            for x in range(0, len(self.pixelList)):
-                if self.pixelList[x].color == s.color:
-                    l.append(x)
-        else:
-            l.append(s.index % len(self.pixelList))
+        l = self.generateIndexList(s)
         for adapted_index in l:
             if s.color % 2 == 0:
                 if self.pixelList[adapted_index].color != 9:
@@ -137,16 +134,8 @@ class pixelRepresentation:
     def duplicateNearPixel(self, s):
         if len(self.pixelList) == 0:
             return 1
-        l = list()
         count = 0
-        if s.allElement == 1:
-            l = [x for x in range(0, len(self.pixelList))]
-        elif s.allElement == 2:
-            for x in range(0, len(self.pixelList)):
-                if self.pixelList[x].color == s.color:
-                    l.append(x)
-        else:
-            l.append(s.index % len(self.pixelList))
+        l = self.generateIndexList(s)
         for adapted_index in l:
             new_pixel = PixelNode(self.pixelList[adapted_index].x, self.pixelList[adapted_index].y, self.pixelList[adapted_index].color)
             if (s.direction % 4) == 0:

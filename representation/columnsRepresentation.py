@@ -22,10 +22,9 @@ class columnsRepresentation:
     def getElementComponent(self, index):
         return self.nr
 
-    #moves the column index if possible based on the direction
-    def moveColonna(self, s):
+    #return the list of column index
+    def generateIndexList(self, s):
         l = list()
-        count = 0
         if s.allElement == 1:
             l = [y for y in range(0, self.nc)]
         elif s.allElement == 2:
@@ -38,6 +37,12 @@ class columnsRepresentation:
                     l.append(y)
         else:
             l.append(s.index % self.nc)
+        return l
+
+    #moves the column index if possible based on the direction
+    def moveColonna(self, s):
+        count = 0
+        l = self.generateIndexList(s)
         if (s.direction % 4) == 2 and s.allElement == 2 and len(l) > 1:
             #sposto le colonne colorate a destra    
             l.sort(key=lambda i: i, reverse=True)
@@ -120,20 +125,8 @@ class columnsRepresentation:
 
     #changes the color of the colored pixel in the column index based on color
     def changeColorColonna(self, s):
-        l = list()
         count = 0
-        if s.allElement == 1:
-            l = [y for y in range(0, self.nc)]
-        elif s.allElement == 2:
-            for y in range(0, self.nc):
-                color = 0
-                for p in self.ColonneList[y]:
-                    if p != 0:
-                        color = p
-                if color == s.color:
-                    l.append(y)
-        else:
-            l.append(s.index % self.nc)
+        l = self.generateIndexList(s)
         for adapted_index in l:
             for element in self.ColonneList[adapted_index]:
                 if element != 0:
@@ -151,20 +144,8 @@ class columnsRepresentation:
 
     #add a new colored pixel in the column index
     def modifyColonnaAdd(self, s):
-        l = list()
         count = 0
-        if s.allElement == 1:
-            l = [y for y in range(0, self.nc)]
-        elif s.allElement == 2:
-            for y in range(0, self.nc):
-                color = 0
-                for p in self.ColonneList[y]:
-                    if p != 0:
-                        color = p
-                if color == s.color:
-                    l.append(y)
-        else:
-            l.append(s.index % self.nc)
+        l = self.generateIndexList(s)
         adapted_component = s.component % self.nr
         for adapted_index in l:
             if self.ColonneList[adapted_index][adapted_component] == 0:
@@ -181,20 +162,8 @@ class columnsRepresentation:
 
     #delete a colored pixel in the row index
     def modifyColonnaDel(self, s):
-        l = list()
         count = 0
-        if s.allElement == 1:
-            l = [y for y in range(0, self.nc)]
-        elif s.allElement == 2:
-            for y in range(0, self.nc):
-                color = 0
-                for p in self.ColonneList[y]:
-                    if p != 0:
-                        color = p
-                if color == s.color:
-                    l.append(y)
-        else:
-            l.append(s.index % self.nc)
+        l = self.generateIndexList(s)
         adapted_component = s.component % self.nr
         for adapted_index in l:
             if self.ColonneList[adapted_index][adapted_component] != 0:
@@ -206,20 +175,8 @@ class columnsRepresentation:
 
     #swap two pixel based on direction in the row index
     def modifyColonnaMove(self, s):
-        l = list()
         count = 0
-        if s.allElement == 1:
-            l = [y for y in range(0, self.nc)]
-        elif s.allElement == 2:
-            for y in range(0, self.nc):
-                color = 0
-                for p in self.ColonneList[y]:
-                    if p != 0:
-                        color = p
-                if color == s.color:
-                    l.append(y)
-        else:
-            l.append(s.index % self.nc)
+        l = self.generateIndexList(s)
         adapted_component = s.component % self.nr
         for adapted_index in l:
             if (s.direction % 2) == 0:
@@ -370,7 +327,7 @@ class columnsRepresentation:
                 score += 0.7
             elif performed_actions[x] == columnsRepresentation.modifyColonnaDel:
                 score += 0.7
-            elif performed_selection[x].allElement == 0 and performed_actions[x] != columnsRepresentation.reduceGrid and  performed_actions[x] != columnsRepresentation.expandGrid:
+            elif performed_selection[x].allElement == 0 and performed_actions[x] != columnsRepresentation.reduceGrid and performed_actions[x] != columnsRepresentation.expandGrid:
                 score += 0.5
             score += 1
         return -score

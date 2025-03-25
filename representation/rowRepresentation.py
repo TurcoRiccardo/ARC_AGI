@@ -22,10 +22,9 @@ class rowRepresentation:
     def getElementComponent(self, index):
         return self.nc
 
-    #moves the row index if possible based on the direction
-    def moveRiga(self, s):
+    #return the list of row index
+    def generateIndexList(self, s):
         l = list()
-        count = 0
         if s.allElement == 1:
             l = [x for x in range(0, self.nr)]
         elif s.allElement == 2:
@@ -38,8 +37,12 @@ class rowRepresentation:
                     l.append(x)
         else:
             l.append(s.index % self.nr)
-        
-        
+        return l
+
+    #moves the row index if possible based on the direction
+    def moveRiga(self, s):
+        count = 0
+        l = self.generateIndexList(s)
         if (s.direction % 4) == 0 and s.allElement == 2 and len(l) > 1:
             #sposto le righe colorate sotto    
             l.sort(key=lambda i: i, reverse=False)
@@ -122,20 +125,8 @@ class rowRepresentation:
 
     #changes the color of the colored pixel in the row index based on color
     def changeColorRiga(self, s):
-        l = list()
         count = 0
-        if s.allElement == 1:
-            l = [x for x in range(0, self.nr)]
-        elif s.allElement == 2:
-            for x in range(0, self.nr):
-                color = 0
-                for p in self.RigheList[x]:
-                    if p != 0:
-                        color = p
-                if color == s.color:
-                    l.append(x)
-        else:
-            l.append(s.index % self.nr)
+        l = self.generateIndexList(s)
         for adapted_index in l:
             for element in self.RigheList[adapted_index]:
                 if element != 0:
@@ -153,20 +144,8 @@ class rowRepresentation:
 
     #add a new colored pixel in the row index
     def modifyRigaAdd(self, s):
-        l = list()
         count = 0
-        if s.allElement == 1:
-            l = [x for x in range(0, self.nr)]
-        elif s.allElement == 2:
-            for x in range(0, self.nr):
-                color = 0
-                for p in self.RigheList[x]:
-                    if p != 0:
-                        color = p
-                if color == s.color:
-                    l.append(x)
-        else:
-            l.append(s.index % self.nr)
+        l = self.generateIndexList(s)
         adapted_component = s.component % self.nc
         for adapted_index in l:
             if self.RigheList[adapted_index][adapted_component] == 0:
@@ -183,20 +162,8 @@ class rowRepresentation:
         
     #delete a colored pixel in the row index
     def modifyRigaDel(self, s):
-        l = list()
         count = 0
-        if s.allElement == 1:
-            l = [x for x in range(0, self.nr)]
-        elif s.allElement == 2:
-            for x in range(0, self.nr):
-                color = 0
-                for p in self.RigheList[x]:
-                    if p != 0:
-                        color = p
-                if color == s.color:
-                    l.append(x)
-        else:
-            l.append(s.index % self.nr)
+        l = self.generateIndexList(s)
         adapted_component = s.component % self.nc
         for adapted_index in l:
             if self.RigheList[adapted_index][adapted_component] != 0:
@@ -208,20 +175,8 @@ class rowRepresentation:
     
     #swap two pixel based on direction in the row index
     def modifyRigaMove(self, s):
-        l = list()
         count = 0
-        if s.allElement == 1:
-            l = [x for x in range(0, self.nr)]
-        elif s.allElement == 2:
-            for x in range(0, self.nr):
-                color = 0
-                for p in self.RigheList[x]:
-                    if p != 0:
-                        color = p
-                if color == s.color:
-                    l.append(x)
-        else:
-            l.append(s.index % self.nr)
+        l = self.generateIndexList(s)
         adapted_component = s.component % self.nc
         for adapted_index in l:
             if (s.direction % 2) == 0:
@@ -372,7 +327,7 @@ class rowRepresentation:
                 score += 0.7
             elif performed_actions[x] == rowRepresentation.modifyRigaDel:
                 score += 0.7
-            elif performed_selection[x].allElement == 0 and performed_actions[x] != rowRepresentation.reduceGrid and  performed_actions[x] != rowRepresentation.expandGrid:
+            elif performed_selection[x].allElement == 0 and performed_actions[x] != rowRepresentation.reduceGrid and performed_actions[x] != rowRepresentation.expandGrid:
                 score += 0.5
             score += 1
         return -score
