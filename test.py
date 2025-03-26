@@ -41,6 +41,7 @@ def main(args):
     describe_task_group(train_problems)
     c = 0
     tsc = 0
+    avg = 0
     #apply the agent to every problem in the loop
     for numprob in tqdm(range(args.min, args.max)):
         prob : ArcProblem = train_problems[numprob]
@@ -59,7 +60,6 @@ def main(args):
         outs = agent.predict(prob.train_pairs, prob.test_inputs)
 
         i = 1
-        avg = 0
         #visualizzo soluzione del nostro agent
         for test_pair, predictions in zip(prob.test_pairs, outs):
             for p in predictions:
