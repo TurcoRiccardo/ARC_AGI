@@ -21,7 +21,7 @@ from representation.borderRepresentation import borderRepresentation
 
 POPULATION_SIZE = 50
 OFFSPRING_SIZE = 10
-MAX_GENERATIONS = 2000
+MAX_GENERATIONS = 2500
 
 @dataclass
 class Individual:
@@ -181,11 +181,11 @@ class Agent(ArcAgent):
         possibleSolutionRep = list()
         reps = [
             (pixelRepresentation, actionsPR),
-            #(rowRepresentation, actionsRR),
-            #(columnsRepresentation, actionsCR),
-            #(colorLayerRepresentation, actionsCLR),
-            #(rectangleRepresentation, actionsRER),
-            #(figureRepresentation, actionsFR),
+            (rowRepresentation, actionsRR),
+            (columnsRepresentation, actionsCR),
+            (colorLayerRepresentation, actionsCLR),
+            (rectangleRepresentation, actionsRER),
+            (figureRepresentation, actionsFR),
             #(borderRepresentation, actionsBR)
         ]
 

@@ -87,4 +87,4 @@ if __name__ == '__main__':
     parser.add_argument('--show_train_pairs', default=False)
     main(parser.parse_args())
 
-#python test.py --min 3 --max 4 --show_test_pairs "false" --show_solution "false" --show_train_pairs "true"
+#python test.py --min 0 --max 10 --show_test_pairs "false" --show_solution "false" --show_train_pairs "true"

@@ -51,159 +51,233 @@ class rectangleRepresentation:
         adapted_index = index % len(self.rectangleList)
         return self.rectangleList[adapted_index].h * self.rectangleList[adapted_index].w
     
+    #return the list of rectangle index
+    def generateIndexList(self, s):
+        l = list()
+        if s.allElement == 1:
+            #sotto
+            l.append(len(self.rectangleList) - (s.index % len(self.rectangleList)) - 1)
+        elif s.allElement == 2:
+            #centro
+            #if len(self.rectangleList) % 2 == 1:
+            #    l.append(len(self.rectangleList) % 2 + 1)
+            #else:
+            #    l.append(len(self.rectangleList) % 2)
+            #    l.append(len(self.rectangleList) % 2 + 1)
+            l.append(s.index % len(self.rectangleList))
+        elif s.allElement == 3:
+            #all
+            l = [x for x in range(0, len(self.rectangleList))]
+        elif s.allElement == 4:
+            #color
+            for x in range(0, len(self.rectangleList)):
+                if self.rectangleList[x].color == s.color:
+                    l.append(x)
+        else:
+            #sopra
+            l.append(s.index % len(self.rectangleList))
+        return l
+
     #moves the rectangle index based on the direction
     def moveRectangle(self, s):
         if len(self.rectangleList) == 0:
             return 1
-        adapted_index = s.index % len(self.rectangleList)
+        count = 0
+        l = self.generateIndexList(s)
         if (s.direction % 4) == 0:
-            #down
-            if self.rectangleList[adapted_index].x + self.rectangleList[adapted_index].h < self.nr:
-                self.rectangleList[adapted_index].x += 1
-                return 0
+            l.sort(key=lambda i: self.rectangleList[i].x, reverse=True)
         elif (s.direction % 4) == 1:
-            #up
-            if self.rectangleList[adapted_index].x > 0:
-                self.rectangleList[adapted_index].x -= 1
-                return 0
+            l.sort(key=lambda i: self.rectangleList[i].x, reverse=False)
         elif (s.direction % 4) == 2:
-            #right
-            if self.rectangleList[adapted_index].y + self.rectangleList[adapted_index].w < self.nc:
-                self.rectangleList[adapted_index].y += 1
-                return 0
+            l.sort(key=lambda i: self.rectangleList[i].y, reverse=True)
         elif (s.direction % 4) == 3:
-            #left
-            if self.rectangleList[adapted_index].y > 0:
-                self.rectangleList[adapted_index].x -= 1
-                return 0
+            l.sort(key=lambda i: self.rectangleList[i].y, reverse=False)
+        for adapted_index in l:
+            if (s.direction % 4) == 0:
+                #down
+                if self.rectangleList[adapted_index].x + self.rectangleList[adapted_index].h < self.nr:
+                    self.rectangleList[adapted_index].x += 1
+                    count += 1
+            elif (s.direction % 4) == 1:
+                #up
+                if self.rectangleList[adapted_index].x > 0:
+                    self.rectangleList[adapted_index].x -= 1
+                    count += 1
+            elif (s.direction % 4) == 2:
+                #right
+                if self.rectangleList[adapted_index].y + self.rectangleList[adapted_index].w < self.nc:
+                    self.rectangleList[adapted_index].y += 1
+                    count += 1
+            elif (s.direction % 4) == 3:
+                #left
+                if self.rectangleList[adapted_index].y > 0:
+                    self.rectangleList[adapted_index].x -= 1
+                    count += 1
+        if count != 0:
+            return 0
         return 1
     
     #changes the color of the rectangle index based on color
     def changeColorRectangle(self, s):
         if len(self.rectangleList) == 0:
             return
-        adapted_index = s.index % len(self.rectangleList)
-        if s.color % 2 == 0:
-            if self.rectangleList[adapted_index].color != 9:
-                self.rectangleList[adapted_index].color += 1
-                return 0
-        else:
-            if self.rectangleList[adapted_index].color != 1:
-                self.rectangleList[adapted_index].color -= 1
-                return 0
+        count = 0
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            if s.color % 2 == 0:
+                if self.rectangleList[adapted_index].color != 9:
+                    self.rectangleList[adapted_index].color += 1
+                    count += 1
+            else:
+                if self.rectangleList[adapted_index].color != 1:
+                    self.rectangleList[adapted_index].color -= 1
+                    count += 1
+        if count != 0:
+            return 0
         return 1
 
     #remove the rectangle index
     def removeRectangle(self, s):
         if len(self.rectangleList) == 0:
             return 1
+        count = 0
+        #l = self.generateIndexList(s)
+        #l.sort(key=lambda i: i, reverse=True)
+        #for adapted_index in l:
+
+
+
         adapted_index = s.index % len(self.rectangleList)
-        self.rectangleList.pop(adapted_index)
-        return 0
+        if count == 0:
+            self.rectangleList.pop(adapted_index)
+            count += 1
+        if count != 0:
+            return 0
+        return 1
 
     #generate a new rectangle near the rectangle index in the direction direction
     def duplicateNearRectangle(self, s):
         if len(self.rectangleList) == 0:
             return 1
-        adapted_index = s.index % len(self.rectangleList)
-        new_rectangle = Rectangle(self.rectangleList[adapted_index].x, self.rectangleList[adapted_index].y, 1, 1, self.rectangleList[adapted_index].color)
-        if (s.direction % 4) == 0:
-            #down
-            if new_rectangle.x + new_rectangle.h < self.nr:
-                new_rectangle.x = new_rectangle.x + new_rectangle.h
-                self.rectangleList.append(new_rectangle)
-                return 0
-        elif (s.direction % 4) == 1:
-            #up
-            if new_rectangle.x - 1 >= 0:
-                new_rectangle.x = new_rectangle.x - 1
-                self.rectangleList.append(new_rectangle)
-                return 0
-        elif (s.direction % 4) == 2:
-            #right
-            if new_rectangle.y + new_rectangle.w < self.nc:
-                new_rectangle.y = new_rectangle.y + new_rectangle.w
-                self.rectangleList.append(new_rectangle)
-                return 0
-        elif (s.direction % 4) == 3:
-            #left
-            if new_rectangle.y - 1 >= 0:
-                new_rectangle.y = new_rectangle.y - 1
-                self.rectangleList.append(new_rectangle)
-                return 0
+        count = 0
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            new_rectangle = Rectangle(self.rectangleList[adapted_index].x, self.rectangleList[adapted_index].y, 1, 1, self.rectangleList[adapted_index].color)
+            if (s.direction % 4) == 0:
+                #down
+                if new_rectangle.x + new_rectangle.h < self.nr:
+                    new_rectangle.x = new_rectangle.x + new_rectangle.h
+                    self.rectangleList.append(new_rectangle)
+                    count += 1
+            elif (s.direction % 4) == 1:
+                #up
+                if new_rectangle.x - 1 >= 0:
+                    new_rectangle.x = new_rectangle.x - 1
+                    self.rectangleList.append(new_rectangle)
+                    count += 1
+            elif (s.direction % 4) == 2:
+                #right
+                if new_rectangle.y + new_rectangle.w < self.nc:
+                    new_rectangle.y = new_rectangle.y + new_rectangle.w
+                    self.rectangleList.append(new_rectangle)
+                    count += 1
+            elif (s.direction % 4) == 3:
+                #left
+                if new_rectangle.y - 1 >= 0:
+                    new_rectangle.y = new_rectangle.y - 1
+                    self.rectangleList.append(new_rectangle)
+                    count += 1
+        if count != 0:
+            return 0
         return 1
 
     #change the order of the rectangle based on color in the rectangle list
     def changeOrder(self, s):
         if len(self.rectangleList) == 0:
             return 1
-        adapted_index = s.index % len(self.rectangleList)
-        if s.color % 2 == 0:
-            if adapted_index + 1 < len(self.rectangleList):
-                self.rectangleList[adapted_index], self.rectangleList[adapted_index + 1] = self.rectangleList[adapted_index + 1], self.rectangleList[adapted_index]
-                return 0
-        else:
-            if adapted_index - 1 >= 0:
-                self.rectangleList[adapted_index], self.rectangleList[adapted_index - 1] = self.rectangleList[adapted_index - 1], self.rectangleList[adapted_index]
-                return 0
+        count = 0
+        l = self.generateIndexList(s)
+        if (s.color % 2) == 0:
+            l.sort(key=lambda i: i, reverse=True)
+        elif (s.color % 2) == 1:
+            l.sort(key=lambda i: i, reverse=False)
+        for adapted_index in l:
+            if s.color % 2 == 0:
+                if adapted_index + 1 < len(self.rectangleList):
+                    self.rectangleList[adapted_index], self.rectangleList[adapted_index + 1] = self.rectangleList[adapted_index + 1], self.rectangleList[adapted_index]
+                    count += 1
+            else:
+                if adapted_index - 1 >= 0:
+                    self.rectangleList[adapted_index], self.rectangleList[adapted_index - 1] = self.rectangleList[adapted_index - 1], self.rectangleList[adapted_index]
+                    count += 1
+        if count != 0:
+            return 0
         return 1
 
     #scale up the rectangle index in the direction direction
     def scaleUpRectangle(self, s):
         if len(self.rectangleList) == 0:
             return 1
-        adapted_index = s.index % len(self.rectangleList)
-        if (s.direction % 4) == 0:
-            #down
-            if self.rectangleList[adapted_index].x + self.rectangleList[adapted_index].h < self.nr:
-                self.rectangleList[adapted_index].h += 1
-                return 0
-        elif (s.direction % 4) == 1:
-            #up
-            if self.rectangleList[adapted_index].x > 0:
-                self.rectangleList[adapted_index].x -= 1
-                self.rectangleList[adapted_index].h += 1
-                return 0
-        elif (s.direction % 4) == 2:
-            #right
-            if self.rectangleList[adapted_index].y + self.rectangleList[adapted_index].w < self.nc:
-                self.rectangleList[adapted_index].w += 1
-                return 0
-        elif (s.direction % 4) == 3:
-            #left
-            if self.rectangleList[adapted_index].y > 0:
-                self.rectangleList[adapted_index].y -= 1
-                self.rectangleList[adapted_index].w += 1
-                return 0
+        count = 0
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            if (s.direction % 4) == 0:
+                #down
+                if self.rectangleList[adapted_index].x + self.rectangleList[adapted_index].h < self.nr:
+                    self.rectangleList[adapted_index].h += 1
+                    count += 1
+            elif (s.direction % 4) == 1:
+                #up
+                if self.rectangleList[adapted_index].x > 0:
+                    self.rectangleList[adapted_index].x -= 1
+                    self.rectangleList[adapted_index].h += 1
+                    count += 1
+            elif (s.direction % 4) == 2:
+                #right
+                if self.rectangleList[adapted_index].y + self.rectangleList[adapted_index].w < self.nc:
+                    self.rectangleList[adapted_index].w += 1
+                    count += 1
+            elif (s.direction % 4) == 3:
+                #left
+                if self.rectangleList[adapted_index].y > 0:
+                    self.rectangleList[adapted_index].y -= 1
+                    self.rectangleList[adapted_index].w += 1
+                    count += 1
+        if count != 0:
+            return 0
         return 1
     
     #scale down the rectangle index in the direction direction
     def scaleDownRectangle(self, s):
         if len(self.rectangleList) == 0:
             return 1
-        adapted_index = s.index % len(self.rectangleList)
-        if (s.direction % 4) == 0:
-            #down
-            if self.rectangleList[adapted_index].h > 1:
-                self.rectangleList[adapted_index].h -= 1
-                return 0
-        elif (s.direction % 4) == 1:
-            #up
-            if self.rectangleList[adapted_index].h > 1:
-                self.rectangleList[adapted_index].x += 1
-                self.rectangleList[adapted_index].h -= 1
-                return 0
-        elif (s.direction % 4) == 2:
-            #right
-            if self.rectangleList[adapted_index].w > 1:
-                self.rectangleList[adapted_index].w -= 1
-                return 0
-        elif (s.direction % 4) == 3:
-            #left
-            if self.rectangleList[adapted_index].w > 1:
-                self.rectangleList[adapted_index].y += 1
-                self.rectangleList[adapted_index].w -= 1
-                return 0
+        count = 0
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            if (s.direction % 4) == 0:
+                #down
+                if self.rectangleList[adapted_index].h > 1:
+                    self.rectangleList[adapted_index].h -= 1
+                    count += 1
+            elif (s.direction % 4) == 1:
+                #up
+                if self.rectangleList[adapted_index].h > 1:
+                    self.rectangleList[adapted_index].x += 1
+                    self.rectangleList[adapted_index].h -= 1
+                    count += 1
+            elif (s.direction % 4) == 2:
+                #right
+                if self.rectangleList[adapted_index].w > 1:
+                    self.rectangleList[adapted_index].w -= 1
+                    count += 1
+            elif (s.direction % 4) == 3:
+                #left
+                if self.rectangleList[adapted_index].w > 1:
+                    self.rectangleList[adapted_index].y += 1
+                    self.rectangleList[adapted_index].w -= 1
+                    count += 1
+        if count != 0:
+            return 0
         return 1
 
     #expand the grid in the direction direction
@@ -320,4 +394,10 @@ class rectangleRepresentation:
                     grid[j][k] = rectangle.color
         return grid
 
-
+    def scoreAction(performed_actions, performed_selection):
+        score = 0
+        for x in range(0, len(performed_actions)):
+            if performed_actions[x] == rectangleRepresentation.removeRectangle or performed_actions[x] == rectangleRepresentation.duplicateNearRectangle or performed_actions[x] == rectangleRepresentation.changeOrder:
+                score += 0.5
+            score += 1
+        return -score

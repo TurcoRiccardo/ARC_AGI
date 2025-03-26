@@ -31,12 +31,26 @@ class pixelRepresentation:
     def generateIndexList(self, s):
         l = list()
         if s.allElement == 1:
-            l = [x for x in range(0, len(self.pixelList))]
+            #sotto
+            l.append(len(self.pixelList) - (s.index % len(self.pixelList)) - 1)
         elif s.allElement == 2:
+            #centro
+            #if len(self.pixelList) % 2 == 1:
+            #    l.append(len(self.pixelList) % 2 + 1)
+            #else:
+            #    l.append(len(self.pixelList) % 2)
+            #    l.append(len(self.pixelList) % 2 + 1)
+            l.append(s.index % len(self.pixelList))
+        elif s.allElement == 3:
+            #all
+            l = [x for x in range(0, len(self.pixelList))]
+        elif s.allElement == 4:
+            #color
             for x in range(0, len(self.pixelList)):
                 if self.pixelList[x].color == s.color:
                     l.append(x)
         else:
+            #sopra
             l.append(s.index % len(self.pixelList))
         return l
 
@@ -126,9 +140,20 @@ class pixelRepresentation:
     def removePixel(self, s):
         if len(self.pixelList) == 0:
             return 1
+        count = 0
+        #l = self.generateIndexList(s)
+        #l.sort(key=lambda i: i, reverse=True)
+        #for adapted_index in l:
+
+
+
         adapted_index = s.index % len(self.pixelList)
-        self.pixelList.pop(adapted_index)
-        return 0
+        if count == 0:
+            self.pixelList.pop(adapted_index)
+            count += 1
+        if count != 0:
+            return 0
+        return 1
 
     #generate a copy of the pixel index in the direction direction
     def duplicateNearPixel(self, s):
@@ -302,11 +327,7 @@ class pixelRepresentation:
     def scoreAction(performed_actions, performed_selection):
         score = 0
         for x in range(0, len(performed_actions)):
-            if performed_actions[x] == pixelRepresentation.duplicateNearPixel:
-                score += 0.7
-            elif performed_actions[x] == pixelRepresentation.removePixel:
-                score += 0.7
-            elif performed_selection[x].allElement == 0 and performed_actions[x] != pixelRepresentation.reduceGrid and  performed_actions[x] != pixelRepresentation.expandGrid:
+            if performed_actions[x] == pixelRepresentation.duplicateNearPixel or performed_actions[x] == pixelRepresentation.removePixel:
                 score += 0.5
             score += 1
         return -score

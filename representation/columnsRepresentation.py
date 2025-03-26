@@ -26,8 +26,20 @@ class columnsRepresentation:
     def generateIndexList(self, s):
         l = list()
         if s.allElement == 1:
-            l = [y for y in range(0, self.nc)]
+            #sotto
+            l.append(self.nc - (s.index % self.nc) - 1)
         elif s.allElement == 2:
+            #centro
+            if self.nc % 2 == 1:
+                l.append(self.nc % 2 + 1)
+            else:
+                l.append(self.nc % 2)
+                l.append(self.nc % 2 + 1)
+        elif s.allElement == 3:
+            #all
+            l = [y for y in range(0, self.nc)]
+        elif s.allElement == 4:
+            #color
             for y in range(0, self.nc):
                 color = 0
                 for p in self.ColonneList[y]:
@@ -36,6 +48,7 @@ class columnsRepresentation:
                 if color == s.color:
                     l.append(y)
         else:
+            #sopra
             l.append(s.index % self.nc)
         return l
 
@@ -323,11 +336,7 @@ class columnsRepresentation:
     def scoreAction(performed_actions, performed_selection):
         score = 0
         for x in range(0, len(performed_actions)):
-            if performed_actions[x] == columnsRepresentation.modifyColonnaAdd:
-                score += 0.7
-            elif performed_actions[x] == columnsRepresentation.modifyColonnaDel:
-                score += 0.7
-            elif performed_selection[x].allElement == 0 and performed_actions[x] != columnsRepresentation.reduceGrid and performed_actions[x] != columnsRepresentation.expandGrid:
+            if performed_actions[x] == columnsRepresentation.modifyColonnaAdd or performed_actions[x] == columnsRepresentation.modifyColonnaDel:
                 score += 0.5
             score += 1
         return -score

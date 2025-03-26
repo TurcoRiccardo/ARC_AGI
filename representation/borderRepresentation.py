@@ -147,16 +147,41 @@ class borderRepresentation:
     def getElementComponent(self, index):
         return len(self.borderList[index].border)
     
+    #return the list of border index
+    def generateIndexList(self, s):
+        l = list()
+        if s.allElement == 1:
+            #sotto
+            l.append(len(self.borderList) - (s.index % len(self.borderList)) - 1)
+        elif s.allElement == 2:
+            #centro
+            #if len(self.borderList) % 2 == 1:
+            #    l.append(len(self.borderList) % 2 + 1)
+            #else:
+            #    l.append(len(self.borderList) % 2)
+            #    l.append(len(self.borderList) % 2 + 1)
+            l.append(s.index % len(self.borderList))
+        elif s.allElement == 3:
+            #all
+            #l = [x for x in range(0, len(self.borderList))]
+            l.append(s.index % len(self.borderList))
+        elif s.allElement == 4:
+            #color
+            #for x in range(0, len(self.borderList)):
+            #    if self.borderList[x].centerColor == s.color:
+            #        l.append(x)
+            l.append(s.index % len(self.borderList))
+        else:
+            #sopra
+            l.append(s.index % len(self.borderList))
+        return l
+
     #moves the border index based on the direction
     def moveFigure(self, s):
         if len(self.borderList) == 0:
             return 1
-        l = list()
         count = 0
-        if s.allElement > 0:
-            l = [x for x in range(0, len(self.borderList))]
-        else:
-            l.append(s.index % len(self.borderList))
+        l = self.generateIndexList(s)
         if (s.direction % 4) == 0:
             l.sort(key=lambda i: self.borderList[i].x, reverse=True)
         elif (s.direction % 4) == 1:
@@ -210,12 +235,8 @@ class borderRepresentation:
     def changeColorBorder(self, s):
         if len(self.borderList) == 0:
             return 1
-        l = list()
         count = 0
-        if s.allElement > 0:
-            l = [x for x in range(0, len(self.borderList))]
-        else:
-            l.append(s.index % len(self.borderList))
+        l = self.generateIndexList(s)
         for adapted_index in l:
             if s.color % 2 == 0:
                 for p in self.borderList[adapted_index].border:
@@ -235,12 +256,8 @@ class borderRepresentation:
     def changeColorCenter2(self, s):
         if len(self.borderList) == 0:
             return 1
-        l = list()
         count = 0
-        if s.allElement > 0:
-            l = [x for x in range(0, len(self.borderList))]
-        else:
-            l.append(s.index % len(self.borderList))
+        l = self.generateIndexList(s)
         for adapted_index in l:
             if s.color % 2 == 0:
                 for p in self.borderList[adapted_index].center:
@@ -260,12 +277,8 @@ class borderRepresentation:
     def changeColorCenter3(self, s):
         if len(self.borderList) == 0:
             return 1
-        l = list()
         count = 0
-        if s.allElement > 0:
-            l = [x for x in range(0, len(self.borderList))]
-        else:
-            l.append(s.index % len(self.borderList))
+        l = self.generateIndexList(s)
         for adapted_index in l:
             if s.color % 2 == 0:
                 if self.borderList[adapted_index].centerColor != 9:
@@ -289,16 +302,8 @@ class borderRepresentation:
     def modifyBorderFigure(self, s):
         if len(self.borderList) == 0:
             return 1
-        l = list()
         count = 0
-        if s.allElement == 1:
-            l = [x for x in range(0, len(self.borderList))]
-        elif s.allElement == 2:
-            for x in range(0, len(self.borderList)):
-                if self.borderList[x].centerColor == s.color:
-                    l.append(x)
-        else:
-            l.append(s.index % len(self.borderList))
+        l = self.generateIndexList(s)
         if (s.direction % 4) == 0:
             l.sort(key=lambda i: self.borderList[i].x, reverse=True)
         elif (s.direction % 4) == 1:
@@ -752,7 +757,7 @@ class borderRepresentation:
     def scoreAction(performed_actions, performed_selection):
         score = 0
         for x in range(0, len(performed_actions)):
-            if performed_selection[x].allElement == 0:
+            if performed_actions[x] == borderRepresentation.modifyBorderFigure:
                 score += 0.5
             score += 1
         return -score

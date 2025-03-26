@@ -26,8 +26,20 @@ class rowRepresentation:
     def generateIndexList(self, s):
         l = list()
         if s.allElement == 1:
-            l = [x for x in range(0, self.nr)]
+            #sotto
+            l.append(self.nr - (s.index % self.nr) - 1)
         elif s.allElement == 2:
+            #centro
+            if self.nr % 2 == 1:
+                l.append(self.nr % 2 + 1)
+            else:
+                l.append(self.nr % 2)
+                l.append(self.nr % 2 + 1)
+        elif s.allElement == 3:
+            #all
+            l = [x for x in range(0, self.nr)]
+        elif s.allElement == 4:
+            #color
             for x in range(0, self.nr):
                 color = 0
                 for p in self.RigheList[x]:
@@ -36,6 +48,7 @@ class rowRepresentation:
                 if color == s.color:
                     l.append(x)
         else:
+            #sopra
             l.append(s.index % self.nr)
         return l
 
@@ -323,11 +336,7 @@ class rowRepresentation:
     def scoreAction(performed_actions, performed_selection):
         score = 0
         for x in range(0, len(performed_actions)):
-            if performed_actions[x] == rowRepresentation.modifyRigaAdd:
-                score += 0.7
-            elif performed_actions[x] == rowRepresentation.modifyRigaDel:
-                score += 0.7
-            elif performed_selection[x].allElement == 0 and performed_actions[x] != rowRepresentation.reduceGrid and performed_actions[x] != rowRepresentation.expandGrid:
+            if performed_actions[x] == rowRepresentation.modifyRigaAdd or performed_actions[x] == rowRepresentation.modifyRigaDel:
                 score += 0.5
             score += 1
         return -score

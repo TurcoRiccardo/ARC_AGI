@@ -9,6 +9,7 @@ class PixelNode:
     y: int
     color: int = 0
 
+#in FigureListLayer i colori sono scalati di 1
 class colorLayerRepresentation:
     def __init__(self, input_grid):
         self.nr = input_grid.shape[0]
@@ -30,113 +31,142 @@ class colorLayerRepresentation:
     def getElementComponent(self, index):
         adapted_index = (index - 1) % 9
         return len(self.FigureListLayer[adapted_index])
+    
+    #return the list of layer index
+    def generateIndexList(self, s):
+        l = list()
+        if s.allElement == 3:
+            #all
+            l = [x for x in range(0, 9)]
+        else:
+            #sopra sotto centro color
+            l.append(s.index % 9)
+        return l
 
     #moves all the pixel in the layer index based on the direction
     def moveLayer(self, s):
-        adapted_index = (s.index - 1) % 9
-        if len(self.FigureListLayer[adapted_index]) == 0:
-            return 1
-        new_figure = list()
-        if (s.direction % 4) == 0:
-            #down
-            for pixel in self.FigureListLayer[adapted_index]:
-                if pixel.x + 1 < self.nr:
-                    new_figure.append(PixelNode(pixel.x+1, pixel.y))
-                elif pixel.x + 1 == self.nr:
-                    new_figure.append(PixelNode(0, pixel.y))
-            self.FigureListLayer[adapted_index] = new_figure
-            return 0
-        elif (s.direction % 4) == 1:
-            #up
-            for pixel in self.FigureListLayer[adapted_index]:
-                if pixel.x > 0:
-                    new_figure.append(PixelNode(pixel.x-1, pixel.y))
-                elif pixel.x == 0:
-                    new_figure.append(PixelNode(self.nr-1, pixel.y))
-            self.FigureListLayer[adapted_index] = new_figure
-            return 0
-        elif (s.direction % 4) == 2:
-            #right
-            for pixel in self.FigureListLayer[adapted_index]:
-                if pixel.y + 1 < self.nc:
-                    new_figure.append(PixelNode(pixel.x, pixel.y+1))
-                elif pixel.y + 1 == self.nc:
-                    new_figure.append(PixelNode(pixel.x, 0))
-            self.FigureListLayer[adapted_index] = new_figure
-            return 0
-        elif (s.direction % 4) == 3:
-            #left
-            for pixel in self.FigureListLayer[adapted_index]:
-                if pixel.y > 0:
-                    new_figure.append(PixelNode(pixel.x, pixel.y-1))
-                elif pixel.y == 0:
-                    new_figure.append(PixelNode(pixel.x, self.nc-1))
-            self.FigureListLayer[adapted_index] = new_figure
+        count = 0
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            if len(self.FigureListLayer[adapted_index]) != 0:
+                new_figure = list()
+                if (s.direction % 4) == 0:
+                    #down
+                    for pixel in self.FigureListLayer[adapted_index]:
+                        if pixel.x + 1 < self.nr:
+                            new_figure.append(PixelNode(pixel.x+1, pixel.y))
+                        elif pixel.x + 1 == self.nr:
+                            new_figure.append(PixelNode(0, pixel.y))
+                    self.FigureListLayer[adapted_index] = new_figure
+                    count += 1
+                elif (s.direction % 4) == 1:
+                    #up
+                    for pixel in self.FigureListLayer[adapted_index]:
+                        if pixel.x > 0:
+                            new_figure.append(PixelNode(pixel.x-1, pixel.y))
+                        elif pixel.x == 0:
+                            new_figure.append(PixelNode(self.nr-1, pixel.y))
+                    self.FigureListLayer[adapted_index] = new_figure
+                    count += 1
+                elif (s.direction % 4) == 2:
+                    #right
+                    for pixel in self.FigureListLayer[adapted_index]:
+                        if pixel.y + 1 < self.nc:
+                            new_figure.append(PixelNode(pixel.x, pixel.y+1))
+                        elif pixel.y + 1 == self.nc:
+                            new_figure.append(PixelNode(pixel.x, 0))
+                    self.FigureListLayer[adapted_index] = new_figure
+                    count += 1
+                elif (s.direction % 4) == 3:
+                    #left
+                    for pixel in self.FigureListLayer[adapted_index]:
+                        if pixel.y > 0:
+                            new_figure.append(PixelNode(pixel.x, pixel.y-1))
+                        elif pixel.y == 0:
+                            new_figure.append(PixelNode(pixel.x, self.nc-1))
+                    self.FigureListLayer[adapted_index] = new_figure
+                    count += 1
+        if count != 0:
             return 0
         return 1
 
     #move the pixel of the layer index in another layer based on the color 
     def layerUnion(self, s):
-        adapted_index = (s.index - 1) % 9
-        if s.color % 2 == 0:
-            if adapted_index != 8:
-                for pixel in self.FigureListLayer[adapted_index]:
-                    ok = 0
-                    for p in self.FigureListLayer[adapted_index + 1]:
-                        if p.x == pixel.x and p.y == pixel.y:
-                            ok = 1
-                    if ok == 0:
-                        self.FigureListLayer[adapted_index + 1].append(PixelNode(pixel.x, pixel.y))
-                self.FigureListLayer[adapted_index].clear()
-                return 0
-        else:
-            if adapted_index != 0:
-                for pixel in self.FigureListLayer[adapted_index]:
-                    ok = 0
-                    for p in self.FigureListLayer[adapted_index - 1]:
-                        if p.x == pixel.x and p.y == pixel.y:
-                            ok = 1
-                    if ok == 0:
-                        self.FigureListLayer[adapted_index - 1].append(PixelNode(pixel.x, pixel.y))
-                self.FigureListLayer[adapted_index].clear()
-                return 0
+        count = 0
+        l = self.generateIndexList(s)
+        if (s.color % 2) == 0:
+            l.sort(key=lambda i: i, reverse=True)
+        elif (s.color % 2) == 1:
+            l.sort(key=lambda i: i, reverse=False)
+        for adapted_index in l:
+            if s.color % 2 == 0:
+                if adapted_index != 8:
+                    for pixel in self.FigureListLayer[adapted_index]:
+                        ok = 0
+                        for p in self.FigureListLayer[adapted_index + 1]:
+                            if p.x == pixel.x and p.y == pixel.y:
+                                ok = 1
+                        if ok == 0:
+                            self.FigureListLayer[adapted_index + 1].append(PixelNode(pixel.x, pixel.y))
+                    self.FigureListLayer[adapted_index].clear()
+                    count += 1
+            else:
+                if adapted_index != 0:
+                    for pixel in self.FigureListLayer[adapted_index]:
+                        ok = 0
+                        for p in self.FigureListLayer[adapted_index - 1]:
+                            if p.x == pixel.x and p.y == pixel.y:
+                                ok = 1
+                        if ok == 0:
+                            self.FigureListLayer[adapted_index - 1].append(PixelNode(pixel.x, pixel.y))
+                    self.FigureListLayer[adapted_index].clear()
+                    count += 1
+        if count != 0:
+            return 0
         return 1
 
     #remove a pixel from the layer index
     def delPixelLayer(self, s):
-        adapted_index = (s.index - 1) % 9
-        if len(self.FigureListLayer[adapted_index]) == 0:
-            return 1
-        pixel_index = s.component % len(self.FigureListLayer[adapted_index])
-        self.FigureListLayer[adapted_index].pop(pixel_index)
-        return 0
+        count = 0
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            if len(self.FigureListLayer[adapted_index]) != 0:
+                pixel_index = s.component % len(self.FigureListLayer[adapted_index])
+                self.FigureListLayer[adapted_index].pop(pixel_index)
+                count += 1
+        if count != 0:
+            return 0
+        return 1
 
     #add a pixel in the layer index near the pixel component in the direction direction
     def addPixelLayer(self, s):
-        adapted_index = (s.index - 1) % 9
-        if len(self.FigureListLayer[adapted_index]) == 0:
-            return 1
-        pixel_index = s.component % len(self.FigureListLayer[adapted_index])
-        if (s.direction % 4) == 0:
-            #down
-            if self.FigureListLayer[adapted_index][pixel_index].x + 1 < self.nr:
-                self.FigureListLayer[adapted_index].append(PixelNode(self.FigureListLayer[adapted_index][pixel_index].x + 1, self.FigureListLayer[adapted_index][pixel_index].y))
-                return 0
-        elif (s.direction % 4) == 1:
-            #up
-            if self.FigureListLayer[adapted_index][pixel_index].x > 0:
-                self.FigureListLayer[adapted_index].append(PixelNode(self.FigureListLayer[adapted_index][pixel_index].x - 1, self.FigureListLayer[adapted_index][pixel_index].y))
-                return 0
-        elif (s.direction % 4) == 2:
-            #right
-            if self.FigureListLayer[adapted_index][pixel_index].y + 1 < self.nc:
-                self.FigureListLayer[adapted_index].append(PixelNode(self.FigureListLayer[adapted_index][pixel_index].x, self.FigureListLayer[adapted_index][pixel_index].y + 1))
-                return 0
-        elif (s.direction % 4) == 3:
-            #left
-            if self.FigureListLayer[adapted_index][pixel_index].y > 0:
-                self.FigureListLayer[adapted_index].append(PixelNode(self.FigureListLayer[adapted_index][pixel_index].x, self.FigureListLayer[adapted_index][pixel_index].y - 1))
-                return 0
+        count = 0
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            if len(self.FigureListLayer[adapted_index]) != 0:
+                pixel_index = s.component % len(self.FigureListLayer[adapted_index])
+                if (s.direction % 4) == 0:
+                    #down
+                    if self.FigureListLayer[adapted_index][pixel_index].x + 1 < self.nr:
+                        self.FigureListLayer[adapted_index].append(PixelNode(self.FigureListLayer[adapted_index][pixel_index].x + 1, self.FigureListLayer[adapted_index][pixel_index].y))
+                        count += 1
+                elif (s.direction % 4) == 1:
+                    #up
+                    if self.FigureListLayer[adapted_index][pixel_index].x > 0:
+                        self.FigureListLayer[adapted_index].append(PixelNode(self.FigureListLayer[adapted_index][pixel_index].x - 1, self.FigureListLayer[adapted_index][pixel_index].y))
+                        count += 1
+                elif (s.direction % 4) == 2:
+                    #right
+                    if self.FigureListLayer[adapted_index][pixel_index].y + 1 < self.nc:
+                        self.FigureListLayer[adapted_index].append(PixelNode(self.FigureListLayer[adapted_index][pixel_index].x, self.FigureListLayer[adapted_index][pixel_index].y + 1))
+                        count += 1
+                elif (s.direction % 4) == 3:
+                    #left
+                    if self.FigureListLayer[adapted_index][pixel_index].y > 0:
+                        self.FigureListLayer[adapted_index].append(PixelNode(self.FigureListLayer[adapted_index][pixel_index].x, self.FigureListLayer[adapted_index][pixel_index].y - 1))
+                        count += 1
+        if count != 0:
+            return 0
         return 1
 
     #expand the grid in the direction direction
@@ -257,3 +287,11 @@ class colorLayerRepresentation:
             for pixel in self.FigureListLayer[x-1]:
                 grid[pixel.x][pixel.y] = x
         return grid
+    
+    def scoreAction(performed_actions, performed_selection):
+        score = 0
+        for x in range(0, len(performed_actions)):
+            if performed_actions[x] == colorLayerRepresentation.addPixelLayer or performed_actions[x] == colorLayerRepresentation.delPixelLayer:
+                score += 0.5
+            score += 1
+        return -score
