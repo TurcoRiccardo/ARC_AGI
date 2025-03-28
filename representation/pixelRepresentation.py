@@ -309,7 +309,7 @@ class pixelRepresentation:
                 c += 1
             if ok != 1:
                 score += 1
-        score += sum(mask)
+        score += sum(mask) * 1.2
         return -score
 
     def rappToGrid(self):

@@ -31,10 +31,10 @@ class rowRepresentation:
         elif s.allElement == 2:
             #centro
             if self.nr % 2 == 1:
-                l.append(self.nr % 2 + 1)
+                l.append(self.nr // 2)
             else:
-                l.append(self.nr % 2)
-                l.append(self.nr % 2 + 1)
+                l.append(self.nr // 2 - 1)
+                l.append(self.nr // 2)
         elif s.allElement == 3:
             #all
             l = [x for x in range(0, self.nr)]
@@ -336,6 +336,8 @@ class rowRepresentation:
     def scoreAction(performed_actions, performed_selection):
         score = 0
         for x in range(0, len(performed_actions)):
+            if performed_selection[x].allElement < 3: 
+                score += 0.5
             if performed_actions[x] == rowRepresentation.modifyRigaAdd or performed_actions[x] == rowRepresentation.modifyRigaDel:
                 score += 0.5
             score += 1

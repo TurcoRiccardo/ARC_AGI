@@ -9,7 +9,7 @@ class PixelNode:
     y: int
     color: int = 0
 
-#in FigureListLayer i colori sono scalati di 1
+#In FigureListLayer i colori sono scalati di 1
 class colorLayerRepresentation:
     def __init__(self, input_grid):
         self.nr = input_grid.shape[0]

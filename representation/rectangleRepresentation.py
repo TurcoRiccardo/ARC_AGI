@@ -59,12 +59,11 @@ class rectangleRepresentation:
             l.append(len(self.rectangleList) - (s.index % len(self.rectangleList)) - 1)
         elif s.allElement == 2:
             #centro
-            #if len(self.rectangleList) % 2 == 1:
-            #    l.append(len(self.rectangleList) % 2 + 1)
-            #else:
-            #    l.append(len(self.rectangleList) % 2)
-            #    l.append(len(self.rectangleList) % 2 + 1)
-            l.append(s.index % len(self.rectangleList))
+            if len(self.rectangleList) % 2 == 1:
+                l.append(len(self.rectangleList) // 2)
+            else:
+                l.append(len(self.rectangleList) // 2 - 1)
+                l.append(len(self.rectangleList) // 2)
         elif s.allElement == 3:
             #all
             l = [x for x in range(0, len(self.rectangleList))]
@@ -141,14 +140,9 @@ class rectangleRepresentation:
         if len(self.rectangleList) == 0:
             return 1
         count = 0
-        #l = self.generateIndexList(s)
-        #l.sort(key=lambda i: i, reverse=True)
-        #for adapted_index in l:
-
-
-
-        adapted_index = s.index % len(self.rectangleList)
-        if count == 0:
+        l = self.generateIndexList(s)
+        l.sort(key=lambda i: i, reverse=True)
+        for adapted_index in l:
             self.rectangleList.pop(adapted_index)
             count += 1
         if count != 0:
@@ -383,7 +377,7 @@ class rectangleRepresentation:
                 score += self.rectangleList[z].h * self.rectangleList[z].w
         if len(output.rectangleList) - len(self.rectangleList) > 0:
             for z in range(len(self.rectangleList), len(output.rectangleList)):
-                score += output.rectangleList[z].h * output.rectangleList[z].w
+                score += output.rectangleList[z].h * output.rectangleList[z].w * 1.2
         return -score
 
     def rappToGrid(self):
@@ -397,6 +391,8 @@ class rectangleRepresentation:
     def scoreAction(performed_actions, performed_selection):
         score = 0
         for x in range(0, len(performed_actions)):
+            if performed_selection[x].allElement < 3: 
+                score += 0.5
             if performed_actions[x] == rectangleRepresentation.removeRectangle or performed_actions[x] == rectangleRepresentation.duplicateNearRectangle or performed_actions[x] == rectangleRepresentation.changeOrder:
                 score += 0.5
             score += 1

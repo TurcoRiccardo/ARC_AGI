@@ -155,22 +155,19 @@ class borderRepresentation:
             l.append(len(self.borderList) - (s.index % len(self.borderList)) - 1)
         elif s.allElement == 2:
             #centro
-            #if len(self.borderList) % 2 == 1:
-            #    l.append(len(self.borderList) % 2 + 1)
-            #else:
-            #    l.append(len(self.borderList) % 2)
-            #    l.append(len(self.borderList) % 2 + 1)
-            l.append(s.index % len(self.borderList))
+            if len(self.borderList) % 2 == 1:
+                l.append(len(self.borderList) // 2)
+            else:
+                l.append(len(self.borderList) // 2 - 1)
+                l.append(len(self.borderList) // 2)
         elif s.allElement == 3:
             #all
-            #l = [x for x in range(0, len(self.borderList))]
-            l.append(s.index % len(self.borderList))
+            l = [x for x in range(0, len(self.borderList))]
         elif s.allElement == 4:
             #color
-            #for x in range(0, len(self.borderList)):
-            #    if self.borderList[x].centerColor == s.color:
-            #        l.append(x)
-            l.append(s.index % len(self.borderList))
+            for x in range(0, len(self.borderList)):
+                if self.borderList[x].centerColor == s.color:
+                    l.append(x)
         else:
             #sopra
             l.append(s.index % len(self.borderList))
@@ -193,7 +190,7 @@ class borderRepresentation:
         for adapted_index in l:
             if (s.direction % 4) == 0:
                 #down
-                if self.borderList[adapted_index].grid.shape[0] + self.borderList[adapted_index].x < self.nr:
+                if self.borderList[adapted_index].grid.shape[0] + self.borderList[adapted_index].x < self.nr - 1:
                     for b in self.borderList[adapted_index].border:
                         b.x += 1
                     for c in self.borderList[adapted_index].center:
@@ -211,7 +208,7 @@ class borderRepresentation:
                     count += 1
             elif (s.direction % 4) == 2:
                 #right
-                if self.borderList[adapted_index].grid.shape[1] + self.borderList[adapted_index].y < self.nc:
+                if self.borderList[adapted_index].grid.shape[1] + self.borderList[adapted_index].y < self.nc - 1:
                     for b in self.borderList[adapted_index].border:
                         b.y += 1
                     for c in self.borderList[adapted_index].center:
@@ -665,12 +662,16 @@ class borderRepresentation:
             if self.nr > 1:
                 ok = 0
                 for fb in self.borderList:
-                    if fb.x > 0:
+                    if fb.x == 0:
                         ok = 1
                 if ok == 0:
                     self.nr -= 1
                     for fb in self.borderList:
                         fb.x -= 1
+                        for p in fb.border:
+                            p.x -= 1
+                        for p in fb.center:
+                            p.x -= 1
                     return 0
         elif (s.direction % 4) == 2:
             #right
@@ -687,12 +688,16 @@ class borderRepresentation:
             if self.nc > 1:
                 ok = 0
                 for fb in self.borderList:
-                    if fb.y > 0:
+                    if fb.y == 0:
                         ok = 1
                 if ok == 0:
                     self.nc -= 1
                     for fb in self.borderList:
                         fb.y -= 1
+                        for p in fb.border:
+                            p.y -= 1
+                        for p in fb.center:
+                            p.y -= 1
                     return 0
         return 1
 
@@ -757,6 +762,8 @@ class borderRepresentation:
     def scoreAction(performed_actions, performed_selection):
         score = 0
         for x in range(0, len(performed_actions)):
+            if performed_selection[x].allElement < 3: 
+                score += 0.5
             if performed_actions[x] == borderRepresentation.modifyBorderFigure:
                 score += 0.5
             score += 1

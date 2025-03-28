@@ -51,7 +51,7 @@ def parent_selection(population):
     
 def mutation(p: Individual, available_actions):
     new_gen = copy.deepcopy(p.genome)
-    for _ in range(0, 10):
+    for _ in range(0, 5):
         #take a random action
         x = np.random.randint(0, len(available_actions))
         action = available_actions[x]
@@ -145,7 +145,7 @@ def evaluate_representation(rep, bestIndividual, inputGrid, outputGrid):
         action(rappresentationX, bestIndividual.performed_selection[c])
         c += 1
     err = error_rate(outputGrid, rappresentationX.rappToGrid())
-    return err + c/10
+    return err - bestIndividual.fitness[0] - bestIndividual.fitness[1]/10
 
 #svolgo le operazioni su tutte le combinazioni degli esempi ricevuti
 def generate_representation(rep, demo_pairs, act):
@@ -176,7 +176,7 @@ class Agent(ArcAgent):
         actionsCR = [columnsRepresentation.moveColonna, columnsRepresentation.changeColorColonna, columnsRepresentation.modifyColonnaAdd, columnsRepresentation.modifyColonnaDel, columnsRepresentation.modifyColonnaMove, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
         actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
-        actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.equalColorFigure, figureRepresentation.addElementFigure, figureRepresentation.removeElementFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
+        actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure, figureRepresentation.removeElementFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
         actionsBR = [borderRepresentation.moveFigure, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter2, borderRepresentation.changeColorCenter3, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
         possibleSolutionRep = list()
         reps = [
@@ -186,8 +186,9 @@ class Agent(ArcAgent):
             (colorLayerRepresentation, actionsCLR),
             (rectangleRepresentation, actionsRER),
             (figureRepresentation, actionsFR),
-            #(borderRepresentation, actionsBR)
+            (borderRepresentation, actionsBR)
         ]
+        #rappresentazione in cui ho delle figure che posso prolungare con ostacoli e elementi sovrapposti
 
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(generate_representation, rep, demo_pairs, actions) for rep, actions in reps]
