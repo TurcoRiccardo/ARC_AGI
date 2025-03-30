@@ -10,8 +10,7 @@ class Selector:
     direction: int
     allElement: int #0 sopra, 1 sotto, 2 centro, 3 all, 4 color
 
-#ha senso una nn per generare i selettori ??????
-
+#generates a new random selector from scratch
 def generateNewSelector(rappresentation):
     index = 0
     component = 0
@@ -24,3 +23,10 @@ def generateNewSelector(rappresentation):
     color = np.random.randint(1, 10)
     direction = np.random.randint(0, 4)
     return Selector(index, component, color, direction, allElement)
+
+#generates a new selector mutating the received selector
+def mutateSelector(s: Selector):
+    l = [i for i in range(0, 5)]
+    l.remove(s.allElement)
+    new_allElement = np.random.choice(l, 1)
+    return Selector(s.index, s.component, s.color, s.direction, new_allElement)
