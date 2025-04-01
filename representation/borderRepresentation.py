@@ -174,7 +174,7 @@ class borderRepresentation:
         return l
 
     #moves the border index based on the direction
-    def moveFigure(self, s):
+    def moveBorder(self, s):
         if len(self.borderList) == 0:
             return 1
         count = 0

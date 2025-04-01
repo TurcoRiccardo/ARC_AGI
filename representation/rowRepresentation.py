@@ -53,7 +53,7 @@ class rowRepresentation:
         return l
 
     #moves the row index if possible based on the direction
-    def moveRiga(self, s):
+    def moveRow(self, s):
         count = 0
         l = self.generateIndexList(s)
         if (s.direction % 4) == 0 and s.allElement == 2 and len(l) > 1:
@@ -137,7 +137,7 @@ class rowRepresentation:
         return 1
 
     #changes the color of the colored pixel in the row index based on color
-    def changeColorRiga(self, s):
+    def changeColorRow(self, s):
         count = 0
         l = self.generateIndexList(s)
         for adapted_index in l:
@@ -156,7 +156,7 @@ class rowRepresentation:
         return 1
 
     #add a new colored pixel in the row index
-    def modifyRigaAdd(self, s):
+    def modifyRowAdd(self, s):
         count = 0
         l = self.generateIndexList(s)
         adapted_component = s.component % self.nc
@@ -174,7 +174,7 @@ class rowRepresentation:
         return 1
         
     #delete a colored pixel in the row index
-    def modifyRigaDel(self, s):
+    def modifyRowDel(self, s):
         count = 0
         l = self.generateIndexList(s)
         adapted_component = s.component % self.nc
@@ -187,7 +187,7 @@ class rowRepresentation:
         return 1
     
     #swap two pixel based on direction in the row index
-    def modifyRigaMove(self, s):
+    def modifyRowMove(self, s):
         count = 0
         l = self.generateIndexList(s)
         adapted_component = s.component % self.nc
@@ -338,7 +338,7 @@ class rowRepresentation:
         for x in range(0, len(performed_actions)):
             if performed_selection[x].allElement < 3: 
                 score += 0.5
-            if performed_actions[x] == rowRepresentation.modifyRigaAdd or performed_actions[x] == rowRepresentation.modifyRigaDel:
+            if performed_actions[x] == rowRepresentation.modifyRowAdd or performed_actions[x] == rowRepresentation.modifyRowDel:
                 score += 0.5
             score += 1
         return -score

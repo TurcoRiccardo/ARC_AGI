@@ -53,7 +53,7 @@ class columnsRepresentation:
         return l
 
     #moves the column index if possible based on the direction
-    def moveColonna(self, s):
+    def moveColumn(self, s):
         count = 0
         l = self.generateIndexList(s)
         if (s.direction % 4) == 2 and s.allElement == 2 and len(l) > 1:
@@ -137,7 +137,7 @@ class columnsRepresentation:
         return 1
 
     #changes the color of the colored pixel in the column index based on color
-    def changeColorColonna(self, s):
+    def changeColorColumn(self, s):
         count = 0
         l = self.generateIndexList(s)
         for adapted_index in l:
@@ -156,7 +156,7 @@ class columnsRepresentation:
         return 1
 
     #add a new colored pixel in the column index
-    def modifyColonnaAdd(self, s):
+    def modifyColumnAdd(self, s):
         count = 0
         l = self.generateIndexList(s)
         adapted_component = s.component % self.nr
@@ -174,7 +174,7 @@ class columnsRepresentation:
         return 1
 
     #delete a colored pixel in the row index
-    def modifyColonnaDel(self, s):
+    def modifyColumnDel(self, s):
         count = 0
         l = self.generateIndexList(s)
         adapted_component = s.component % self.nr
@@ -187,7 +187,7 @@ class columnsRepresentation:
         return 1
 
     #swap two pixel based on direction in the row index
-    def modifyColonnaMove(self, s):
+    def modifyColumnMove(self, s):
         count = 0
         l = self.generateIndexList(s)
         adapted_component = s.component % self.nr
@@ -338,7 +338,7 @@ class columnsRepresentation:
         for x in range(0, len(performed_actions)):
             if performed_selection[x].allElement < 3: 
                 score += 0.5
-            if performed_actions[x] == columnsRepresentation.modifyColonnaAdd or performed_actions[x] == columnsRepresentation.modifyColonnaDel:
+            if performed_actions[x] == columnsRepresentation.modifyColumnAdd or performed_actions[x] == columnsRepresentation.modifyColumnDel:
                 score += 0.5
             score += 1
         return -score
