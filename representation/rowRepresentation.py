@@ -36,20 +36,48 @@ class rowRepresentation:
                 l.append(self.nr // 2 - 1)
                 l.append(self.nr // 2)
         elif s.allElement == 3:
-            #all
+            #all the row
             l = [x for x in range(0, self.nr)]
         elif s.allElement == 4:
-            #color
+            #the row need to contain a crtaint color
             for x in range(0, self.nr):
-                color = 0
+                ok = 0
                 for p in self.RigheList[x]:
-                    if p != 0:
-                        color = p
-                if color == s.color:
+                    if p == s.color:
+                        ok = 1
+                if ok == 1:
                     l.append(x)
         else:
             #sopra
             l.append(s.index % self.nr)
+        return l
+    
+    #return the list of component index
+    def generateComponentList(self, s, adapted_index):
+        l = list()
+        if s.allComponent == 1:
+            #da destra
+            l.append(self.nc - (s.component % self.nc) - 1)
+        elif s.allComponent == 2:
+            #centro
+            if self.nc % 2 == 1:
+                l.append(self.nc // 2)
+            else:
+                l.append(self.nc // 2 - 1)
+                l.append(self.nc // 2)
+        elif s.allComponent == 3:
+            #all
+            l = [x for x in range(0, self.nc)]
+        elif s.allComponent == 4:
+            #component of the selected color
+            c = 0
+            for p in self.RigheList[adapted_index]:
+                if p == s.color:
+                    l.append(c)
+                c += 1
+        else:
+            #da sinistra
+            l.append(s.component % self.nc)
         return l
 
     #moves the row index if possible based on the direction
@@ -141,15 +169,15 @@ class rowRepresentation:
         count = 0
         l = self.generateIndexList(s)
         for adapted_index in l:
-            for element in self.RigheList[adapted_index]:
-                if element != 0:
+            for x in range(0, self.nc):
+                if self.RigheList[adapted_index][x] != 0:
                     if s.color % 2 == 0:
-                        if element != 9:
-                            element += 1
+                        if self.RigheList[adapted_index][x] != 9:
+                            self.RigheList[adapted_index][x] += 1
                             count += 1
                     else:
-                        if element != 1:
-                            element -= 1
+                        if self.RigheList[adapted_index][x] != 1:
+                            self.RigheList[adapted_index][x] -= 1
                             count += 1
         if count != 0:
             return 0
@@ -158,17 +186,18 @@ class rowRepresentation:
     #add a new colored pixel in the row index
     def modifyRowAdd(self, s):
         count = 0
-        l = self.generateIndexList(s)
-        adapted_component = s.component % self.nc
-        for adapted_index in l:
-            if self.RigheList[adapted_index][adapted_component] == 0:
-                color = 1
-                for p in self.RigheList[adapted_index]:
-                    if p != 0:
-                        color = p
-                        break
-                self.RigheList[adapted_index][adapted_component] == color
-                count += 1
+        li = self.generateIndexList(s)
+        for adapted_index in li:
+            lc = self.generateComponentList(s, adapted_index)
+            for adapted_component in lc:
+                if self.RigheList[adapted_index][adapted_component] == 0:
+                    color = 1
+                    for p in self.RigheList[adapted_index]:
+                        if p != 0:
+                            color = p
+                            break
+                    self.RigheList[adapted_index][adapted_component] == color
+                    count += 1
         if count != 0:
             return 0
         return 1
@@ -176,12 +205,13 @@ class rowRepresentation:
     #delete a colored pixel in the row index
     def modifyRowDel(self, s):
         count = 0
-        l = self.generateIndexList(s)
-        adapted_component = s.component % self.nc
-        for adapted_index in l:
-            if self.RigheList[adapted_index][adapted_component] != 0:
-                self.RigheList[adapted_index][adapted_component] == 0
-                count += 1
+        li = self.generateIndexList(s)
+        for adapted_index in li:
+            lc = self.generateComponentList(s, adapted_index)
+            for adapted_component in lc:
+                if self.RigheList[adapted_index][adapted_component] != 0:
+                    self.RigheList[adapted_index][adapted_component] == 0
+                    count += 1
         if count != 0:
             return 0
         return 1
@@ -189,33 +219,40 @@ class rowRepresentation:
     #swap two pixel based on direction in the row index
     def modifyRowMove(self, s):
         count = 0
-        l = self.generateIndexList(s)
-        adapted_component = s.component % self.nc
-        for adapted_index in l:
+        li = self.generateIndexList(s)
+        for adapted_index in li:
+            lc = self.generateComponentList(s, adapted_index)
             if (s.direction % 2) == 0:
-                #swappo andando verso destra
-                if adapted_component + 1 < self.nc:
-                    tmp = self.RigheList[adapted_index][adapted_component + 1]
-                    self.RigheList[adapted_index][adapted_component + 1] = self.RigheList[adapted_index][adapted_component]
-                    self.RigheList[adapted_index][adapted_component] = tmp
-                    count += 1
-                elif adapted_component + 1 == self.nc:
-                    tmp = self.RigheList[adapted_index][0]
-                    self.RigheList[adapted_index][0] = self.RigheList[adapted_index][adapted_component]
-                    self.RigheList[adapted_index][adapted_component] = tmp
-                    count += 1
+                lc.sort(key=lambda i: i, reverse=True)
             elif (s.direction % 2) == 1:
-                #swappo andando verso sinistra
-                if adapted_component - 1 >= 0:
-                    tmp = self.RigheList[adapted_index][adapted_component - 1]
-                    self.RigheList[adapted_index][adapted_component - 1] = self.RigheList[adapted_index][adapted_component]
-                    self.RigheList[adapted_index][adapted_component] = tmp
-                    count += 1 
-                elif adapted_component == 0:
-                    tmp = self.RigheList[adapted_index][self.nc - 1]
-                    self.RigheList[adapted_index][self.nc - 1] = self.RigheList[adapted_index][adapted_component]
-                    self.RigheList[adapted_index][adapted_component] = tmp
-                    count += 1 
+                lc.sort(key=lambda i: i, reverse=False)
+            if len(lc) == self.nc:
+                lc.pop(-1)
+            for adapted_component in lc:
+                if (s.direction % 2) == 0:
+                    #swappo andando verso destra
+                    if adapted_component + 1 < self.nc:
+                        tmp = self.RigheList[adapted_index][adapted_component + 1]
+                        self.RigheList[adapted_index][adapted_component + 1] = self.RigheList[adapted_index][adapted_component]
+                        self.RigheList[adapted_index][adapted_component] = tmp
+                        count += 1
+                    elif adapted_component + 1 == self.nc:
+                        tmp = self.RigheList[adapted_index][0]
+                        self.RigheList[adapted_index][0] = self.RigheList[adapted_index][adapted_component]
+                        self.RigheList[adapted_index][adapted_component] = tmp
+                        count += 1
+                elif (s.direction % 2) == 1:
+                    #swappo andando verso sinistra
+                    if adapted_component - 1 >= 0:
+                        tmp = self.RigheList[adapted_index][adapted_component - 1]
+                        self.RigheList[adapted_index][adapted_component - 1] = self.RigheList[adapted_index][adapted_component]
+                        self.RigheList[adapted_index][adapted_component] = tmp
+                        count += 1 
+                    elif adapted_component == 0:
+                        tmp = self.RigheList[adapted_index][self.nc - 1]
+                        self.RigheList[adapted_index][self.nc - 1] = self.RigheList[adapted_index][adapted_component]
+                        self.RigheList[adapted_index][adapted_component] = tmp
+                        count += 1 
         if count != 0:
             return 0
         return 1

@@ -67,8 +67,15 @@ We can select or group rows in various ways:
 - based on the order of the row list
 - based on the reverse order of the row list
 - based on the central row in the row list
-- based on the color of the row
+- based if the row contain a certaint color
 - we can select all the row
+
+We can select or group the components of the row in various ways:
+- based on the order of the components
+- based on the reverse order of the components
+- based on the central components in the row
+- based on the color of the components in the row
+- we can select all the components in the row
 
 ### Column Representation
 We can represent the grid as a list of columns.
@@ -86,8 +93,15 @@ We can select or group columns in various ways:
 - based on the order of the column list
 - based on the reverse order of the column list
 - based on the central column in the column list
-- based on the color of the column
+- based if the column contain a certaint color
 - we can select all the column
+
+We can select or group the components of the column in various ways:
+- based on the order of the components
+- based on the reverse order of the components
+- based on the central components in the column
+- based on the color of the components in the column
+- we can select all the components in the column
 
 ### Color Layer Representation
 We can represent the grid as a list of layer composed of all the pixels of one color, we have a layer for color.

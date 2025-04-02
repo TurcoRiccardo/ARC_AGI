@@ -52,6 +52,34 @@ class columnsRepresentation:
             l.append(s.index % self.nc)
         return l
 
+    #return the list of component index
+    def generateComponentList(self, s, adapted_index):
+        l = list()
+        if s.allComponent == 1:
+            #da destra
+            l.append(self.nr - (s.component % self.nr) - 1)
+        elif s.allComponent == 2:
+            #centro
+            if self.nc % 2 == 1:
+                l.append(self.nr // 2)
+            else:
+                l.append(self.nr // 2 - 1)
+                l.append(self.nr // 2)
+        elif s.allComponent == 3:
+            #all
+            l = [x for x in range(0, self.nr)]
+        elif s.allComponent == 4:
+            #component of the selected color
+            c = 0
+            for p in self.ColonneList[adapted_index]:
+                if p == s.color:
+                    l.append(c)
+                c += 1
+        else:
+            #da sinistra
+            l.append(s.component % self.nr)
+        return l
+
     #moves the column index if possible based on the direction
     def moveColumn(self, s):
         count = 0
@@ -141,15 +169,15 @@ class columnsRepresentation:
         count = 0
         l = self.generateIndexList(s)
         for adapted_index in l:
-            for element in self.ColonneList[adapted_index]:
-                if element != 0:
+            for x in range(0, self.nr):
+                if self.ColonneList[adapted_index][x] != 0:
                     if s.color % 2 == 0:
-                        if element != 9:
-                            element += 1
+                        if self.ColonneList[adapted_index][x] != 9:
+                            self.ColonneList[adapted_index][x] += 1
                             count += 1
                     else:
-                        if element != 1:
-                            element -= 1
+                        if self.ColonneList[adapted_index][x] != 1:
+                            self.ColonneList[adapted_index][x] -= 1
                             count += 1
         if count != 0:
             return 0
@@ -158,17 +186,18 @@ class columnsRepresentation:
     #add a new colored pixel in the column index
     def modifyColumnAdd(self, s):
         count = 0
-        l = self.generateIndexList(s)
-        adapted_component = s.component % self.nr
-        for adapted_index in l:
-            if self.ColonneList[adapted_index][adapted_component] == 0:
-                color = 1
-                for p in self.ColonneList[adapted_index]:
-                    if p != 0:
-                        color = p
-                        break
-                self.ColonneList[adapted_index][adapted_component] == color
-                count += 1
+        li = self.generateIndexList(s)
+        for adapted_index in li:
+            lc = self.generateComponentList(s, adapted_index)
+            for adapted_component in lc:
+                if self.ColonneList[adapted_index][adapted_component] == 0:
+                    color = 1
+                    for p in self.ColonneList[adapted_index]:
+                        if p != 0:
+                            color = p
+                            break
+                    self.ColonneList[adapted_index][adapted_component] == color
+                    count += 1
         if count != 0:
             return 0
         return 1
@@ -176,12 +205,13 @@ class columnsRepresentation:
     #delete a colored pixel in the row index
     def modifyColumnDel(self, s):
         count = 0
-        l = self.generateIndexList(s)
-        adapted_component = s.component % self.nr
-        for adapted_index in l:
-            if self.ColonneList[adapted_index][adapted_component] != 0:
-                self.ColonneList[adapted_index][adapted_component] == 0
-                count += 1
+        li = self.generateIndexList(s)
+        for adapted_index in li:
+            lc = self.generateComponentList(s, adapted_index)
+            for adapted_component in lc:
+                if self.ColonneList[adapted_index][adapted_component] != 0:
+                    self.ColonneList[adapted_index][adapted_component] == 0
+                    count += 1
         if count != 0:
             return 0
         return 1
@@ -189,33 +219,40 @@ class columnsRepresentation:
     #swap two pixel based on direction in the row index
     def modifyColumnMove(self, s):
         count = 0
-        l = self.generateIndexList(s)
-        adapted_component = s.component % self.nr
-        for adapted_index in l:
+        li = self.generateIndexList(s)
+        for adapted_index in li:
+            lc = self.generateComponentList(s, adapted_index)
             if (s.direction % 2) == 0:
-                #swappo andando verso il basso
-                if adapted_component + 1 < self.nr:
-                    tmp = self.ColonneList[adapted_index][adapted_component + 1]
-                    self.ColonneList[adapted_index][adapted_component + 1] = self.ColonneList[adapted_index][adapted_component]
-                    self.ColonneList[adapted_index][adapted_component] = tmp
-                    count += 1
-                elif adapted_component + 1 == self.nr:
-                    tmp = self.ColonneList[adapted_index][0]
-                    self.ColonneList[adapted_index][0] = self.ColonneList[adapted_index][adapted_component]
-                    self.ColonneList[adapted_index][adapted_component] = tmp
-                    count += 1
+                lc.sort(key=lambda i: i, reverse=True)
             elif (s.direction % 2) == 1:
-                #swappo andando verso l'alto
-                if adapted_component - 1 >= 0:
-                    tmp = self.ColonneList[adapted_index][adapted_component - 1]
-                    self.ColonneList[adapted_index][adapted_component - 1] = self.ColonneList[adapted_index][adapted_component]
-                    self.ColonneList[adapted_index][adapted_component] = tmp
-                    count += 1  
-                elif adapted_component == 0:
-                    tmp = self.ColonneList[adapted_index][self.nr - 1]
-                    self.ColonneList[adapted_index][self.nr - 1] = self.ColonneList[adapted_index][adapted_component]
-                    self.ColonneList[adapted_index][adapted_component] = tmp
-                    count += 1  
+                lc.sort(key=lambda i: i, reverse=False)
+            if len(lc) == self.nr:
+                lc.pop(-1)
+            for adapted_component in lc:
+                if (s.direction % 2) == 0:
+                    #swappo andando verso il basso
+                    if adapted_component + 1 < self.nr:
+                        tmp = self.ColonneList[adapted_index][adapted_component + 1]
+                        self.ColonneList[adapted_index][adapted_component + 1] = self.ColonneList[adapted_index][adapted_component]
+                        self.ColonneList[adapted_index][adapted_component] = tmp
+                        count += 1
+                    elif adapted_component + 1 == self.nr:
+                        tmp = self.ColonneList[adapted_index][0]
+                        self.ColonneList[adapted_index][0] = self.ColonneList[adapted_index][adapted_component]
+                        self.ColonneList[adapted_index][adapted_component] = tmp
+                        count += 1
+                elif (s.direction % 2) == 1:
+                    #swappo andando verso l'alto
+                    if adapted_component - 1 >= 0:
+                        tmp = self.ColonneList[adapted_index][adapted_component - 1]
+                        self.ColonneList[adapted_index][adapted_component - 1] = self.ColonneList[adapted_index][adapted_component]
+                        self.ColonneList[adapted_index][adapted_component] = tmp
+                        count += 1  
+                    elif adapted_component == 0:
+                        tmp = self.ColonneList[adapted_index][self.nr - 1]
+                        self.ColonneList[adapted_index][self.nr - 1] = self.ColonneList[adapted_index][adapted_component]
+                        self.ColonneList[adapted_index][adapted_component] = tmp
+                        count += 1  
         if count != 0:
             return 0
         return 1
