@@ -118,6 +118,12 @@ We can select or group layers in various ways:
 - based on the order of the color that represents the layer
 - we can select all the layer
 
+We can select or group the components of the layer in various ways:
+- based on the order of the pixel in the layer
+- based on the reverse order of the pixel in the layer
+- based on the central pixel in the layer
+- we can select all the pixels in the layer
+
 ### Rectangle Representation
 We can represent the grid as a group of rectangles having the same color, rectangles can be overlapped.
 
@@ -160,6 +166,12 @@ We can select or group figures in various ways:
 - based on the color of the figure
 - we can select all the figure
 
+We can select or group the components of the figure in various ways:
+- based on the order of the pixel in the figure
+- based on the reverse order of the pixel in the figure
+- based on the central pixel in the figure
+- we can select all the pixels in the figure
+
 ### Border Representation
 We can represent the grid as a group of border having the same color having an central area, we do not allow overlapping border.
 
@@ -178,3 +190,9 @@ We can select or group borders in various ways:
 - based on the central border in the border list
 - based on the color of the center
 - we can select all the border
+
+We can select or group the components of the border in various ways:
+- based on the order of the pixel in the border
+- based on the reverse order of the pixel in the border
+- based on the central pixel in the border
+- we can select all the pixels in the border

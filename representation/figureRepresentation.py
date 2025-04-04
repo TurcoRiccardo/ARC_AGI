@@ -82,6 +82,27 @@ class figureRepresentation:
             l.append(s.index % len(self.figureList))
         return l
     
+    #return the list of component index
+    def generateComponentList(self, s, adapted_index):
+        l = list()
+        if s.allComponent == 1:
+            #da destra
+            l.append(len(self.figureList[adapted_index].l) - (s.component % len(self.figureList[adapted_index].l)) - 1)
+        elif s.allComponent == 2:
+            #centro
+            if len(self.figureList[adapted_index].l) % 2 == 1:
+                l.append(len(self.figureList[adapted_index].l) // 2)
+            else:
+                l.append(len(self.figureList[adapted_index].l) // 2 - 1)
+                l.append(len(self.figureList[adapted_index].l) // 2)
+        elif s.allComponent >= 3:
+            #all color
+            l = [x for x in range(0, len(self.figureList[adapted_index].l))]
+        else:
+            #da sinistra
+            l.append(s.component % len(self.figureList[adapted_index].l))
+        return l
+
     #moves the figure index based on the direction
     def moveFigure(self, s):
         if len(self.figureList) == 0:
@@ -227,13 +248,15 @@ class figureRepresentation:
         l = self.generateIndexList(s)
         l.sort(key=lambda i: i, reverse=True)
         for adapted_index in l:
-            if len(self.figureList[adapted_index].l) > 1:
-                adapted_component = s.component % len(self.figureList[adapted_index].l)
-                self.figureList[adapted_index].l.pop(adapted_component)
-                count += 1
-            else:
-                self.figureList.pop(adapted_index)
-                count += 1
+            lc = self.generateComponentList(s, adapted_index)
+            lc.sort(key=lambda i: i, reverse=True)
+            for adapted_component in lc:
+                if len(self.figureList[adapted_index].l) > 1:
+                    self.figureList[adapted_index].l.pop(adapted_component)
+                    count += 1
+                else:
+                    self.figureList.pop(adapted_index)
+                    count += 1
         if count != 0:
             return 0
         return 1
