@@ -41,22 +41,23 @@ def ricFindFigure(grid, posX, posY, pixel, mask, nc, nr):
     return 
 
 #return 0 if we are in a closed border
-def ricEscapeLine(grid, posX, posY, cnt):
+def ricEscapeLine(grid, posX, posY):
+    cnt = 0
     if posX == 0 or posX == grid.shape[0]-1 or posY == 0 or posY == grid.shape[1]-1:
-        return 1
+        return cnt + 1
     grid[posX][posY] = 1
     #up
     if grid[posX+1][posY] == 0:
-        cnt = ricEscapeLine(grid, posX+1, posY, cnt)
+        cnt += ricEscapeLine(grid, posX+1, posY)
     #right
     if cnt == 0 and grid[posX][posY+1] == 0:
-        cnt = ricEscapeLine(grid, posX, posY+1, cnt)
+        cnt += ricEscapeLine(grid, posX, posY+1)
     #down
     if cnt == 0 and grid[posX-1][posY] == 0:
-        cnt = ricEscapeLine(grid, posX-1, posY, cnt)
+        cnt += ricEscapeLine(grid, posX-1, posY)
     #left
     if cnt == 0 and grid[posX][posY-1] == 0:
-        cnt = ricEscapeLine(grid, posX, posY-1, cnt)
+        cnt += ricEscapeLine(grid, posX, posY-1)
     return cnt
 
 @dataclass
@@ -131,7 +132,7 @@ class borderRepresentation:
                     #center pixel = 3 and adding center pixel empty
                     for j in range(1, fb.grid.shape[0] - 1):
                         for k in range(1, fb.grid.shape[1] - 1):
-                            if fb.grid[j][k] == 0 and ricEscapeLine(fb.grid.copy(), j, k, 0) == 0:
+                            if fb.grid[j][k] == 0 and ricEscapeLine(fb.grid.copy(), j, k) == 0:
                                 fb.grid[j][k] = 3
                                 fb.center.append(PixelNode(j + fb.x, k + fb.y, fb.centerColor))
                     self.borderList.append(fb)
@@ -345,30 +346,13 @@ class borderRepresentation:
                 if (s.direction % 4) == 0:
                     #down
                     if self.borderList[adapted_index].grid.shape[0] + self.borderList[adapted_index].x < self.nr:
-                        #devo controllare se e un border pixel e che non sovrappone altri pixel
-                        ok = 0
-                        okMaxX = 0
-                        okMinX = 0
-                        okMaxY = 0
-                        okMinY = 0
+                        #devo controllare che non sovrapponga altri pixel
+                        okSovrapp = 0
                         for pb in self.borderList[adapted_index].border:
                             if pb.x == self.borderList[adapted_index].border[adapted_component].x+1 and pb.y == self.borderList[adapted_index].border[adapted_component].y:
-                                ok = 1
+                                okSovrapp = 1
                                 break
-                            if not (pb.x == self.borderList[adapted_index].border[adapted_component].x and pb.y == self.borderList[adapted_index].border[adapted_component].y):
-                                #down
-                                if self.borderList[adapted_index].border[adapted_component].x+1 < pb.x and self.borderList[adapted_index].border[adapted_component].y == pb.y:
-                                    okMaxX = 1
-                                #up
-                                if self.borderList[adapted_index].border[adapted_component].x+1 > pb.x and self.borderList[adapted_index].border[adapted_component].y == pb.y:
-                                    okMinX = 1
-                                #right
-                                if self.borderList[adapted_index].border[adapted_component].x+1 == pb.x and self.borderList[adapted_index].border[adapted_component].y < pb.y:
-                                    okMaxY = 1
-                                #left
-                                if self.borderList[adapted_index].border[adapted_component].x+1 == pb.x and self.borderList[adapted_index].border[adapted_component].y > pb.y:
-                                    okMinY = 1
-                        if ok == 0 and (okMaxX == 0 or okMinX == 0 or okMaxY == 0 or okMinY == 0):
+                        if okSovrapp == 0:
                             #espando griglia se troppo piccola
                             xgrid = self.borderList[adapted_index].border[adapted_component].x - self.borderList[adapted_index].x
                             ygrid = self.borderList[adapted_index].border[adapted_component].y - self.borderList[adapted_index].y
@@ -377,7 +361,7 @@ class borderRepresentation:
                                 grid = np.vstack([grid, np.zeros((1, grid.shape[1]), dtype=int)])
                             #modifico grid e center
                             grid[xgrid+1][ygrid] = 1
-                            if ricEscapeLine(grid.copy(), xgrid, ygrid, 0) == 0:
+                            if ricEscapeLine(grid.copy(), xgrid, ygrid) == 0:
                                 grid[xgrid][ygrid] = 3
                                 self.borderList[adapted_index].grid = grid.copy()
                                 self.borderList[adapted_index].border[adapted_component].x += 1
@@ -385,26 +369,20 @@ class borderRepresentation:
                                 count += 1
                             else:
                                 #guardo se buca il bordo
-                                ok = 0
+                                okBuca = 0
                                 grid[xgrid][ygrid] = 0
                                 controlGird = grid.copy()
                                 for value in controlGird.flat:
                                     if value != 1:
                                         value = 0
                                 if len(self.borderList[adapted_index].center) > 0:
-                                    if ricEscapeLine(controlGird, self.borderList[adapted_index].center[0].x - self.borderList[adapted_index].x, self.borderList[adapted_index].center[0].y - self.borderList[adapted_index].y, 0) != 0:
-                                        ok = 1
-                                if ok == 0:
+                                    if ricEscapeLine(controlGird, self.borderList[adapted_index].center[0].x - self.borderList[adapted_index].x, self.borderList[adapted_index].center[0].y - self.borderList[adapted_index].y) != 0:
+                                        okBuca = 1
+                                if okBuca == 0:
+                                    #non sta bucando il bordo
                                     self.borderList[adapted_index].grid = grid.copy()
                                     self.borderList[adapted_index].border[adapted_component].x += 1
-                                    #riduco griglia se troppo grande
-                                    ok = 0
-                                    for y in range(0, self.borderList[adapted_index].grid.shape[1]):
-                                        if self.borderList[adapted_index].grid[0][y] != 0:
-                                            ok = 1
-                                    if ok == 0:
-                                        self.borderList[adapted_index].grid = np.delete(self.borderList[adapted_index].grid, 0, axis=0)
-                                        self.borderList[adapted_index].x += 1
+                                    #rimuovo il pixel dalla lista dei pixel centrali
                                     remove = list()
                                     for pc in range(0, len(self.borderList[adapted_index].center)):
                                         if self.borderList[adapted_index].center[pc].x == self.borderList[adapted_index].border[adapted_component].x+1 and self.borderList[adapted_index].center[pc].y == self.borderList[adapted_index].border[adapted_component].y:
@@ -412,75 +390,62 @@ class borderRepresentation:
                                     if len(remove) > 0:
                                         for r in sorted(remove, reverse=True):
                                             self.borderList[adapted_index].center.pop(r)
-                                    count += 1
+                                    #riduco griglia se troppo grande in alto
+                                    okRiduco = 0
+                                    for y in range(0, self.borderList[adapted_index].grid.shape[1]):
+                                        if self.borderList[adapted_index].grid[0][y] != 0:
+                                            okRiduco = 1
+                                    if okRiduco == 0:
+                                        self.borderList[adapted_index].grid = np.delete(self.borderList[adapted_index].grid, 0, axis=0)
+                                        self.borderList[adapted_index].x += 1
+                                else:
+                                    #sta bucando il bordo
+                                    grid[xgrid][ygrid] = 1
+                                    self.borderList[adapted_index].grid = grid.copy()
+                                    self.borderList[adapted_index].border.append(PixelNode(self.borderList[adapted_index].border[adapted_component].x+1, self.borderList[adapted_index].border[adapted_component].y, self.borderList[adapted_index].border[0].color))
+                                count += 1
                 elif (s.direction % 4) == 1:
                     #up
                     if self.borderList[adapted_index].x > 0:
-                        #devo controllare se e un border pixel e che non sovrappone altri pixel
-                        ok = 0
-                        okMaxX = 0
-                        okMinX = 0
-                        okMaxY = 0
-                        okMinY = 0
+                        #devo controllare che non sovrapponga altri pixel
+                        okSovrapp = 0
                         for pb in self.borderList[adapted_index].border:
                             if pb.x == self.borderList[adapted_index].border[adapted_component].x-1 and pb.y == self.borderList[adapted_index].border[adapted_component].y:
-                                ok = 1
+                                okSovrapp = 1
                                 break
-                            if not (pb.x == self.borderList[adapted_index].border[adapted_component].x and pb.y == self.borderList[adapted_index].border[adapted_component].y):
-                                #down
-                                if self.borderList[adapted_index].border[adapted_component].x-1 < pb.x and self.borderList[adapted_index].border[adapted_component].y == pb.y:
-                                    okMaxX = 1
-                                #up
-                                if self.borderList[adapted_index].border[adapted_component].x-1 > pb.x and self.borderList[adapted_index].border[adapted_component].y == pb.y:
-                                    okMinX = 1
-                                #right
-                                if self.borderList[adapted_index].border[adapted_component].x-1 == pb.x and self.borderList[adapted_index].border[adapted_component].y < pb.y:
-                                    okMaxY = 1
-                                #left
-                                if self.borderList[adapted_index].border[adapted_component].x-1 == pb.x and self.borderList[adapted_index].border[adapted_component].y > pb.y:
-                                    okMinY = 1
-                        if ok == 0 and (okMaxX == 0 or okMinX == 0 or okMaxY == 0 or okMinY == 0):
+                        if okSovrapp == 0:
                             #espando griglia se troppo piccola
                             xgrid = self.borderList[adapted_index].border[adapted_component].x - self.borderList[adapted_index].x
                             ygrid = self.borderList[adapted_index].border[adapted_component].y - self.borderList[adapted_index].y
                             grid = self.borderList[adapted_index].grid.copy()
-                            isIncremented = 0
                             if xgrid == 0:
                                 grid = np.vstack([np.zeros((1, grid.shape[1]), dtype=int), grid])
-                                isIncremented = 1
+                                self.borderList[adapted_index].x -= 1
+                                xgrid += 1
                             #modifico grid e center
-                            grid[xgrid-1+isIncremented][ygrid] = 1
-                            if ricEscapeLine(grid.copy(), xgrid+isIncremented, ygrid, 0) == 0:
-                                grid[xgrid+isIncremented][ygrid] = 3
-                                if isIncremented == 1:
-                                    self.borderList[adapted_index].x -= 1
+                            grid[xgrid-1][ygrid] = 1
+                            if ricEscapeLine(grid.copy(), xgrid, ygrid) == 0:
+                                grid[xgrid][ygrid] = 3
                                 self.borderList[adapted_index].grid = grid.copy()
                                 self.borderList[adapted_index].border[adapted_component].x -= 1
                                 self.borderList[adapted_index].center.append(PixelNode(self.borderList[adapted_index].border[adapted_component].x, self.borderList[adapted_index].border[adapted_component].y, self.borderList[adapted_index].centerColor))
                                 count += 1
                             else:
                                 #guardo se buca il bordo
-                                ok = 0
-                                grid[xgrid+isIncremented][ygrid] = 0
+                                okBuca = 0
+                                grid[xgrid][ygrid] = 0
                                 controlGird = grid.copy()
                                 for value in controlGird.flat:
                                     if value != 1:
                                         value = 0
                                 if len(self.borderList[adapted_index].center) > 0:
-                                    if ricEscapeLine(controlGird, self.borderList[adapted_index].center[0].x - self.borderList[adapted_index].x+isIncremented, self.borderList[adapted_index].center[0].y - self.borderList[adapted_index].y, 0) != 0:
-                                        ok = 1
-                                if ok == 0:
-                                    if isIncremented == 1:
-                                        self.borderList[adapted_index].x -= 1
+                                    if ricEscapeLine(controlGird, self.borderList[adapted_index].center[0].x - self.borderList[adapted_index].x, self.borderList[adapted_index].center[0].y - self.borderList[adapted_index].y) != 0:
+                                        okBuca = 1
+                                if okBuca == 0:
+                                    #non sta bucando il bordo
                                     self.borderList[adapted_index].grid = grid.copy()
                                     self.borderList[adapted_index].border[adapted_component].x -= 1
-                                    #riduco griglia se troppo grande
-                                    ok = 0
-                                    for y in range(0, self.borderList[adapted_index].grid.shape[1]):
-                                        if self.borderList[adapted_index].grid[-1][y] != 0:
-                                            ok = 1
-                                    if ok == 0:
-                                        self.borderList[adapted_index].grid = np.delete(self.borderList[adapted_index].grid, -1, axis=0)
+                                    #rimuovo il pixel dalla lista dei pixel centrali
                                     remove = list()
                                     for pc in range(0, len(self.borderList[adapted_index].center)):
                                         if self.borderList[adapted_index].center[pc].x == self.borderList[adapted_index].border[adapted_component].x-1 and self.borderList[adapted_index].center[pc].y == self.borderList[adapted_index].border[adapted_component].y:
@@ -488,34 +453,29 @@ class borderRepresentation:
                                     if len(remove) > 0:
                                         for r in sorted(remove, reverse=True):
                                             self.borderList[adapted_index].center.pop(r)
-                                    count += 1
+                                    #riduco griglia se troppo grande in basso
+                                    okRiduco = 0
+                                    for y in range(0, self.borderList[adapted_index].grid.shape[1]):
+                                        if self.borderList[adapted_index].grid[-1][y] != 0:
+                                            okRiduco = 1
+                                    if okRiduco == 0:
+                                        self.borderList[adapted_index].grid = np.delete(self.borderList[adapted_index].grid, -1, axis=0)
+                                else:
+                                    #sta bucando il bordo
+                                    grid[xgrid][ygrid] = 1
+                                    self.borderList[adapted_index].grid = grid.copy()
+                                    self.borderList[adapted_index].border.append(PixelNode(self.borderList[adapted_index].border[adapted_component].x-1, self.borderList[adapted_index].border[adapted_component].y, self.borderList[adapted_index].border[0].color))
+                                count += 1
                 elif (s.direction % 4) == 2:
                     #right
                     if self.borderList[adapted_index].grid.shape[1] + self.borderList[adapted_index].y < self.nc:
-                        #devo controllare se e un border pixel e che non sovrappone altri pixel
-                        ok = 0
-                        okMaxX = 0
-                        okMinX = 0
-                        okMaxY = 0
-                        okMinY = 0
+                        #devo controllare che non sovrapponga altri pixel
+                        okSovrapp = 0
                         for pb in self.borderList[adapted_index].border:
                             if pb.x == self.borderList[adapted_index].border[adapted_component].x and pb.y == self.borderList[adapted_index].border[adapted_component].y+1:
-                                ok = 1
+                                okSovrapp = 1
                                 break
-                            if not (pb.x == self.borderList[adapted_index].border[adapted_component].x and pb.y == self.borderList[adapted_index].border[adapted_component].y):
-                                #down
-                                if self.borderList[adapted_index].border[adapted_component].x < pb.x and self.borderList[adapted_index].border[adapted_component].y == pb.y+1:
-                                    okMaxX = 1
-                                #up
-                                if self.borderList[adapted_index].border[adapted_component].x > pb.x and self.borderList[adapted_index].border[adapted_component].y == pb.y+1:
-                                    okMinX = 1
-                                #right
-                                if self.borderList[adapted_index].border[adapted_component].x == pb.x and self.borderList[adapted_index].border[adapted_component].y < pb.y+1:
-                                    okMaxY = 1
-                                #left
-                                if self.borderList[adapted_index].border[adapted_component].x == pb.x and self.borderList[adapted_index].border[adapted_component].y > pb.y+1:
-                                    okMinY = 1
-                        if ok == 0 and (okMaxX == 0 or okMinX == 0 or okMaxY == 0 or okMinY == 0):
+                        if okSovrapp == 0:
                             #espando griglia se troppo piccola
                             xgrid = self.borderList[adapted_index].border[adapted_component].x - self.borderList[adapted_index].x
                             ygrid = self.borderList[adapted_index].border[adapted_component].y - self.borderList[adapted_index].y
@@ -524,7 +484,7 @@ class borderRepresentation:
                                 grid = np.hstack([grid, np.zeros((1, grid.shape[0]), dtype=int).reshape(grid.shape[0], 1)])
                             #modifico grid e center
                             grid[xgrid][ygrid+1] = 1
-                            if ricEscapeLine(grid.copy(), xgrid, ygrid, 0) == 0:
+                            if ricEscapeLine(grid.copy(), xgrid, ygrid) == 0:
                                 grid[xgrid][ygrid] = 3
                                 self.borderList[adapted_index].grid = grid.copy()
                                 self.borderList[adapted_index].border[adapted_component].y += 1
@@ -532,26 +492,20 @@ class borderRepresentation:
                                 count += 1
                             else:
                                 #guardo se buca il bordo
-                                ok = 0
+                                okBuca = 0
                                 grid[xgrid][ygrid] = 0
                                 controlGird = grid.copy()
                                 for value in controlGird.flat:
                                     if value != 1:
                                         value = 0
                                 if len(self.borderList[adapted_index].center) > 0:
-                                    if ricEscapeLine(controlGird, self.borderList[adapted_index].center[0].x - self.borderList[adapted_index].x, self.borderList[adapted_index].center[0].y - self.borderList[adapted_index].y, 0) != 0:
-                                        ok = 1
-                                if ok == 0:
+                                    if ricEscapeLine(controlGird, self.borderList[adapted_index].center[0].x - self.borderList[adapted_index].x, self.borderList[adapted_index].center[0].y - self.borderList[adapted_index].y) != 0:
+                                        okBuca = 1
+                                if okBuca == 0:
+                                    #non sta bucando il bordo
                                     self.borderList[adapted_index].grid = grid.copy()
                                     self.borderList[adapted_index].border[adapted_component].y += 1
-                                    #riduco griglia se troppo grande
-                                    ok = 0
-                                    for x in range(0, self.borderList[adapted_index].grid.shape[0]):
-                                        if self.borderList[adapted_index].grid[x][0] != 0:
-                                            ok = 1
-                                    if ok == 0:
-                                        self.borderList[adapted_index].grid = np.delete(self.borderList[adapted_index].grid, 0, axis=1)
-                                        self.borderList[adapted_index].y += 1
+                                    #rimuovo il pixel dalla lista dei pixel centrali
                                     remove = list()
                                     for pc in range(0, len(self.borderList[adapted_index].center)):
                                         if self.borderList[adapted_index].center[pc].x == self.borderList[adapted_index].border[adapted_component].x and self.borderList[adapted_index].center[pc].y == self.borderList[adapted_index].border[adapted_component].y+1:
@@ -559,75 +513,62 @@ class borderRepresentation:
                                     if len(remove) > 0:
                                         for r in sorted(remove, reverse=True):
                                             self.borderList[adapted_index].center.pop(r)
-                                    count += 1
+                                    #riduco griglia se troppo grande in alto
+                                    okRiduco = 0
+                                    for x in range(0, self.borderList[adapted_index].grid.shape[0]):
+                                        if self.borderList[adapted_index].grid[x][0] != 0:
+                                            okRiduco = 1
+                                    if okRiduco == 0:
+                                        self.borderList[adapted_index].grid = np.delete(self.borderList[adapted_index].grid, 0, axis=1)
+                                        self.borderList[adapted_index].y += 1
+                                else:
+                                    #sta bucando il bordo
+                                    grid[xgrid][ygrid] = 1
+                                    self.borderList[adapted_index].grid = grid.copy()
+                                    self.borderList[adapted_index].border.append(PixelNode(self.borderList[adapted_index].border[adapted_component].x, self.borderList[adapted_index].border[adapted_component].y+1, self.borderList[adapted_index].border[0].color))
+                                count += 1
                 elif (s.direction % 4) == 3:
                     #left
                     if self.borderList[adapted_index].y > 0:
-                        #devo controllare se e un border pixel e che non sovrappone altri pixel
-                        ok = 0
-                        okMaxX = 0
-                        okMinX = 0
-                        okMaxY = 0
-                        okMinY = 0
+                        #devo controllare che non sovrapponga altri pixel
+                        okSovrapp = 0
                         for pb in self.borderList[adapted_index].border:
                             if pb.x == self.borderList[adapted_index].border[adapted_component].x and pb.y == self.borderList[adapted_index].border[adapted_component].y-1:
-                                ok = 1
+                                okSovrapp = 1
                                 break
-                            if not (pb.x == self.borderList[adapted_index].border[adapted_component].x and pb.y == self.borderList[adapted_index].border[adapted_component].y):
-                                #down
-                                if self.borderList[adapted_index].border[adapted_component].x < pb.x and self.borderList[adapted_index].border[adapted_component].y == pb.y-1:
-                                    okMaxX = 1
-                                #up
-                                if self.borderList[adapted_index].border[adapted_component].x > pb.x and self.borderList[adapted_index].border[adapted_component].y == pb.y-1:
-                                    okMinX = 1
-                                #right
-                                if self.borderList[adapted_index].border[adapted_component].x == pb.x and self.borderList[adapted_index].border[adapted_component].y < pb.y-1:
-                                    okMaxY = 1
-                                #left
-                                if self.borderList[adapted_index].border[adapted_component].x == pb.x and self.borderList[adapted_index].border[adapted_component].y > pb.y-1:
-                                    okMinY = 1
-                        if ok == 0 and (okMaxX == 0 or okMinX == 0 or okMaxY == 0 or okMinY == 0):
+                        if okSovrapp == 0:
                             #espando griglia se troppo piccola
                             xgrid = self.borderList[adapted_index].border[adapted_component].x - self.borderList[adapted_index].x
                             ygrid = self.borderList[adapted_index].border[adapted_component].y - self.borderList[adapted_index].y
                             grid = self.borderList[adapted_index].grid.copy()
-                            isIncremented = 0
                             if ygrid == 0:
                                 grid = np.hstack([np.zeros((1, grid.shape[0]), dtype=int).reshape(grid.shape[0], 1), grid])
-                                isIncremented =  1
+                                self.borderList[adapted_index].y -= 1
+                                ygrid += 1
                             #modifico grid e center
-                            grid[xgrid][ygrid-1+isIncremented] = 1
-                            if ricEscapeLine(grid.copy(), xgrid, ygrid+isIncremented, 0) == 0:
-                                grid[xgrid][ygrid+isIncremented] = 3
-                                if isIncremented == 1:
-                                    self.borderList[adapted_index].y -= 1
+                            grid[xgrid][ygrid-1] = 1
+                            if ricEscapeLine(grid.copy(), xgrid, ygrid) == 0:
+                                grid[xgrid][ygrid] = 3
                                 self.borderList[adapted_index].grid = grid.copy()
                                 self.borderList[adapted_index].border[adapted_component].y -= 1
                                 self.borderList[adapted_index].center.append(PixelNode(self.borderList[adapted_index].border[adapted_component].x, self.borderList[adapted_index].border[adapted_component].y, self.borderList[adapted_index].centerColor))
                                 count += 1
                             else:
                                 #guardo se buca il bordo
-                                ok = 0
-                                grid[xgrid][ygrid+isIncremented] = 0
+                                okBuca = 0
+                                grid[xgrid][ygrid] = 0
                                 controlGird = grid.copy()
                                 for value in controlGird.flat:
                                     if value != 1:
                                         value = 0
                                 if len(self.borderList[adapted_index].center) > 0:
-                                    if ricEscapeLine(controlGird, self.borderList[adapted_index].center[0].x - self.borderList[adapted_index].x, self.borderList[adapted_index].center[0].y - self.borderList[adapted_index].y+isIncremented, 0) != 0:
-                                        ok = 1
-                                if ok == 0:
-                                    if isIncremented == 1:
-                                        self.borderList[adapted_index].y -= 1
+                                    if ricEscapeLine(controlGird, self.borderList[adapted_index].center[0].x - self.borderList[adapted_index].x, self.borderList[adapted_index].center[0].y - self.borderList[adapted_index].y) != 0:
+                                        okBuca = 1
+                                if okBuca == 0:
+                                    #non sta bucando il bordo
                                     self.borderList[adapted_index].grid = grid.copy()
                                     self.borderList[adapted_index].border[adapted_component].y -= 1
-                                    #riduco griglia se troppo grande
-                                    ok = 0
-                                    for x in range(0, self.borderList[adapted_index].grid.shape[0]):
-                                        if self.borderList[adapted_index].grid[x][-1] != 0:
-                                            ok = 1
-                                    if ok == 0:
-                                        self.borderList[adapted_index].grid = np.delete(self.borderList[adapted_index].grid, -1, axis=1)
+                                    #rimuovo il pixel dalla lista dei pixel centrali
                                     remove = list()
                                     for pc in range(0, len(self.borderList[adapted_index].center)):
                                         if self.borderList[adapted_index].center[pc].x == self.borderList[adapted_index].border[adapted_component].x and self.borderList[adapted_index].center[pc].y == self.borderList[adapted_index].border[adapted_component].y-1:
@@ -635,7 +576,19 @@ class borderRepresentation:
                                     if len(remove) > 0:
                                         for r in sorted(remove, reverse=True):
                                             self.borderList[adapted_index].center.pop(r)
-                                    count += 1
+                                    #riduco griglia se troppo grande in basso
+                                    okRiduco = 0
+                                    for x in range(0, self.borderList[adapted_index].grid.shape[0]):
+                                        if self.borderList[adapted_index].grid[x][-1] != 0:
+                                            okRiduco = 1
+                                    if okRiduco == 0:
+                                        self.borderList[adapted_index].grid = np.delete(self.borderList[adapted_index].grid, -1, axis=1)
+                                else:
+                                    #sta bucando il bordo
+                                    grid[xgrid][ygrid] = 1
+                                    self.borderList[adapted_index].grid = grid.copy()
+                                    self.borderList[adapted_index].border.append(PixelNode(self.borderList[adapted_index].border[adapted_component].x, self.borderList[adapted_index].border[adapted_component].y-1, self.borderList[adapted_index].border[0].color))
+                                count += 1
         if count != 0:
             return 0
         return 1
