@@ -17,6 +17,8 @@ from representation.colorLayerRepresentation import colorLayerRepresentation
 from representation.rectangleRepresentation import rectangleRepresentation
 from representation.figureRepresentation import figureRepresentation
 from representation.borderRepresentation import borderRepresentation
+from representation.firstDiagonalRepresentation import firstDiagonalRepresentation
+from representation.secondDiagonalRepresentation import secondDiagonalRepresentation
 
 
 POPULATION_SIZE = 50
@@ -249,6 +251,8 @@ class Agent(ArcAgent):
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure, figureRepresentation.removeElementFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
         actionsBR = [borderRepresentation.moveBorder, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter2, borderRepresentation.changeColorCenter3, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
+        actionsFDR = [firstDiagonalRepresentation.moveDiagonal]
+        actionsSDR = [secondDiagonalRepresentation.moveDiagonal]
         possibleSolutionRep = list()
         reps = [
             (pixelRepresentation, actionsPR),
@@ -257,7 +261,9 @@ class Agent(ArcAgent):
             (colorLayerRepresentation, actionsCLR),
             (rectangleRepresentation, actionsRER),
             (figureRepresentation, actionsFR),
-            (borderRepresentation, actionsBR)
+            (borderRepresentation, actionsBR),
+            #(firstDiagonalRepresentation, actionsFDR),
+            #(secondDiagonalRepresentation, actionsSDR)
         ]
         #rappresentazione in cui ho delle figure che posso prolungare con ostacoli e elementi sovrapposti
 
