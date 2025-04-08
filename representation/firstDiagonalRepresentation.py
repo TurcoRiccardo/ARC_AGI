@@ -168,6 +168,114 @@ class firstDiagonalRepresentation:
             return 0
         return 1
     
+    #expand the grid in the direction direction
+    def expandGrid(self, s):
+        if (s.direction % 4) == 0:
+            #down
+            if self.nr < 30:
+                self.nr += 1
+                max = 0
+                self.DiagonaleList.append([0])
+                for x in range(0, len(self.DiagonaleList) - 1):
+                    if len(self.DiagonaleList[x + 1]) <= max:
+                        if x >= len(self.DiagonaleList) - self.nc:
+                            self.DiagonaleList[x].append(0)
+                    else:
+                        max = len(self.DiagonaleList[x + 1])
+                return 0
+        elif (s.direction % 4) == 1:
+            #up
+            if self.nr < 30:
+                self.nr += 1
+                max = 0
+                for x in range(0, len(self.DiagonaleList) - 1):
+                    if len(self.DiagonaleList[x + 1]) >= max:
+                        max = len(self.DiagonaleList[x + 1])
+                        if x < self.nc - 1:
+                            self.DiagonaleList[x].insert(0, 0)
+                self.DiagonaleList.insert(0, [0])
+                return 0
+        elif (s.direction % 4) == 2:
+            #right
+            if self.nc < 30:
+                self.nc += 1
+                max = 0
+                for x in range(0, len(self.DiagonaleList) - 1):
+                    if len(self.DiagonaleList[x + 1]) >= max:
+                        max = len(self.DiagonaleList[x + 1])
+                        if x < self.nr - 1:
+                            self.DiagonaleList[x].append(0)
+                self.DiagonaleList.insert(0, [0])
+                return 0
+        elif (s.direction % 4) == 3:
+            #left
+            if self.nc < 30:
+                self.nc += 1
+                max = 0
+                self.DiagonaleList.append([0])
+                for x in range(0, len(self.DiagonaleList) - 1):
+                    if len(self.DiagonaleList[x + 1]) <= max:
+                        if x >= len(self.DiagonaleList) - self.nr:
+                            self.DiagonaleList[x].insert(0, 0)
+                    else:
+                        max = len(self.DiagonaleList[x + 1])
+                return 0
+        return 1
+
+    #reduce the grid in the direction direction
+    def reduceGrid(self, s):
+        if (s.direction % 4) == 0:
+            #down
+            if self.nr > 1:
+                self.nr -= 1
+                max = 0
+                for x in range(0, len(self.DiagonaleList) - 1):
+                    if len(self.DiagonaleList[x + 1]) <= max:
+                        self.DiagonaleList[x].pop(-1)
+                    else:
+                        max = len(self.DiagonaleList[x + 1])
+                self.DiagonaleList.pop(-1)
+                return 0
+        elif (s.direction % 4) == 1:
+            #up
+            if self.nr > 1:
+                self.nr -= 1
+                max = 0
+                for x in range(1, len(self.DiagonaleList) - 1):
+                    if len(self.DiagonaleList[x + 1]) >= max:
+                        max = len(self.DiagonaleList[x + 1])
+                        self.DiagonaleList[x].pop(0)
+                    elif len(self.DiagonaleList[x]) == max:
+                        self.DiagonaleList[x].pop(0)
+                self.DiagonaleList.pop(0)
+                return 0
+        elif (s.direction % 4) == 2:
+            #right
+            if self.nc > 1:
+                self.nc -= 1
+                max = 0
+                for x in range(1, len(self.DiagonaleList) - 1):
+                    if len(self.DiagonaleList[x + 1]) >= max:
+                        max = len(self.DiagonaleList[x + 1])
+                        self.DiagonaleList[x].pop(-1)
+                    elif len(self.DiagonaleList[x]) == max:
+                        self.DiagonaleList[x].pop(-1)
+                self.DiagonaleList.pop(0)
+                return 0
+        elif (s.direction % 4) == 3:
+            #left
+            if self.nc > 1:
+                self.nc -= 1
+                max = 0
+                for x in range(0, len(self.DiagonaleList) - 1):
+                    if len(self.DiagonaleList[x + 1]) <= max:
+                        self.DiagonaleList[x].pop(0)
+                    else:
+                        max = len(self.DiagonaleList[x + 1])
+                self.DiagonaleList.pop(-1)
+                return 0
+        return 1
+    
     def score(self, output):
         score = abs(output.nr - self.nr)*min(self.nc, output.nc)*2 + abs(output.nc - self.nc)*min(self.nr,  output.nr)*2 + abs(output.nr - self.nr)*abs(output.nc - self.nc)*2
         for i in range(0, min(len(self.DiagonaleList), len(output.DiagonaleList))):
@@ -184,7 +292,7 @@ class firstDiagonalRepresentation:
         max = 0
         m = 1
         for diag in self.DiagonaleList:
-            if len(diag) < max:
+            if len(diag) <= max:
                 x = m
                 y = 0
                 for p in diag:

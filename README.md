@@ -37,12 +37,12 @@ We can visualize our grid with different representations
 We represent the colored pixels of the grid as a list of pixels, we do not allow overlapping pixels.
 
 We can apply different types of actions to pixels: 
-- movePixel: moves the selected pixels of one in one direction
-- changeColorPixel: slightly changes the color of selected pixels
-- removePixel: removes selected pixels from the list
-- duplicateNearPixel: duplicates the selected pixels next to the pixel in one direction
-- expandGrid: expands the grid size
-- reduceGrid: reduce the grid size
+- **movePixel:** moves the selected pixels of one in one direction
+- **changeColorPixel:** slightly changes the color of selected pixels
+- **removePixel:** removes selected pixels from the list
+- **duplicateNearPixel:** duplicates the selected pixels next to the pixel in one direction
+- **expandGrid:** expands the grid size
+- **reduceGrid:** reduce the grid size
 
 We can select or group pixels in various ways:
 - based on the order of the pixel list
@@ -55,13 +55,13 @@ We can select or group pixels in various ways:
 We can represent the grid as a list of rows.
 
 We can apply different types of actions to rows: 
-- moveRow: moves the selected row of one in one direction
-- changeColorRow: slightly changes the color of the colored pixel in the selected row
-- modifyRowAdd: add a new colored pixel in the selected row
-- modifyRowDel: delete a colored pixel in the selected row
-- modifyRowMove: modify the selected row by swapping two pixel
-- expandGrid: expands the grid size
-- reduceGrid: reduce the grid size
+- **moveRow:** moves the selected row of one in one direction
+- **changeColorRow:** slightly changes the color of the colored pixel in the selected row
+- **modifyRowAdd:** add a new colored pixel in the selected row
+- **modifyRowDel:** delete a colored pixel in the selected row
+- **modifyRowMove:** modify the selected row by swapping two pixel
+- **expandGrid:** expands the grid size
+- **reduceGrid:** reduce the grid size
 
 We can select or group rows in various ways:
 - based on the order of the row list
@@ -81,13 +81,13 @@ We can select or group the components of the row in various ways:
 We can represent the grid as a list of columns.
 
 We can apply different types of actions to columns: 
-- moveColumn: moves the selected column of one in one direction
-- changeColorColumn: slightly changes the color of the colored pixel in the selected column
-- modifyColumnAdd: add a new colored pixel in the selected column
-- modifyColumnDel: delete a colored pixel in the selected column
-- modifyColumnMove: modify the selected column by swapping two pixel
-- expandGrid: expands the grid size
-- reduceGrid: reduce the grid size
+- **moveColumn:** moves the selected column of one in one direction
+- **changeColorColumn:** slightly changes the color of the colored pixel in the selected column
+- **modifyColumnAdd:** add a new colored pixel in the selected column
+- **modifyColumnDel:** delete a colored pixel in the selected column
+- **modifyColumnMove:** modify the selected column by swapping two pixel
+- **expandGrid:** expands the grid size
+- **reduceGrid:** reduce the grid size
 
 We can select or group columns in various ways:
 - based on the order of the column list
@@ -107,12 +107,12 @@ We can select or group the components of the column in various ways:
 We can represent the grid as a list of layer composed of all the pixels of one color, we have a layer for color.
 
 We can apply different types of actions to layers: 
-- moveLayer: moves the selected layer of one in one direction
-- layerUnion: move the pixel of the selected layer in another closest layer
-- delPixelLayer: delete a pixel in the selected layer
-- addPixelLayer: add a new pixel in the selected layer
-- expandGrid: expands the grid size
-- reduceGrid: reduce the grid size
+- **moveLayer:** moves the selected layer of one in one direction
+- **layerUnion:** move the pixel of the selected layer in another closest layer
+- **delPixelLayer:** delete a pixel in the selected layer
+- **addPixelLayer:** add a new pixel in the selected layer
+- **expandGrid:** expands the grid size
+- **reduceGrid:** reduce the grid size
 
 We can select or group layers in various ways:
 - based on the order of the color that represents the layer
@@ -128,15 +128,15 @@ We can select or group the components of the layer in various ways:
 We can represent the grid as a group of rectangles having the same color, rectangles can be overlapped.
 
 We can apply different types of actions to rectangles: 
-- moveRectangle: moves the selected rectangle of one in one direction
-- changeColorRectangle: slightly changes the color of the selected rectangle
-- removeRectangle: delete the selected rectangle from the rectangle list
-- duplicateNearRectangle: 
-- changeOrder: change the display order of the rectangles
-- scaleUpRectangle: scale up the selected rectangle in the direction direction
-- scaleDownRectangle: scale down the selected rectangle in the direction direction
-- expandGrid: expands the grid size
-- reduceGrid: reduce the grid size
+- **moveRectangle:** moves the selected rectangle of one in one direction
+- **changeColorRectangle:** slightly changes the color of the selected rectangle
+- **removeRectangle:** delete the selected rectangle from the rectangle list
+- **duplicateNearRectangle:** 
+- **changeOrder:** change the display order of the rectangles
+- **scaleUpRectangle:** scale up the selected rectangle in the direction direction
+- **scaleDownRectangle:** scale down the selected rectangle in the direction direction
+- **expandGrid:** expands the grid size
+- **reduceGrid:** reduce the grid size
 
 We can select or group rectangles in various ways:
 - based on the order of the rectangle list
@@ -149,15 +149,15 @@ We can select or group rectangles in various ways:
 We can represent the grid as a group of figures having the same color, we do not allow overlapping figures.
 
 We can apply different types of actions to figures: 
-- moveFigure: moves the selected figure of one in one direction
-- changeColorFigure: slightly changes the color of the selected figure
-- addElementFigure: add a element to the selected figure
-- removeElementFigure: remove a element to the selected figure
-- mergeFigure: merge two figures that are next to each other
-- divideFigure: divide the selected figure in the direction direction generating a new figure
-- changeOrder: change the display order of the figures
-- expandGrid: expands the grid size
-- reduceGrid: reduce the grid size
+- **moveFigure:** moves the selected figure of one in one direction
+- **changeColorFigure:** slightly changes the color of the selected figure
+- **addElementFigure:**v add a element to the selected figure
+- **removeElementFigure:** remove a element to the selected figure
+- **mergeFigure:** merge two figures that are next to each other
+- **divideFigure:** divide the selected figure in the direction direction generating a new figure
+- **changeOrder:** change the display order of the figures
+- **expandGrid:** expands the grid size
+- **reduceGrid:** reduce the grid size
 
 We can select or group figures in various ways:
 - based on the order of the figure list
@@ -176,13 +176,13 @@ We can select or group the components of the figure in various ways:
 We can represent the grid as a group of border having the same color having an central area, we do not allow overlapping border.
 
 We can apply different types of actions to borders: 
-- moveBorder: moves the selected border of one in one direction
-- changeColorBorder: slightly changes the color of the selected border
-- changeColorCenter2: slightly changes the color of the centrel colored pixel of the selected border
-- changeColorCenter3: slightly changes the color of the central area of the selected border
-- modifyBorderFigure: slightly changes the dimension of the selected border
-- expandGrid: expands the grid size
-- reduceGrid: reduce the grid size
+- **moveBorder:** moves the selected border of one in one direction
+- **changeColorBorder:** slightly changes the color of the selected border
+- **changeColorCenter2:** slightly changes the color of the centrel colored pixel of the selected border
+- **changeColorCenter3:** slightly changes the color of the central area of the selected border
+- **modifyBorderFigure:** slightly changes the dimension of the selected border
+- **expandGrid:** expands the grid size
+- **reduceGrid:** reduce the grid size
 
 We can select or group borders in various ways:
 - based on the order of the border list
@@ -196,3 +196,13 @@ We can select or group the components of the border in various ways:
 - based on the reverse order of the pixel in the border
 - based on the central pixel in the border
 - we can select all the pixels in the border
+
+### first Diagonal Representation
+We can represent the grid as a list of diagonal. The diagonals run from the top left vertex to the bottom right vertex, and are listed from the top right vertex to the bottom left vertex.
+
+
+
+### second Diagonal Representation
+We can represent the grid as a list of diagonal. The diagonals run from the top right vertex to the bottom left vertex, and are listed from the top left vertex to the bottom right vertex.
+
+
