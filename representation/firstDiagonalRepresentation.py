@@ -231,7 +231,8 @@ class firstDiagonalRepresentation:
                 max = 0
                 for x in range(0, len(self.DiagonaleList) - 1):
                     if len(self.DiagonaleList[x + 1]) <= max:
-                        self.DiagonaleList[x].pop(-1)
+                        if x > self.nr - 1:
+                            self.DiagonaleList[x].pop(-1)
                     else:
                         max = len(self.DiagonaleList[x + 1])
                 self.DiagonaleList.pop(-1)
@@ -241,26 +242,30 @@ class firstDiagonalRepresentation:
             if self.nr > 1:
                 self.nr -= 1
                 max = 0
-                for x in range(1, len(self.DiagonaleList) - 1):
+                self.DiagonaleList.pop(0)
+                for x in range(0, len(self.DiagonaleList) - 1):
                     if len(self.DiagonaleList[x + 1]) >= max:
                         max = len(self.DiagonaleList[x + 1])
-                        self.DiagonaleList[x].pop(0)
+                        if x < self.nc - 1:
+                            self.DiagonaleList[x].pop(0)
                     elif len(self.DiagonaleList[x]) == max:
-                        self.DiagonaleList[x].pop(0)
-                self.DiagonaleList.pop(0)
+                        if x < self.nc - 1:
+                            self.DiagonaleList[x].pop(0)
                 return 0
         elif (s.direction % 4) == 2:
             #right
             if self.nc > 1:
                 self.nc -= 1
                 max = 0
-                for x in range(1, len(self.DiagonaleList) - 1):
+                self.DiagonaleList.pop(0)
+                for x in range(0, len(self.DiagonaleList) - 1):
                     if len(self.DiagonaleList[x + 1]) >= max:
                         max = len(self.DiagonaleList[x + 1])
-                        self.DiagonaleList[x].pop(-1)
+                        if x < self.nr - 1:
+                            self.DiagonaleList[x].pop(-1)
                     elif len(self.DiagonaleList[x]) == max:
-                        self.DiagonaleList[x].pop(-1)
-                self.DiagonaleList.pop(0)
+                        if x < self.nr - 1:
+                            self.DiagonaleList[x].pop(-1)
                 return 0
         elif (s.direction % 4) == 3:
             #left
@@ -269,7 +274,8 @@ class firstDiagonalRepresentation:
                 max = 0
                 for x in range(0, len(self.DiagonaleList) - 1):
                     if len(self.DiagonaleList[x + 1]) <= max:
-                        self.DiagonaleList[x].pop(0)
+                        if x > self.nc - 1:
+                            self.DiagonaleList[x].pop(0)
                     else:
                         max = len(self.DiagonaleList[x + 1])
                 self.DiagonaleList.pop(-1)
@@ -293,13 +299,20 @@ class firstDiagonalRepresentation:
         m = 1
         for diag in self.DiagonaleList:
             if len(diag) <= max:
-                x = m
-                y = 0
+                if col >= 0:
+                    x = 0
+                    y = col
+                else:
+                    x = m
+                    y = 0
                 for p in diag:
                     grid[x][y] = p
                     x += 1
                     y += 1
-                m += 1
+                if col > 0:
+                    col -= 1
+                else:
+                    m += 1
             else:
                 max = len(diag)
                 x = 0
