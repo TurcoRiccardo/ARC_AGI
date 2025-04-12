@@ -70,11 +70,9 @@ class columnsRepresentation:
             l = [x for x in range(0, self.nr)]
         elif s.allComponent == 4:
             #component of the selected color
-            c = 0
-            for p in self.ColonneList[adapted_index]:
+            for c, p in enumerate(self.ColonneList[adapted_index]):
                 if p == s.color:
                     l.append(c)
-                c += 1
         else:
             #da sinistra
             l.append(s.component % self.nr)

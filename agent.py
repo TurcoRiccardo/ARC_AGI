@@ -114,7 +114,7 @@ def evaluate_representation(rep, individual, inputGrid, outputGrid):
     for action, selector in zip(individual.performed_actions, individual.performed_selection):
         action(rappresentationX, selector)
     err = error_rate(outputGrid, rappresentationX.rappToGrid())
-    return err - individual.fitness[0] - individual.fitness[1]/10
+    return err + abs(individual.fitness[0]) + abs(individual.fitness[1]/10)
 
 #I perform the operations on all the combinations of the examples received
 def generate_representation(rep, demo_pairs, act):
@@ -159,7 +159,7 @@ class Agent(ArcAgent):
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure, figureRepresentation.removeElementFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
         actionsBR = [borderRepresentation.moveBorder, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter2, borderRepresentation.changeColorCenter3, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
-        actionsFDR = [firstDiagonalRepresentation.moveDiagonal, firstDiagonalRepresentation.expandGrid, firstDiagonalRepresentation.reduceGrid]
+        actionsFDR = [firstDiagonalRepresentation.moveDiagonal, firstDiagonalRepresentation.changeColorDiagonal, firstDiagonalRepresentation.modifyDiagonalAdd, firstDiagonalRepresentation.modifyDiagonalDel, firstDiagonalRepresentation.modifyDiagonalMove, firstDiagonalRepresentation.expandGrid, firstDiagonalRepresentation.reduceGrid]
         actionsSDR = [secondDiagonalRepresentation.moveDiagonal]
         possibleSolutionRep = list()
         reps = [
