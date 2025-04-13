@@ -160,7 +160,7 @@ class Agent(ArcAgent):
         actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure, figureRepresentation.removeElementFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
         actionsBR = [borderRepresentation.moveBorder, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter2, borderRepresentation.changeColorCenter3, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
         actionsFDR = [firstDiagonalRepresentation.moveDiagonal, firstDiagonalRepresentation.changeColorDiagonal, firstDiagonalRepresentation.modifyDiagonalAdd, firstDiagonalRepresentation.modifyDiagonalDel, firstDiagonalRepresentation.modifyDiagonalMove, firstDiagonalRepresentation.expandGrid, firstDiagonalRepresentation.reduceGrid]
-        actionsSDR = [secondDiagonalRepresentation.moveDiagonal]
+        actionsSDR = [secondDiagonalRepresentation.moveDiagonal, secondDiagonalRepresentation.changeColorDiagonal, secondDiagonalRepresentation.modifyDiagonalAdd, secondDiagonalRepresentation.modifyDiagonalDel, secondDiagonalRepresentation.modifyDiagonalMove, secondDiagonalRepresentation.expandGrid, secondDiagonalRepresentation.reduceGrid]
         possibleSolutionRep = list()
         reps = [
             #(pixelRepresentation, actionsPR),
@@ -170,8 +170,8 @@ class Agent(ArcAgent):
             #(rectangleRepresentation, actionsRER),
             #(figureRepresentation, actionsFR),
             #(borderRepresentation, actionsBR),
-            (firstDiagonalRepresentation, actionsFDR),
-            #(secondDiagonalRepresentation, actionsSDR)
+            #(firstDiagonalRepresentation, actionsFDR),
+            (secondDiagonalRepresentation, actionsSDR)
         ]
         #rappresentazione in cui ho delle figure che posso prolungare con ostacoli e elementi sovrapposti
 

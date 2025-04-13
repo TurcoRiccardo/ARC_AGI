@@ -15,25 +15,26 @@ class secondDiagonalRepresentation:
         self.nr = input_grid.shape[0]
         self.nc = input_grid.shape[1]
         self.DiagonaleList = list()
-        # Diagonali che partono dalla prima riga
-        for col in range(self.nr):
-            i = 0
-            j = col
+        col = 0
+        m = 1
+        for d in range(0, self.nr + self.nc - 1):
             diag = []
-            while i < self.nc and j >= 0:
-                diag.append(input_grid[i][j])
-                i += 1
-                j -= 1
-            self.DiagonaleList.append(diag)
-        # Diagonali che partono dall'ultima colonna (escludendo la prima riga)
-        for row in range(1, self.nc):
-            i = row
-            j = self.nr - 1
-            diag = []
-            while i < self.nc and j >= 0:
-                diag.append(input_grid[i][j])
-                i += 1
-                j -= 1
+            if d < self.nc:
+                x = 0
+                y = col
+                while x < self.nr and y >= 0:
+                    diag.append(input_grid[x][y])
+                    x += 1
+                    y -= 1
+                col += 1
+            else:
+                x = m
+                y = self.nc - 1
+                while x < self.nr and y >= 0:
+                    diag.append(input_grid[x][y])
+                    x += 1
+                    y -= 1
+                m += 1
             self.DiagonaleList.append(diag)
     
     #return the total number of diagonal
@@ -72,6 +73,32 @@ class secondDiagonalRepresentation:
         else:
             #sopra
             l.append(s.index % len(self.DiagonaleList))
+        return l
+    
+    #return the list of component index
+    def generateComponentList(self, s, adapted_index):
+        l = list()
+        if s.allComponent == 1:
+            #da destra
+            l.append(len(self.DiagonaleList[adapted_index]) - (s.component % len(self.DiagonaleList[adapted_index])) - 1)
+        elif s.allComponent == 2:
+            #centro
+            if len(self.DiagonaleList[adapted_index]) % 2 == 1:
+                l.append(len(self.DiagonaleList[adapted_index])// 2)
+            else:
+                l.append(len(self.DiagonaleList[adapted_index]) // 2 - 1)
+                l.append(len(self.DiagonaleList[adapted_index]) // 2)
+        elif s.allComponent == 3:
+            #all
+            l = [x for x in range(0, len(self.DiagonaleList[adapted_index]))]
+        elif s.allComponent == 4:
+            #component of the selected color
+            for c, p in enumerate(self.DiagonaleList[adapted_index]):
+                if p == s.color:
+                    l.append(c)
+        else:
+            #da sinistra
+            l.append(s.component % len(self.DiagonaleList[adapted_index]))
         return l
 
     #moves the diagonal index if possible based on the direction
@@ -166,33 +193,231 @@ class secondDiagonalRepresentation:
         if count != 0:
             return 0
         return 1
+    
+    #changes the color of the colored pixel in the diagonal index based on color
+    def changeColorDiagonal(self, s):
+        count = 0
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            for y in range(0, len(self.DiagonaleList[adapted_index])):
+                if self.DiagonaleList[adapted_index][y] != 0:
+                    if s.color % 2 == 0:
+                        if self.DiagonaleList[adapted_index][y] != 9:
+                            self.DiagonaleList[adapted_index][y] += 1
+                            count += 1
+                    else:
+                        if self.DiagonaleList[adapted_index][y] != 1:
+                            self.DiagonaleList[adapted_index][y] -= 1
+                            count += 1
+        if count != 0:
+            return 0
+        return 1
+    
+    #add a new colored pixel in the diagonal index
+    def modifyDiagonalAdd(self, s):
+        count = 0
+        li = self.generateIndexList(s)
+        for adapted_index in li:
+            lc = self.generateComponentList(s, adapted_index)
+            for adapted_component in lc:
+                if self.DiagonaleList[adapted_index][adapted_component] == 0:
+                    color = 1
+                    for p in self.DiagonaleList[adapted_index]:
+                        if p != 0:
+                            color = p
+                            break
+                    self.DiagonaleList[adapted_index][adapted_component] == color
+                    count += 1
+        if count != 0:
+            return 0
+        return 1
+    
+    #delete a colored pixel in the diagonal index
+    def modifyDiagonalDel(self, s):
+        count = 0
+        li = self.generateIndexList(s)
+        for adapted_index in li:
+            lc = self.generateComponentList(s, adapted_index)
+            for adapted_component in lc:
+                if self.DiagonaleList[adapted_index][adapted_component] != 0:
+                    self.DiagonaleList[adapted_index][adapted_component] == 0
+                    count += 1
+        if count != 0:
+            return 0
+        return 1
+    
+    #swap two pixel based on direction in the row index
+    def modifyDiagonalMove(self, s):
+        count = 0
+        li = self.generateIndexList(s)
+        for adapted_index in li:
+            lc = self.generateComponentList(s, adapted_index)
+            if (s.direction % 2) == 0:
+                lc.sort(key=lambda i: i, reverse=True)
+            elif (s.direction % 2) == 1:
+                lc.sort(key=lambda i: i, reverse=False)
+            if len(lc) == len(self.DiagonaleList[adapted_index]):
+                lc.pop(-1)
+            for adapted_component in lc:
+                if (s.direction % 2) == 0:
+                    #swappo andando verso destra
+                    if adapted_component + 1 < len(self.DiagonaleList[adapted_index]):
+                        tmp = self.DiagonaleList[adapted_index][adapted_component + 1]
+                        self.DiagonaleList[adapted_index][adapted_component + 1] = self.DiagonaleList[adapted_index][adapted_component]
+                        self.DiagonaleList[adapted_index][adapted_component] = tmp
+                        count += 1
+                    elif adapted_component + 1 == len(self.DiagonaleList[adapted_index]):
+                        tmp = self.DiagonaleList[adapted_index][0]
+                        self.DiagonaleList[adapted_index][0] = self.DiagonaleList[adapted_index][adapted_component]
+                        self.DiagonaleList[adapted_index][adapted_component] = tmp
+                        count += 1
+                elif (s.direction % 2) == 1:
+                    #swappo andando verso sinistra
+                    if adapted_component - 1 >= 0:
+                        tmp = self.DiagonaleList[adapted_index][adapted_component - 1]
+                        self.DiagonaleList[adapted_index][adapted_component - 1] = self.DiagonaleList[adapted_index][adapted_component]
+                        self.DiagonaleList[adapted_index][adapted_component] = tmp
+                        count += 1 
+                    elif adapted_component == 0:
+                        tmp = self.DiagonaleList[adapted_index][-1]
+                        self.DiagonaleList[adapted_index][-1] = self.DiagonaleList[adapted_index][adapted_component]
+                        self.DiagonaleList[adapted_index][adapted_component] = tmp
+                        count += 1 
+        if count != 0:
+            return 0
+        return 1
+    
+    #expand the grid in the direction direction
+    def expandGrid(self, s):
+        if (s.direction % 4) == 0:
+            #down
+            if self.nr < 30:
+                self.nr += 1
+                max = 0
+                self.DiagonaleList.append([0])
+                for x in range(0, len(self.DiagonaleList) - 1):
+                    if len(self.DiagonaleList[x + 1]) <= max:
+                        if x >= len(self.DiagonaleList) - self.nc:
+                            self.DiagonaleList[x].append(0)
+                    else:
+                        max = len(self.DiagonaleList[x + 1])
+                return 0
+        elif (s.direction % 4) == 1:
+            #up
+            if self.nr < 30:
+                self.nr += 1
+                max = 0
+                for x in range(0, len(self.DiagonaleList) - 1):
+                    if len(self.DiagonaleList[x + 1]) >= max:
+                        max = len(self.DiagonaleList[x + 1])
+                        if x < self.nc - 1:
+                            self.DiagonaleList[x].insert(0, 0)
+                self.DiagonaleList.insert(0, [0])
+                return 0
+        elif (s.direction % 4) == 2:
+            #right
+            if self.nc < 30:
+                self.nc += 1
+                max = 0
+                self.DiagonaleList.append([0])
+                for x in range(0, len(self.DiagonaleList) - 1):
+                    if len(self.DiagonaleList[x + 1]) <= max:
+                        if x >= len(self.DiagonaleList) - self.nr:
+                            self.DiagonaleList[x].insert(0, 0)
+                    else:
+                        max = len(self.DiagonaleList[x + 1])
+                return 0
+        elif (s.direction % 4) == 3:
+            #left
+            if self.nc < 30:
+                self.nc += 1
+                max = 0
+                for x in range(0, len(self.DiagonaleList) - 1):
+                    if len(self.DiagonaleList[x + 1]) >= max:
+                        max = len(self.DiagonaleList[x + 1])
+                        if x < self.nr - 1:
+                            self.DiagonaleList[x].append(0)
+                self.DiagonaleList.insert(0, [0])
+                return 0
+        return 1
+
+    #reduce the grid in the direction direction
+    def reduceGrid(self, s):
+        if (s.direction % 4) == 0:
+            #down
+            if self.nr > 1:
+                self.nr -= 1
+                max = 0
+                for x in range(0, len(self.DiagonaleList) - 1):
+                    if len(self.DiagonaleList[x + 1]) <= max:
+                        if x > self.nr - 1:
+                            self.DiagonaleList[x].pop(-1)
+                    else:
+                        max = len(self.DiagonaleList[x + 1])
+                self.DiagonaleList.pop(-1)
+                return 0
+        elif (s.direction % 4) == 1:
+            #up
+            if self.nr > 1:
+                self.nr -= 1
+                max = 0
+                self.DiagonaleList.pop(0)
+                for x in range(0, len(self.DiagonaleList) - 1):
+                    if len(self.DiagonaleList[x + 1]) >= max:
+                        max = len(self.DiagonaleList[x + 1])
+                        if x < self.nc - 1:
+                            self.DiagonaleList[x].pop(0)
+                    elif len(self.DiagonaleList[x]) == max:
+                        if x < self.nc - 1:
+                            self.DiagonaleList[x].pop(0)
+                return 0
+        elif (s.direction % 4) == 2:
+            #right
+            if self.nc > 1:
+                self.nc -= 1
+                max = 0
+                for x in range(0, len(self.DiagonaleList) - 1):
+                    if len(self.DiagonaleList[x + 1]) <= max:
+                        if x > self.nc - 1:
+                            self.DiagonaleList[x].pop(0)
+                    else:
+                        max = len(self.DiagonaleList[x + 1])
+                self.DiagonaleList.pop(-1)
+                return 0
+        elif (s.direction % 4) == 3:
+            #left
+            if self.nc > 1:
+                self.nc -= 1
+                max = 0
+                self.DiagonaleList.pop(0)
+                for x in range(0, len(self.DiagonaleList) - 1):
+                    if len(self.DiagonaleList[x + 1]) >= max:
+                        max = len(self.DiagonaleList[x + 1])
+                        if x < self.nr - 1:
+                            self.DiagonaleList[x].pop(-1)
+                    elif len(self.DiagonaleList[x]) == max:
+                        if x < self.nr - 1:
+                            self.DiagonaleList[x].pop(-1)
+                return 0
+        return 1
 
     def score(self, output):
         score = abs(output.nr - self.nr)*min(self.nc, output.nc)*2 + abs(output.nc - self.nc)*min(self.nr,  output.nr)*2 + abs(output.nr - self.nr)*abs(output.nc - self.nc)*2
         for i in range(0, min(len(self.DiagonaleList), len(output.DiagonaleList))):
             for c in range(0, min(len(self.DiagonaleList[i]), len(output.DiagonaleList[i]))):
-                if self.DiagonaleList[i][c] == 0 or output.DiagonaleList[i][c] == 0:
-                    score += 1
-                else:
-                    score += abs(int(self.DiagonaleList[i][c]) - int(output.DiagonaleList[i][c]))/10
+                if self.DiagonaleList[i][c] != output.DiagonaleList[i][c]:
+                    if self.DiagonaleList[i][c] == 0 or output.DiagonaleList[i][c] == 0:
+                        score += 1
+                    else:
+                        score += abs(int(self.DiagonaleList[i][c]) - int(output.DiagonaleList[i][c]))/10
         return -score
 
     def rappToGrid(self):
         grid = np.zeros([self.nr, self.nc], dtype=np.uint8)
         col = 0
-        max = 0
         m = 1
-        for diag in self.DiagonaleList:
-            if len(diag) < max:
-                x = m
-                y = self.nc - 1
-                for p in diag:
-                    grid[x][y] = p
-                    x += 1
-                    y -= 1
-                m += 1
-            else:
-                max = len(diag)
+        for c, diag in enumerate(self.DiagonaleList):
+            if c < self.nc:
                 x = 0
                 y = col
                 for p in diag:
@@ -200,6 +425,14 @@ class secondDiagonalRepresentation:
                     x += 1
                     y -= 1
                 col += 1
+            else:
+                x = m
+                y = self.nc - 1
+                for p in diag:
+                    grid[x][y] = p
+                    x += 1
+                    y -= 1
+                m += 1
         return grid
     
     def scoreAction(performed_actions, performed_selection):
@@ -207,7 +440,7 @@ class secondDiagonalRepresentation:
         for x in range(0, len(performed_actions)):
             if performed_selection[x].allElement < 3: 
                 score += 0.5
-            #if performed_actions[x] == firstDiagonalRepresentation.modifyRowAdd or performed_actions[x] == firstDiagonalRepresentation.modifyRowDel:
-            #    score += 0.5
+            if performed_actions[x] == secondDiagonalRepresentation.modifyDiagonalAdd or performed_actions[x] == secondDiagonalRepresentation.modifyDiagonalDel or performed_actions[x] == secondDiagonalRepresentation.reduceGrid or performed_actions[x] == secondDiagonalRepresentation.expandGrid:
+                score += 0.5
             score += 1
         return -score

@@ -30,6 +30,18 @@ A grid can have any height or width between 1x1 and 30x30 inclusive (average hei
 - 8: Cyan
 - 9: Brown
 
+## Basic Geometry and Topology concepts that the algorithm knows as priors:
+- **translation:**
+- **color change:**
+- **rotations:** da fare
+- **Copy, repeat objects:** da finire
+- **Shape upscaling or downscaling:**
+- **elastic distortions:** ?
+- **symmetries:** ?
+- **Draw lines, connection points, orthogonal projections:** ?
+- **To contain or be contained within or outside a perimeter:** ?
+
+
 ## Representation
 We can visualize our grid with different representations
 
@@ -200,9 +212,51 @@ We can select or group the components of the border in various ways:
 ### first Diagonal Representation
 We can represent the grid as a list of diagonal. The diagonals run from the top left vertex to the bottom right vertex, and are listed from the top right vertex to the bottom left vertex.
 
+We can apply different types of actions to diagonals: 
+- **moveDiagonal:** moves the selected diagonal of one in one direction
+- **changeColorDiagonal:** slightly changes the color of the colored pixel in the selected diagonal
+- **modifyDiagonalAdd:** add a new colored pixel in the selected diagonal
+- **modifyDiagonalDel:** delete a colored pixel in the selected diagonal
+- **modifyDiagonalMove:** modify the selected diagonal by swapping two pixel
+- **expandGrid:** expands the grid size
+- **reduceGrid:** reduce the grid size
 
+We can select or group diagonals in various ways:
+- based on the order of the diagonal list
+- based on the reverse order of the diagonal list
+- based on the central diagonal in the diagonal list
+- based if the diagonal contain a certaint color
+- we can select all the diagonal
+
+We can select or group the components of the diagonal in various ways:
+- based on the order of the components
+- based on the reverse order of the components
+- based on the central components in the diagonal
+- based on the color of the components in the diagonal
+- we can select all the components in the diagonal
 
 ### second Diagonal Representation
 We can represent the grid as a list of diagonal. The diagonals run from the top right vertex to the bottom left vertex, and are listed from the top left vertex to the bottom right vertex.
 
+We can apply different types of actions to diagonals: 
+- **moveDiagonal:** moves the selected diagonal of one in one direction
+- **changeColorDiagonal:** slightly changes the color of the colored pixel in the selected diagonal
+- **modifyDiagonalAdd:** add a new colored pixel in the selected diagonal
+- **modifyDiagonalDel:** delete a colored pixel in the selected diagonal
+- **modifyDiagonalMove:** modify the selected diagonal by swapping two pixel
+- **expandGrid:** expands the grid size
+- **reduceGrid:** reduce the grid size
 
+We can select or group diagonals in various ways:
+- based on the order of the diagonal list
+- based on the reverse order of the diagonal list
+- based on the central diagonal in the diagonal list
+- based if the diagonal contain a certaint color
+- we can select all the diagonal
+
+We can select or group the components of the diagonal in various ways:
+- based on the order of the components
+- based on the reverse order of the components
+- based on the central components in the diagonal
+- based on the color of the components in the diagonal
+- we can select all the components in the diagonal
