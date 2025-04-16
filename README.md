@@ -36,7 +36,6 @@ A grid can have any height or width between 1x1 and 30x30 inclusive (average hei
 - **rotations:** da fare
 - **Copy, repeat objects:** da finire
 - **Shape upscaling or downscaling:**
-- **elastic distortions:** ?
 - **symmetries:** ?
 - **Draw lines, connection points, orthogonal projections:** ?
 - **To contain or be contained within or outside a perimeter:** ?
@@ -143,7 +142,7 @@ We can apply different types of actions to rectangles:
 - **moveRectangle:** moves the selected rectangle of one in one direction
 - **changeColorRectangle:** slightly changes the color of the selected rectangle
 - **removeRectangle:** delete the selected rectangle from the rectangle list
-- **duplicateNearRectangle:** 
+- **duplicateNearRectangle:** duplicate the selected rectangle from the rectangle list in one direction
 - **changeOrder:** change the display order of the rectangles
 - **scaleUpRectangle:** scale up the selected rectangle in the direction direction
 - **scaleDownRectangle:** scale down the selected rectangle in the direction direction
@@ -158,13 +157,14 @@ We can select or group rectangles in various ways:
 - we can select all the rectangle
 
 ### Figure Representation
-We can represent the grid as a group of figures having the same color, we do not allow overlapping figures.
+We can represent the grid as a group of figures having the same color, figures can be overlapped.
 
 We can apply different types of actions to figures: 
 - **moveFigure:** moves the selected figure of one in one direction
 - **changeColorFigure:** slightly changes the color of the selected figure
 - **addElementFigure:**v add a element to the selected figure
 - **removeElementFigure:** remove a element to the selected figure
+
 - **mergeFigure:** merge two figures that are next to each other
 - **divideFigure:** divide the selected figure in the direction direction generating a new figure
 - **changeOrder:** change the display order of the figures

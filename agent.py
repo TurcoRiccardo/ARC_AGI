@@ -94,7 +94,7 @@ def generate_representation_solution(rep, demo_pairs, act, indice):
         population.sort(key=lambda i: i.fitness, reverse = True)
         population = population[:POPULATION_SIZE]
     
-    '''
+    
     print("azioni")
     print(population[0].performed_actions)
     print(len(population[0].performed_actions))
@@ -104,7 +104,7 @@ def generate_representation_solution(rep, demo_pairs, act, indice):
     prediction.plot(show=True, title=f"Input-Output")
     prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
     prediction.plot(show=True, title=f"Output-OutputGenerato")
-    '''
+    
 
     return population[0]
 
@@ -157,7 +157,8 @@ class Agent(ArcAgent):
         actionsCR = [columnsRepresentation.moveColumn, columnsRepresentation.changeColorColumn, columnsRepresentation.modifyColumnAdd, columnsRepresentation.modifyColumnDel, columnsRepresentation.modifyColumnMove, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
         actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
-        actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure, figureRepresentation.removeElementFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
+        actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure, figureRepresentation.removeElementFigure,  figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
+        #figureRepresentation.mergeFigure, figureRepresentation.divideFigure,
         actionsBR = [borderRepresentation.moveBorder, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter2, borderRepresentation.changeColorCenter3, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
         actionsFDR = [firstDiagonalRepresentation.moveDiagonal, firstDiagonalRepresentation.changeColorDiagonal, firstDiagonalRepresentation.modifyDiagonalAdd, firstDiagonalRepresentation.modifyDiagonalDel, firstDiagonalRepresentation.modifyDiagonalMove, firstDiagonalRepresentation.expandGrid, firstDiagonalRepresentation.reduceGrid]
         actionsSDR = [secondDiagonalRepresentation.moveDiagonal, secondDiagonalRepresentation.changeColorDiagonal, secondDiagonalRepresentation.modifyDiagonalAdd, secondDiagonalRepresentation.modifyDiagonalDel, secondDiagonalRepresentation.modifyDiagonalMove, secondDiagonalRepresentation.expandGrid, secondDiagonalRepresentation.reduceGrid]
@@ -168,10 +169,10 @@ class Agent(ArcAgent):
             #(columnsRepresentation, actionsCR),
             #(colorLayerRepresentation, actionsCLR),
             #(rectangleRepresentation, actionsRER),
-            #(figureRepresentation, actionsFR),
+            (figureRepresentation, actionsFR),
             #(borderRepresentation, actionsBR),
             #(firstDiagonalRepresentation, actionsFDR),
-            (secondDiagonalRepresentation, actionsSDR)
+            #(secondDiagonalRepresentation, actionsSDR)
         ]
         #rappresentazione in cui ho delle figure che posso prolungare con ostacoli e elementi sovrapposti
 

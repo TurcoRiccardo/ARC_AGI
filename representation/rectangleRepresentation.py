@@ -156,29 +156,29 @@ class rectangleRepresentation:
         count = 0
         l = self.generateIndexList(s)
         for adapted_index in l:
-            new_rectangle = Rectangle(self.rectangleList[adapted_index].x, self.rectangleList[adapted_index].y, 1, 1, self.rectangleList[adapted_index].color)
+            new_rectangle = Rectangle(self.rectangleList[adapted_index].x, self.rectangleList[adapted_index].y, self.rectangleList[adapted_index].h, self.rectangleList[adapted_index].w, self.rectangleList[adapted_index].color)
             if (s.direction % 4) == 0:
                 #down
-                if new_rectangle.x + new_rectangle.h < self.nr:
-                    new_rectangle.x = new_rectangle.x + new_rectangle.h
+                if self.rectangleList[adapted_index].x + 2 * self.rectangleList[adapted_index].h < self.nr:
+                    new_rectangle.x += new_rectangle.h
                     self.rectangleList.append(new_rectangle)
                     count += 1
             elif (s.direction % 4) == 1:
                 #up
-                if new_rectangle.x - 1 >= 0:
-                    new_rectangle.x = new_rectangle.x - 1
+                if self.rectangleList[adapted_index].x - new_rectangle.h >= 0:
+                    new_rectangle.x -= new_rectangle.h
                     self.rectangleList.append(new_rectangle)
                     count += 1
             elif (s.direction % 4) == 2:
                 #right
-                if new_rectangle.y + new_rectangle.w < self.nc:
-                    new_rectangle.y = new_rectangle.y + new_rectangle.w
+                if self.rectangleList[adapted_index].y + 2 * self.rectangleList[adapted_index].w < self.nc:
+                    new_rectangle.y += new_rectangle.w
                     self.rectangleList.append(new_rectangle)
                     count += 1
             elif (s.direction % 4) == 3:
                 #left
-                if new_rectangle.y - 1 >= 0:
-                    new_rectangle.y = new_rectangle.y - 1
+                if self.rectangleList[adapted_index].y - new_rectangle.w >= 0:
+                    new_rectangle.y -= new_rectangle.w
                     self.rectangleList.append(new_rectangle)
                     count += 1
         if count != 0:
