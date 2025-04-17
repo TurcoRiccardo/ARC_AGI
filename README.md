@@ -164,7 +164,7 @@ We can apply different types of actions to figures:
 - **changeColorFigure:** slightly changes the color of the selected figure
 - **addElementFigure:**v add a element to the selected figure
 - **removeElementFigure:** remove a element to the selected figure
-
+- **duplicateFigure:** duplicate the selected figure from the figure list in one direction
 - **mergeFigure:** merge two figures that are next to each other
 - **divideFigure:** divide the selected figure in the direction direction generating a new figure
 - **changeOrder:** change the display order of the figures

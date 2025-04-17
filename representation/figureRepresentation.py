@@ -88,7 +88,7 @@ class figureRepresentation:
         elif s.allElement == 4:
             #color
             for x in range(0, len(self.figureList)):
-                if self.figureList[x].l[0].color == s.color:
+                if self.figureList[x].color == s.color:
                     l.append(x)
         else:
             #sopra
@@ -245,20 +245,62 @@ class figureRepresentation:
         li = self.generateIndexList(s)
         li.sort(key=lambda i: i, reverse=True)
         for adapted_index in li:
-            lc = self.generateComponentList(s, adapted_index)
-            lc.sort(key=lambda i: i, reverse=True)
-            for adapted_component in lc:
-                if len(self.figureList[adapted_index].l) > 1:
-                    self.figureList[adapted_index].l.pop(adapted_component)
-                    for p in self.figureList[adapted_index].l:
-                        if self.figureList[adapted_index].xMax < p.x:
-                            self.figureList[adapted_index].xMax = p.x
-                        if self.figureList[adapted_index].xMin > p.x:
-                            self.figureList[adapted_index].xMin = p.x
-                        if self.figureList[adapted_index].yMax < p.y:
-                            self.figureList[adapted_index].yMax = p.y
-                        if self.figureList[adapted_index].yMin > p.y:
-                            self.figureList[adapted_index].yMin = p.y
+            if (s.direction % 4) == 0:
+                #down
+                height = (self.figureList[adapted_index].xMax - self.figureList[adapted_index].xMin + 1)
+                if height > 1:
+                    rim = list()
+                    for x in range(0, len(self.figureList[adapted_index].l)):
+                        if self.figureList[adapted_index].l[x].x == self.figureList[adapted_index].xMax:
+                            rim.append(x)
+                    for x in sorted(rim, reverse=True):
+                        self.figureList[adapted_index].l.pop(x)
+                    self.figureList[adapted_index].xMax -= 1
+                    count += 1
+                else:
+                    self.figureList.pop(adapted_index)
+                    count += 1
+            elif (s.direction % 4) == 1:
+                #up
+                height = (self.figureList[adapted_index].xMax - self.figureList[adapted_index].xMin + 1)
+                if height > 1:
+                    rim = list()
+                    for x in range(0, len(self.figureList[adapted_index].l)):
+                        if self.figureList[adapted_index].l[x].x == self.figureList[adapted_index].xMin:
+                            rim.append(x)
+                    for x in sorted(rim, reverse=True):
+                        self.figureList[adapted_index].l.pop(x)
+                    self.figureList[adapted_index].xMin += 1
+                    count += 1
+                else:
+                    self.figureList.pop(adapted_index)
+                    count += 1
+            elif (s.direction % 4) == 2:
+                #right
+                width = (self.figureList[adapted_index].yMax - self.figureList[adapted_index].yMin + 1)
+                if width > 1:
+                    rim = list()
+                    for x in range(0, len(self.figureList[adapted_index].l)):
+                        if self.figureList[adapted_index].l[x].y == self.figureList[adapted_index].yMax:
+                            rim.append(x)
+                    for x in sorted(rim, reverse=True):
+                        self.figureList[adapted_index].l.pop(x)
+                    self.figureList[adapted_index].yMax -= 1
+                    count += 1
+                else:
+                    self.figureList.pop(adapted_index)
+                    count += 1
+            elif (s.direction % 4) == 3:
+                #left
+                width = (self.figureList[adapted_index].yMax - self.figureList[adapted_index].yMin + 1)
+                if width > 1:
+                    rim = list()
+                    for x in range(0, len(self.figureList[adapted_index].l)):
+                        if self.figureList[adapted_index].l[x].y == self.figureList[adapted_index].yMin:
+                            rim.append(x)
+                    for x in sorted(rim, reverse=True):
+                        self.figureList[adapted_index].l.pop(x)
+                    self.figureList[adapted_index].yMin += 1
                     count += 1
                 else:
                     self.figureList.pop(adapted_index)
@@ -307,7 +349,7 @@ class figureRepresentation:
                 if self.figureList[adapted_index].yMin - width >= 0:
                     newPixel = list()
                     for p in self.figureList[adapted_index].l:
-                        newPixel.append(PixelNode(p.x, p.y - height, self.figureList[adapted_index].color))
+                        newPixel.append(PixelNode(p.x, p.y - width, self.figureList[adapted_index].color))
                     self.figureList.append(Figure(newPixel, self.figureList[adapted_index].xMax, self.figureList[adapted_index].xMin, self.figureList[adapted_index].yMax - width, self.figureList[adapted_index].yMin - width, self.figureList[adapted_index].color))
                     count += 1
         if count != 0:
@@ -324,96 +366,128 @@ class figureRepresentation:
             if adapted_index < len(self.figureList):
                 if (s.direction % 4) == 0:
                     #down
-                    indexFigure = set()
-                    for p1 in self.figureList[adapted_index].l:
-                        if p1.x + 1 < self.nr:
+                    if self.figureList[adapted_index].xMax + 1 < self.nr:
+                        indexFigure = set()
+                        for p1 in self.figureList[adapted_index].l:
                             for f2 in range(0, len(self.figureList)):
                                 if f2 != adapted_index:
                                     for p2 in self.figureList[f2].l:
                                         if p1.x+1 == p2.x and p1.y == p2.y and p1.color == p2.color:
                                             indexFigure.add(f2)
-                    if len(indexFigure) > 0:
-                        existing_pixels = {(p.x, p.y) for p in self.figureList[adapted_index].l}
-                        newPixel = list()
-                        for f in sorted(indexFigure, reverse=True):
-                            figureToMerge = self.figureList[f]
-                            for p2 in figureToMerge.l:
-                                if (p2.x, p2.y) not in existing_pixels:
-                                    newPixel.append(p2)
-                                    existing_pixels.add((p2.x, p2.y))
-                        self.figureList[adapted_index].l.extend(newPixel)
-                        for f in sorted(indexFigure, reverse=True):
-                            self.figureList.pop(f)
-                        count += 1
+                        if len(indexFigure) > 0:
+                            existing_pixels = {(p.x, p.y) for p in self.figureList[adapted_index].l}
+                            newPixel = list()
+                            for f in sorted(indexFigure, reverse=True):
+                                figureToMerge = self.figureList[f]
+                                for p2 in figureToMerge.l:
+                                    if (p2.x, p2.y) not in existing_pixels:
+                                        newPixel.append(p2)
+                                        existing_pixels.add((p2.x, p2.y))
+                                if self.figureList[f].xMax > self.figureList[adapted_index].xMax:
+                                    self.figureList[adapted_index].xMax = self.figureList[f].xMax
+                                if self.figureList[f].xMin < self.figureList[adapted_index].xMin:
+                                    self.figureList[adapted_index].xMin = self.figureList[f].xMin
+                                if self.figureList[f].yMax > self.figureList[adapted_index].yMax:
+                                    self.figureList[adapted_index].yMax = self.figureList[f].yMax
+                                if self.figureList[f].yMin < self.figureList[adapted_index].yMin:
+                                    self.figureList[adapted_index].yMin = self.figureList[f].yMin
+                            self.figureList[adapted_index].l.extend(newPixel)
+                            for f in sorted(indexFigure, reverse=True):
+                                self.figureList.pop(f)
+                            count += 1
                 elif (s.direction % 4) == 1:
                     #up
-                    indexFigure = set()
-                    for p1 in self.figureList[adapted_index].l:
-                        if p1.x > 0:
+                    if self.figureList[adapted_index].xMin > 0:
+                        indexFigure = set()
+                        for p1 in self.figureList[adapted_index].l:
                             for f2 in range(0, len(self.figureList)):
                                 if f2 != adapted_index:
                                     for p2 in self.figureList[f2].l:
                                         if p1.x-1 == p2.x and p1.y == p2.y and p1.color == p2.color:
                                             indexFigure.add(f2)
-                    if len(indexFigure) > 0:
-                        existing_pixels = {(p.x, p.y) for p in self.figureList[adapted_index].l}
-                        newPixel = list()
-                        for f in sorted(indexFigure, reverse=True):
-                            figureToMerge = self.figureList[f]
-                            for p2 in figureToMerge.l:
-                                if (p2.x, p2.y) not in existing_pixels:
-                                    newPixel.append(p2)
-                                    existing_pixels.add((p2.x, p2.y))
-                        self.figureList[adapted_index].l.extend(newPixel)
-                        for f in sorted(indexFigure, reverse=True):
-                            self.figureList.pop(f)
-                        count += 1
+                        if len(indexFigure) > 0:
+                            existing_pixels = {(p.x, p.y) for p in self.figureList[adapted_index].l}
+                            newPixel = list()
+                            for f in sorted(indexFigure, reverse=True):
+                                figureToMerge = self.figureList[f]
+                                for p2 in figureToMerge.l:
+                                    if (p2.x, p2.y) not in existing_pixels:
+                                        newPixel.append(p2)
+                                        existing_pixels.add((p2.x, p2.y))
+                                if self.figureList[f].xMax > self.figureList[adapted_index].xMax:
+                                    self.figureList[adapted_index].xMax = self.figureList[f].xMax
+                                if self.figureList[f].xMin < self.figureList[adapted_index].xMin:
+                                    self.figureList[adapted_index].xMin = self.figureList[f].xMin
+                                if self.figureList[f].yMax > self.figureList[adapted_index].yMax:
+                                    self.figureList[adapted_index].yMax = self.figureList[f].yMax
+                                if self.figureList[f].yMin < self.figureList[adapted_index].yMin:
+                                    self.figureList[adapted_index].yMin = self.figureList[f].yMin
+                            self.figureList[adapted_index].l.extend(newPixel)
+                            for f in sorted(indexFigure, reverse=True):
+                                self.figureList.pop(f)
+                            count += 1
                 elif (s.direction % 4) == 2:
                     #right
-                    indexFigure = set()
-                    for p1 in self.figureList[adapted_index].l:
-                        if p1.y + 1 < self.nc:
+                    if self.figureList[adapted_index].yMax + 1 < self.nc:
+                        indexFigure = set()
+                        for p1 in self.figureList[adapted_index].l:
                             for f2 in range(0, len(self.figureList)):
                                 if f2 != adapted_index:
                                     for p2 in self.figureList[f2].l:
                                         if p1.x == p2.x and p1.y+1 == p2.y and p1.color == p2.color:
                                             indexFigure.add(f2)
-                    if len(indexFigure) > 0:
-                        existing_pixels = {(p.x, p.y) for p in self.figureList[adapted_index].l}
-                        newPixel = list()
-                        for f in sorted(indexFigure, reverse=True):
-                            figureToMerge = self.figureList[f]
-                            for p2 in figureToMerge.l:
-                                if (p2.x, p2.y) not in existing_pixels:
-                                    newPixel.append(p2)
-                                    existing_pixels.add((p2.x, p2.y))
-                        self.figureList[adapted_index].l.extend(newPixel)
-                        for f in sorted(indexFigure, reverse=True):
-                            self.figureList.pop(f)
-                        count += 1
+                        if len(indexFigure) > 0:
+                            existing_pixels = {(p.x, p.y) for p in self.figureList[adapted_index].l}
+                            newPixel = list()
+                            for f in sorted(indexFigure, reverse=True):
+                                figureToMerge = self.figureList[f]
+                                for p2 in figureToMerge.l:
+                                    if (p2.x, p2.y) not in existing_pixels:
+                                        newPixel.append(p2)
+                                        existing_pixels.add((p2.x, p2.y))
+                                if self.figureList[f].xMax > self.figureList[adapted_index].xMax:
+                                    self.figureList[adapted_index].xMax = self.figureList[f].xMax
+                                if self.figureList[f].xMin < self.figureList[adapted_index].xMin:
+                                    self.figureList[adapted_index].xMin = self.figureList[f].xMin
+                                if self.figureList[f].yMax > self.figureList[adapted_index].yMax:
+                                    self.figureList[adapted_index].yMax = self.figureList[f].yMax
+                                if self.figureList[f].yMin < self.figureList[adapted_index].yMin:
+                                    self.figureList[adapted_index].yMin = self.figureList[f].yMin
+                            self.figureList[adapted_index].l.extend(newPixel)
+                            for f in sorted(indexFigure, reverse=True):
+                                self.figureList.pop(f)
+                            count += 1
                 elif (s.direction % 4) == 3:
                     #left
-                    indexFigure = set()
-                    for p1 in self.figureList[adapted_index].l:
-                        if p1.y > 0:
+                    if self.figureList[adapted_index].yMin > 0:
+                        indexFigure = set()
+                        for p1 in self.figureList[adapted_index].l:
                             for f2 in range(0, len(self.figureList)):
                                 if f2 != adapted_index:
                                     for p2 in self.figureList[f2].l:
                                         if p1.x == p2.x and p1.y-1 == p2.y and p1.color == p2.color:
                                             indexFigure.add(f2)
-                    if len(indexFigure) > 0:
-                        existing_pixels = {(p.x, p.y) for p in self.figureList[adapted_index].l}
-                        newPixel = list()
-                        for f in sorted(indexFigure, reverse=True):
-                            figureToMerge = self.figureList[f]
-                            for p2 in figureToMerge.l:
-                                if (p2.x, p2.y) not in existing_pixels:
-                                    newPixel.append(p2)
-                                    existing_pixels.add((p2.x, p2.y))
-                        self.figureList[adapted_index].l.extend(newPixel)
-                        for f in sorted(indexFigure, reverse=True):
-                            self.figureList.pop(f)
-                        count += 1
+                        if len(indexFigure) > 0:
+                            existing_pixels = {(p.x, p.y) for p in self.figureList[adapted_index].l}
+                            newPixel = list()
+                            for f in sorted(indexFigure, reverse=True):
+                                figureToMerge = self.figureList[f]
+                                for p2 in figureToMerge.l:
+                                    if (p2.x, p2.y) not in existing_pixels:
+                                        newPixel.append(p2)
+                                        existing_pixels.add((p2.x, p2.y))
+                                if self.figureList[f].xMax > self.figureList[adapted_index].xMax:
+                                    self.figureList[adapted_index].xMax = self.figureList[f].xMax
+                                if self.figureList[f].xMin < self.figureList[adapted_index].xMin:
+                                    self.figureList[adapted_index].xMin = self.figureList[f].xMin
+                                if self.figureList[f].yMax > self.figureList[adapted_index].yMax:
+                                    self.figureList[adapted_index].yMax = self.figureList[f].yMax
+                                if self.figureList[f].yMin < self.figureList[adapted_index].yMin:
+                                    self.figureList[adapted_index].yMin = self.figureList[f].yMin
+                            self.figureList[adapted_index].l.extend(newPixel)
+                            for f in sorted(indexFigure, reverse=True):
+                                self.figureList.pop(f)
+                            count += 1
         if count != 0:
             return 0
         return 1
@@ -425,87 +499,102 @@ class figureRepresentation:
         count = 0
         l = self.generateIndexList(s)
         for adapted_index in l:
-            fig = Figure([], self.figureList[adapted_index].color)
             if (s.direction % 4) == 0:
                 #down
-                val = self.figureList[adapted_index].l[0].x
-                ok = 0
-                for p in self.figureList[adapted_index].l:
-                    if val < p.x:
-                        val = p.x
-                    if p.x != val:
-                        ok = 1
-                if ok != 0:
-                    remPixel = list()
-                    for p in range(0, len(self.figureList[adapted_index].l)):
-                        if val == self.figureList[adapted_index].l[p].x:
-                            remPixel.append(p)
-                            fig.l.append(self.figureList[adapted_index].l[p])
-                    if len(remPixel) > 0:
-                        for ind in sorted(remPixel, reverse=True):
-                            self.figureList[adapted_index].l.pop(ind)
-                        self.figureList.append(fig)
-                        count += 1
+                height = (self.figureList[adapted_index].xMax - self.figureList[adapted_index].xMin + 1)
+                if height > 1:
+                    fig = Figure([], 0, 1000, 0, 1000, self.figureList[adapted_index].color)
+                    rim = list()
+                    for x in range(0, len(self.figureList[adapted_index].l)):
+                        if self.figureList[adapted_index].l[x].x == self.figureList[adapted_index].xMax:
+                            rim.append(x)
+                    for x in sorted(rim, reverse=True):
+                        fig.l.append(self.figureList[adapted_index].l.pop(x))
+                    self.figureList[adapted_index].xMax -= 1
+                    fig.l.sort(key=lambda i: (i.x, i.y), reverse=False)
+                    for p in fig.l:
+                        if fig.xMax < p.x:
+                            fig.xMax = p.x
+                        if fig.xMin > p.x:
+                            fig.xMin = p.x
+                        if fig.yMax < p.y:
+                            fig.yMax = p.y
+                        if fig.yMin > p.y:
+                            fig.yMin = p.y
+                    self.figureList.append(fig)
+                    count += 1
             elif (s.direction % 4) == 1:
                 #up
-                val = self.figureList[adapted_index].l[0].x
-                ok = 0
-                for p in self.figureList[adapted_index].l:
-                    if val > p.x:
-                        val = p.x
-                        if p.x != val:
-                            ok = 1
-                if ok != 0:
-                    remPixel = list()
-                    for p in range(0, len(self.figureList[adapted_index].l)):
-                        if val == self.figureList[adapted_index].l[p].x:
-                            remPixel.append(p)
-                            fig.l.append(self.figureList[adapted_index].l[p])
-                    if len(remPixel) > 0:
-                        for ind in sorted(remPixel, reverse=True):
-                            self.figureList[adapted_index].l.pop(ind)
-                        self.figureList.append(fig)
-                        count += 1
+                height = (self.figureList[adapted_index].xMax - self.figureList[adapted_index].xMin + 1)
+                if height > 1:
+                    fig = Figure([], 0, 1000, 0, 1000, self.figureList[adapted_index].color)
+                    rim = list()
+                    for x in range(0, len(self.figureList[adapted_index].l)):
+                        if self.figureList[adapted_index].l[x].x == self.figureList[adapted_index].xMin:
+                            rim.append(x)
+                    for x in sorted(rim, reverse=True):
+                        fig.l.append(self.figureList[adapted_index].l.pop(x))
+                    self.figureList[adapted_index].xMin += 1
+                    fig.l.sort(key=lambda i: (i.x, i.y), reverse=False)
+                    for p in fig.l:
+                        if fig.xMax < p.x:
+                            fig.xMax = p.x
+                        if fig.xMin > p.x:
+                            fig.xMin = p.x
+                        if fig.yMax < p.y:
+                            fig.yMax = p.y
+                        if fig.yMin > p.y:
+                            fig.yMin = p.y
+                    self.figureList.append(fig)
+                    count += 1
             elif (s.direction % 4) == 2:
                 #right
-                val = self.figureList[adapted_index].l[0].y
-                ok = 0
-                for p in self.figureList[adapted_index].l:
-                    if val < p.y:
-                        val = p.y
-                        if p.y != val:
-                            ok = 1
-                if ok != 0:
-                    remPixel = list()
-                    for p in range(0, len(self.figureList[adapted_index].l)):
-                        if val == self.figureList[adapted_index].l[p].y:
-                            remPixel.append(p)
-                            fig.l.append(self.figureList[adapted_index].l[p])
-                    if len(remPixel) > 0:
-                        for ind in sorted(remPixel, reverse=True):
-                            self.figureList[adapted_index].l.pop(ind)
-                        self.figureList.append(fig)
-                        count += 1
+                width = (self.figureList[adapted_index].yMax - self.figureList[adapted_index].yMin + 1)
+                if width > 1:
+                    fig = Figure([], 0, 1000, 0, 1000, self.figureList[adapted_index].color)
+                    rim = list()
+                    for x in range(0, len(self.figureList[adapted_index].l)):
+                        if self.figureList[adapted_index].l[x].y == self.figureList[adapted_index].yMax:
+                            rim.append(x)
+                    for x in sorted(rim, reverse=True):
+                        fig.l.append(self.figureList[adapted_index].l.pop(x))
+                    self.figureList[adapted_index].yMax -= 1
+                    fig.l.sort(key=lambda i: (i.x, i.y), reverse=False)
+                    for p in fig.l:
+                        if fig.xMax < p.x:
+                            fig.xMax = p.x
+                        if fig.xMin > p.x:
+                            fig.xMin = p.x
+                        if fig.yMax < p.y:
+                            fig.yMax = p.y
+                        if fig.yMin > p.y:
+                            fig.yMin = p.y
+                    self.figureList.append(fig)
+                    count += 1
             elif (s.direction % 4) == 3:
                 #left
-                val = self.figureList[adapted_index].l[0].y
-                ok = 0
-                for p in self.figureList[adapted_index].l:
-                    if val > p.y:
-                        val = p.y
-                        if p.y != val:
-                            ok = 1
-                if ok != 0:
-                    remPixel = list()
-                    for p in range(0, len(self.figureList[adapted_index].l)):
-                        if val == self.figureList[adapted_index].l[p].y:
-                            remPixel.append(p)
-                            fig.l.append(self.figureList[adapted_index].l[p])
-                    if len(remPixel) > 0:
-                        for ind in sorted(remPixel, reverse=True):
-                            self.figureList[adapted_index].l.pop(ind)
-                        self.figureList.append(fig)
-                        count += 1
+                width = (self.figureList[adapted_index].yMax - self.figureList[adapted_index].yMin + 1)
+                if width > 1:
+                    fig = Figure([], 0, 1000, 0, 1000, self.figureList[adapted_index].color)
+                    rim = list()
+                    for x in range(0, len(self.figureList[adapted_index].l)):
+                        if self.figureList[adapted_index].l[x].y == self.figureList[adapted_index].yMin:
+                            rim.append(x)
+                    for x in sorted(rim, reverse=True):
+                        fig.l.append(self.figureList[adapted_index].l.pop(x))
+                    self.figureList[adapted_index].yMin += 1
+                    fig.l.sort(key=lambda i: (i.x, i.y), reverse=False)
+                    for p in fig.l:
+                        if fig.xMax < p.x:
+                            fig.xMax = p.x
+                        if fig.xMin > p.x:
+                            fig.xMin = p.x
+                        if fig.yMax < p.y:
+                            fig.yMax = p.y
+                        if fig.yMin > p.y:
+                            fig.yMin = p.y
+                    self.figureList.append(fig)
+                    count += 1
         if count != 0:
             return 0
         return 1
