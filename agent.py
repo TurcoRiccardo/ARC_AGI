@@ -48,7 +48,7 @@ def generate_representation_solution(rep, demo_pairs, act, indice):
     rappresentationX = rep(demo_pairs[indice].x)
     rappresentationY = rep(demo_pairs[indice].y)
     population = list()
-    for _ in range(0, POPULATION_SIZE//2):
+    for _ in range(0, POPULATION_SIZE):
         population.append(Individual(copy.deepcopy(rappresentationX), [], [], (rappresentationX.score(rappresentationY), 0)))
     #first part of the evolutionary algorithm: we start creating individuals from scratch
     for _ in range(MAX_GENERATIONS_1):
@@ -71,12 +71,12 @@ def generate_representation_solution(rep, demo_pairs, act, indice):
         offspring = list()
         for _ in range(OFFSPRING_SIZE):
             r = np.random.random()
-            if r > 0.4:
+            if r > 0.8:
                 #add
                 p = parent_selection(population)
                 o: Individual = add_mutation(p, act)
                 offspring.append(o)
-            elif r > 0.2:
+            elif r > 0.4:
                 #tweak
                 p = parent_selection(population)
                 o: Individual = tweak_mutation(p, act, rappresentationX)
@@ -157,7 +157,8 @@ class Agent(ArcAgent):
         actionsCR = [columnsRepresentation.moveColumn, columnsRepresentation.changeColorColumn, columnsRepresentation.modifyColumnAdd, columnsRepresentation.modifyColumnDel, columnsRepresentation.modifyColumnMove, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
         actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
-        actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure, figureRepresentation.removeElementFigure, figureRepresentation.duplicateFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
+        actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure, figureRepresentation.removeElementFigure, figureRepresentation.duplicateFigure, figureRepresentation.rotateFigure, figureRepresentation.mergeFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
+        #,  , figureRepresentation.divideFigure,
         actionsBR = [borderRepresentation.moveBorder, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter2, borderRepresentation.changeColorCenter3, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
         actionsFDR = [firstDiagonalRepresentation.moveDiagonal, firstDiagonalRepresentation.changeColorDiagonal, firstDiagonalRepresentation.modifyDiagonalAdd, firstDiagonalRepresentation.modifyDiagonalDel, firstDiagonalRepresentation.modifyDiagonalMove, firstDiagonalRepresentation.expandGrid, firstDiagonalRepresentation.reduceGrid]
         actionsSDR = [secondDiagonalRepresentation.moveDiagonal, secondDiagonalRepresentation.changeColorDiagonal, secondDiagonalRepresentation.modifyDiagonalAdd, secondDiagonalRepresentation.modifyDiagonalDel, secondDiagonalRepresentation.modifyDiagonalMove, secondDiagonalRepresentation.expandGrid, secondDiagonalRepresentation.reduceGrid]
