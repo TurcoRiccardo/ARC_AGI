@@ -33,8 +33,8 @@ A grid can have any height or width between 1x1 and 30x30 inclusive (average hei
 ## Basic Geometry and Topology concepts that the algorithm knows as priors:
 - **translation:**
 - **color change:**
-- **rotations:** da fare
-- **Copy, repeat objects:** da finire
+- **rotations:**
+- **Copy, repeat objects:**
 - **Shape upscaling or downscaling:**
 - **symmetries:** ?
 - **Draw lines, connection points, orthogonal projections:** ?
@@ -165,7 +165,8 @@ We can apply different types of actions to figures:
 - **addElementFigure:**v add a element to the selected figure
 - **removeElementFigure:** remove a element to the selected figure
 - **duplicateFigure:** duplicate the selected figure from the figure list in one direction
-- **mergeFigure:** merge two figures that are next to each other
+- **rotateFigure:** rotate the selected figure from the figure list to the right or the left
+- **mergeFigure:** merge two figures that are next to each other of the same color
 - **divideFigure:** divide the selected figure in the direction direction generating a new figure
 - **changeOrder:** change the display order of the figures
 - **expandGrid:** expands the grid size

@@ -183,7 +183,7 @@ class Agent(ArcAgent):
         #I choose the best solution based on the error rate and apply it to the test input grid
         outputs = []
         possibleSolutionRep.sort(key=lambda i: i.errAvg, reverse = False)
-        print("\nRepresentation: " + str(possibleSolutionRep[0].classe))
+        print("Representation: " + str(possibleSolutionRep[0].classe))
         print("Avg Error: " + str(possibleSolutionRep[0].errAvg))
         print("Min Error: " + str(possibleSolutionRep[0].errMin))
         for x in range(0, len(test_grids)):

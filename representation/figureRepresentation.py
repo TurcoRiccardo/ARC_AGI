@@ -350,14 +350,10 @@ class figureRepresentation:
         if len(self.figureList) == 0:
             return 1
         count = 0
-        totfig = set()
+        removefig = set()
         l = self.generateIndexList(s)
         for adapted_index in l:
-            if adapted_index not in totfig:
-
-
-
-                
+            if adapted_index not in removefig:
                 if (s.direction % 4) == 0:
                     #down
                     if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h <= self.nr:
@@ -370,7 +366,9 @@ class figureRepresentation:
                                             for k in range(0, self.figureList[indfig].w):
                                                 if self.figureList[indfig].grid[j][k] != 0:
                                                     if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h == self.figureList[indfig].pos.x + j and self.figureList[adapted_index].pos.y + y == self.figureList[indfig].pos.y + k:
-                                                        indexFigure.add(indfig)
+                                                        if indfig not in removefig:
+                                                            indexFigure.add(indfig)
+                                                            removefig.add(indfig)
                         if len(indexFigure) > 0:
                             for f in sorted(indexFigure, reverse=True):
                                 #guardo a sotto
@@ -402,27 +400,152 @@ class figureRepresentation:
                                     for y in range(0, self.figureList[f].w):
                                         if self.figureList[f].grid[x][y] == 1:
                                             self.figureList[adapted_index].grid[diffx + x][diffy + y] = 1
-                            #rimuovo figure unite
-                            for f in sorted(indexFigure, reverse=True):
-                                self.figureList.pop(f)
-                                totfig.add(f)
                             count += 1
                 elif (s.direction % 4) == 1:
                     #up
                     if self.figureList[adapted_index].pos.x > 0:
                         indexFigure = set()
- 
+                        for y in range(0, self.figureList[adapted_index].w):
+                            if self.figureList[adapted_index].grid[0][y] == 1:
+                                for indfig in range(0, len(self.figureList)):
+                                    if self.figureList[indfig].color == self.figureList[adapted_index].color and adapted_index != indfig:
+                                        for j in range(0, self.figureList[indfig].h):
+                                            for k in range(0, self.figureList[indfig].w):
+                                                if self.figureList[indfig].grid[j][k] != 0:
+                                                    if self.figureList[adapted_index].pos.x - 1 == self.figureList[indfig].pos.x + j and self.figureList[adapted_index].pos.y + y == self.figureList[indfig].pos.y + k:
+                                                        if indfig not in removefig:
+                                                            indexFigure.add(indfig)
+                                                            removefig.add(indfig)
+                        if len(indexFigure) > 0:
+                            for f in sorted(indexFigure, reverse=True):
+                                #guardo a sotto
+                                if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h - 1 < self.figureList[f].pos.x + self.figureList[f].h - 1:
+                                    inc = self.figureList[f].pos.x + self.figureList[f].h - 1 - (self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h - 1)
+                                    self.figureList[adapted_index].h += inc
+                                    self.figureList[adapted_index].grid = np.vstack([self.figureList[adapted_index].grid, np.zeros((inc, self.figureList[adapted_index].w), dtype=int)])
+                                #guardo a sopra
+                                if self.figureList[adapted_index].pos.x > self.figureList[f].pos.x:
+                                    inc = self.figureList[adapted_index].pos.x - self.figureList[f].pos.x
+                                    self.figureList[adapted_index].pos.x -= inc
+                                    self.figureList[adapted_index].h += inc
+                                    self.figureList[adapted_index].grid = np.vstack([np.zeros((inc, self.figureList[adapted_index].w), dtype=int), self.figureList[adapted_index].grid])
+                                #guardo a destra
+                                if self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w - 1 < self.figureList[f].pos.y + self.figureList[f].w - 1:
+                                    inc = self.figureList[f].pos.y + self.figureList[f].w - 1 - (self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w - 1)
+                                    self.figureList[adapted_index].w += inc
+                                    self.figureList[adapted_index].grid = np.hstack([self.figureList[adapted_index].grid, np.zeros((inc, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, inc)])
+                                #guardo a sinistra
+                                if self.figureList[adapted_index].pos.y > self.figureList[f].pos.y:
+                                    inc = self.figureList[adapted_index].pos.y - self.figureList[f].pos.y
+                                    self.figureList[adapted_index].pos.y -= inc
+                                    self.figureList[adapted_index].w += inc
+                                    self.figureList[adapted_index].grid = np.hstack([np.zeros((inc, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, inc), self.figureList[adapted_index].grid])
+                                #copio grigia
+                                diffx = self.figureList[f].pos.x - self.figureList[adapted_index].pos.x
+                                diffy = self.figureList[f].pos.y - self.figureList[adapted_index].pos.y 
+                                for x in range(0, self.figureList[f].h):
+                                    for y in range(0, self.figureList[f].w):
+                                        if self.figureList[f].grid[x][y] == 1:
+                                            self.figureList[adapted_index].grid[diffx + x][diffy + y] = 1
+                            count += 1
                 elif (s.direction % 4) == 2:
                     #right
                     if self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w <= self.nc:
                         indexFigure = set()
-                        
+                        for x in range(0, self.figureList[adapted_index].h):
+                            if self.figureList[adapted_index].grid[x][-1] == 1:
+                                for indfig in range(0, len(self.figureList)):
+                                    if self.figureList[indfig].color == self.figureList[adapted_index].color and adapted_index != indfig:
+                                        for j in range(0, self.figureList[indfig].h):
+                                            for k in range(0, self.figureList[indfig].w):
+                                                if self.figureList[indfig].grid[j][k] != 0:
+                                                    if self.figureList[adapted_index].pos.x + x == self.figureList[indfig].pos.x + j and self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w == self.figureList[indfig].pos.y + k:
+                                                        if indfig not in removefig:
+                                                            indexFigure.add(indfig)
+                                                            removefig.add(indfig)
+                        if len(indexFigure) > 0:
+                            for f in sorted(indexFigure, reverse=True):
+                                #guardo a sotto
+                                if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h - 1 < self.figureList[f].pos.x + self.figureList[f].h - 1:
+                                    inc = self.figureList[f].pos.x + self.figureList[f].h - 1 - (self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h - 1)
+                                    self.figureList[adapted_index].h += inc
+                                    self.figureList[adapted_index].grid = np.vstack([self.figureList[adapted_index].grid, np.zeros((inc, self.figureList[adapted_index].w), dtype=int)])
+                                #guardo a sopra
+                                if self.figureList[adapted_index].pos.x > self.figureList[f].pos.x:
+                                    inc = self.figureList[adapted_index].pos.x - self.figureList[f].pos.x
+                                    self.figureList[adapted_index].pos.x -= inc
+                                    self.figureList[adapted_index].h += inc
+                                    self.figureList[adapted_index].grid = np.vstack([np.zeros((inc, self.figureList[adapted_index].w), dtype=int), self.figureList[adapted_index].grid])
+                                #guardo a destra
+                                if self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w - 1 < self.figureList[f].pos.y + self.figureList[f].w - 1:
+                                    inc = self.figureList[f].pos.y + self.figureList[f].w - 1 - (self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w - 1)
+                                    self.figureList[adapted_index].w += inc
+                                    self.figureList[adapted_index].grid = np.hstack([self.figureList[adapted_index].grid, np.zeros((inc, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, inc)])
+                                #guardo a sinistra
+                                if self.figureList[adapted_index].pos.y > self.figureList[f].pos.y:
+                                    inc = self.figureList[adapted_index].pos.y - self.figureList[f].pos.y
+                                    self.figureList[adapted_index].pos.y -= inc
+                                    self.figureList[adapted_index].w += inc
+                                    self.figureList[adapted_index].grid = np.hstack([np.zeros((inc, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, inc), self.figureList[adapted_index].grid])
+                                #copio grigia
+                                diffx = self.figureList[f].pos.x - self.figureList[adapted_index].pos.x
+                                diffy = self.figureList[f].pos.y - self.figureList[adapted_index].pos.y 
+                                for x in range(0, self.figureList[f].h):
+                                    for y in range(0, self.figureList[f].w):
+                                        if self.figureList[f].grid[x][y] == 1:
+                                            self.figureList[adapted_index].grid[diffx + x][diffy + y] = 1
+                            count += 1
                 elif (s.direction % 4) == 3:
                     #left
                     if self.figureList[adapted_index].pos.y > 0:
                         indexFigure = set()
- 
+                        for x in range(0, self.figureList[adapted_index].h):
+                            if self.figureList[adapted_index].grid[x][0] == 1:
+                                for indfig in range(0, len(self.figureList)):
+                                    if self.figureList[indfig].color == self.figureList[adapted_index].color and adapted_index != indfig:
+                                        for j in range(0, self.figureList[indfig].h):
+                                            for k in range(0, self.figureList[indfig].w):
+                                                if self.figureList[indfig].grid[j][k] != 0:
+                                                    if self.figureList[adapted_index].pos.x + x == self.figureList[indfig].pos.x + j and self.figureList[adapted_index].pos.y - 1 == self.figureList[indfig].pos.y + k:
+                                                        if indfig not in removefig:
+                                                            indexFigure.add(indfig)
+                                                            removefig.add(indfig)
+                        if len(indexFigure) > 0:
+                            for f in sorted(indexFigure, reverse=True):
+                                #guardo a sotto
+                                if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h - 1 < self.figureList[f].pos.x + self.figureList[f].h - 1:
+                                    inc = self.figureList[f].pos.x + self.figureList[f].h - 1 - (self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h - 1)
+                                    self.figureList[adapted_index].h += inc
+                                    self.figureList[adapted_index].grid = np.vstack([self.figureList[adapted_index].grid, np.zeros((inc, self.figureList[adapted_index].w), dtype=int)])
+                                #guardo a sopra
+                                if self.figureList[adapted_index].pos.x > self.figureList[f].pos.x:
+                                    inc = self.figureList[adapted_index].pos.x - self.figureList[f].pos.x
+                                    self.figureList[adapted_index].pos.x -= inc
+                                    self.figureList[adapted_index].h += inc
+                                    self.figureList[adapted_index].grid = np.vstack([np.zeros((inc, self.figureList[adapted_index].w), dtype=int), self.figureList[adapted_index].grid])
+                                #guardo a destra
+                                if self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w - 1 < self.figureList[f].pos.y + self.figureList[f].w - 1:
+                                    inc = self.figureList[f].pos.y + self.figureList[f].w - 1 - (self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w - 1)
+                                    self.figureList[adapted_index].w += inc
+                                    self.figureList[adapted_index].grid = np.hstack([self.figureList[adapted_index].grid, np.zeros((inc, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, inc)])
+                                #guardo a sinistra
+                                if self.figureList[adapted_index].pos.y > self.figureList[f].pos.y:
+                                    inc = self.figureList[adapted_index].pos.y - self.figureList[f].pos.y
+                                    self.figureList[adapted_index].pos.y -= inc
+                                    self.figureList[adapted_index].w += inc
+                                    self.figureList[adapted_index].grid = np.hstack([np.zeros((inc, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, inc), self.figureList[adapted_index].grid])
+                                #copio grigia
+                                diffx = self.figureList[f].pos.x - self.figureList[adapted_index].pos.x
+                                diffy = self.figureList[f].pos.y - self.figureList[adapted_index].pos.y 
+                                for x in range(0, self.figureList[f].h):
+                                    for y in range(0, self.figureList[f].w):
+                                        if self.figureList[f].grid[x][y] == 1:
+                                            self.figureList[adapted_index].grid[diffx + x][diffy + y] = 1
+                            count += 1
         if count != 0:
+            #rimuovo figure unite
+            for f in sorted(removefig, reverse=True):
+                self.figureList.pop(f)
             return 0
         return 1
 
