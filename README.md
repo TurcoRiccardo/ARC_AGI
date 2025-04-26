@@ -162,7 +162,8 @@ We can represent the grid as a group of figures having the same color, figures c
 We can apply different types of actions to figures: 
 - **moveFigure:** moves the selected figure of one in one direction
 - **changeColorFigure:** slightly changes the color of the selected figure
-- **addElementFigure:**v add a element to the selected figure
+- **addElementFigure_row:** add a element in the figure in the selected row
+- **addElementFigure_column:** add a element in the figure in the selected column
 - **removeElementFigure:** remove a element to the selected figure
 - **duplicateFigure:** duplicate the selected figure from the figure list in one direction
 - **rotateFigure:** rotate the selected figure from the figure list to the right or the left
