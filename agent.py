@@ -44,28 +44,55 @@ class PossibleSolutionRepresentation:
     indMin: int
 
 #Evolutionary algorithm on rep representation trained on example i and returns the best individual
-def generate_representation_solution(rep, demo_pairs, act, indice):
+def generate_representation_solution(rep, demo_pairs, base_act, act, indice):
     rappresentationX = rep(demo_pairs[indice].x)
     rappresentationY = rep(demo_pairs[indice].y)
-    population = list()
-    for _ in range(0, POPULATION_SIZE):
-        population.append(Individual(copy.deepcopy(rappresentationX), [], [], (rappresentationX.score(rappresentationY), 0)))
-    #first part of the evolutionary algorithm: we start creating individuals from scratch
+
+    #first part of the evolutionary algorithm: we start creating individuals from scratch with base actions
+    #generating the first part of the initial population with base_act
+    population1 = list()
+    for _ in range(0, POPULATION_SIZE//2):
+        population1.append(Individual(copy.deepcopy(rappresentationX), [], [], (rappresentationX.score(rappresentationY), 0)))
     for _ in range(MAX_GENERATIONS_1):
         #genero gli offspring
         offspring = list()
         for _ in range(OFFSPRING_SIZE):
-            p = parent_selection(population)
-            o: Individual = add_mutation(p, act)
-            offspring.append(o)
+            p = parent_selection(population1)
+            o: Individual = add_mutation(p, base_act)
+            if o != None:
+                offspring.append(o)
         #valuto il genome calcolando fitness
         for i in offspring:
             i.fitness = (i.genome.score(rappresentationY), rep.scoreAction(i.performed_actions, i.performed_selection))  
         #reinserisco gli offspring nella popolazione e tengo solo i primi POPULATION_SIZE individui
-        population.extend(offspring)
-        population.sort(key=lambda i: i.fitness, reverse = True)
-        population = population[:POPULATION_SIZE]
+        population1.extend(offspring)
+        population1.sort(key=lambda i: i.fitness, reverse = True)
+        population1 = population1[:POPULATION_SIZE//2]
+    
+    #generating the second part of the initial population with act
+    population2 = list()
+    for _ in range(0, POPULATION_SIZE//2):
+        population2.append(Individual(copy.deepcopy(rappresentationX), [], [], (rappresentationX.score(rappresentationY), 0)))
+    for _ in range(MAX_GENERATIONS_1):
+        #genero gli offspring
+        offspring = list()
+        for _ in range(OFFSPRING_SIZE):
+            p = parent_selection(population2)
+            o: Individual = add_mutation(p, act)
+            if o != None:
+                offspring.append(o)
+        #valuto il genome calcolando fitness
+        for i in offspring:
+            i.fitness = (i.genome.score(rappresentationY), rep.scoreAction(i.performed_actions, i.performed_selection))  
+        #reinserisco gli offspring nella popolazione e tengo solo i primi POPULATION_SIZE individui
+        population2.extend(offspring)
+        population2.sort(key=lambda i: i.fitness, reverse = True)
+        population2 = population2[:POPULATION_SIZE//2]
+    
     #second part of the evolutionary algorithm: we improve the individuals created
+    population = list()
+    population.extend(population1)
+    population.extend(population2)
     for _ in range(MAX_GENERATIONS_2):
         #genero gli offspring
         offspring = list()
@@ -75,16 +102,15 @@ def generate_representation_solution(rep, demo_pairs, act, indice):
                 #add
                 p = parent_selection(population)
                 o: Individual = add_mutation(p, act)
-                offspring.append(o)
             elif r > 0.4:
                 #tweak
                 p = parent_selection(population)
                 o: Individual = tweak_mutation(p, act, rappresentationX)
-                offspring.append(o)
             else:
                 #swap
                 p = parent_selection(population)
                 o: Individual = swap_mutation(p, act, rappresentationX)
+            if o != None:
                 offspring.append(o)
         #valuto il genome calcolando fitness
         for i in offspring:
@@ -117,7 +143,7 @@ def evaluate_representation(rep, individual, inputGrid, outputGrid):
     return err + abs(individual.fitness[0]) + abs(individual.fitness[1]/10)
 
 #I perform the operations on all the combinations of the examples received
-def generate_representation(rep, demo_pairs, act):
+def generate_representation(rep, demo_pairs, base_act, act):
     possibleSolution = list()
     AvgTot = 0
     errMin = 1000
@@ -131,10 +157,11 @@ def generate_representation(rep, demo_pairs, act):
 
     for x in range(0, len(demo_pairs)):
         errAvg = 0
-        bestIndividual = generate_representation_solution(rep, demo_pairs, act, x)
+        bestIndividual = generate_representation_solution(rep, demo_pairs, base_act, act, x)
 
         #mi serve qualcosa che mi aiuta a generalizzare la lista di azioni-selettore ad altri esempi dello stesso problema
         #posso provare ad utilizzare un algoritmo evolutivo con mutazioni solo sul selettore e la possibilita di dupricare o cancellare coppie azioni-selettore
+        #guardo se ci sono delle mutazioni di colore senon ci sono non uso il colore, guardo se ci sono mutazioni nel numero di elementi se ...
         #Generalizer: 
         #new_action, new_selection = borderRepresentation.generalizer(population[0].performed_actions, population[0].performed_selection)
 
@@ -152,32 +179,41 @@ def generate_representation(rep, demo_pairs, act):
 #Class where I compare the results received from the various representations and apply the best one to the test grid
 class Agent(ArcAgent):
     def predict(self, demo_pairs: List[ArcIOPair], test_grids: List[ArcGrid]) -> List[ArcPrediction]:
+        base_actionPR = [pixelRepresentation.movePixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid]
         actionsPR = [pixelRepresentation.movePixel, pixelRepresentation.changeColorPixel, pixelRepresentation.removePixel, pixelRepresentation.duplicateNearPixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid]
+        base_actionRR = [rowRepresentation.moveRow, rowRepresentation.expandGrid, rowRepresentation.reduceGrid]
         actionsRR = [rowRepresentation.moveRow, rowRepresentation.changeColorRow, rowRepresentation.modifyRowAdd, rowRepresentation.modifyRowDel, rowRepresentation.modifyRowMove, rowRepresentation.expandGrid, rowRepresentation.reduceGrid]
+        base_actionCR = [columnsRepresentation.moveColumn, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
         actionsCR = [columnsRepresentation.moveColumn, columnsRepresentation.changeColorColumn, columnsRepresentation.modifyColumnAdd, columnsRepresentation.modifyColumnDel, columnsRepresentation.modifyColumnMove, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
+        base_actionCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
         actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
+        base_actionRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
+        base_actionFR = [figureRepresentation.moveFigure, figureRepresentation.duplicateFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
         actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure_row, figureRepresentation.addElementFigure_column, figureRepresentation.removeElementFigure, figureRepresentation.duplicateFigure, figureRepresentation.rotateFigure, figureRepresentation.mergeFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
-        #,  , figureRepresentation.divideFigure,
+        #,  , figureRepresentation.divideFigure, faccio prima operazioni base su meta popolazione e poi quelle piu complesse
+        base_actionBR = [borderRepresentation.moveBorder, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
         actionsBR = [borderRepresentation.moveBorder, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter2, borderRepresentation.changeColorCenter3, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
+        base_actionFDR = [firstDiagonalRepresentation.moveDiagonal, firstDiagonalRepresentation.expandGrid, firstDiagonalRepresentation.reduceGrid]
         actionsFDR = [firstDiagonalRepresentation.moveDiagonal, firstDiagonalRepresentation.changeColorDiagonal, firstDiagonalRepresentation.modifyDiagonalAdd, firstDiagonalRepresentation.modifyDiagonalDel, firstDiagonalRepresentation.modifyDiagonalMove, firstDiagonalRepresentation.expandGrid, firstDiagonalRepresentation.reduceGrid]
+        base_actionSDR = [secondDiagonalRepresentation.moveDiagonal, secondDiagonalRepresentation.expandGrid, secondDiagonalRepresentation.reduceGrid]
         actionsSDR = [secondDiagonalRepresentation.moveDiagonal, secondDiagonalRepresentation.changeColorDiagonal, secondDiagonalRepresentation.modifyDiagonalAdd, secondDiagonalRepresentation.modifyDiagonalDel, secondDiagonalRepresentation.modifyDiagonalMove, secondDiagonalRepresentation.expandGrid, secondDiagonalRepresentation.reduceGrid]
         possibleSolutionRep = list()
         reps = [
-            #(pixelRepresentation, actionsPR),
-            #(rowRepresentation, actionsRR),
-            #(columnsRepresentation, actionsCR),
-            #(colorLayerRepresentation, actionsCLR),
-            #(rectangleRepresentation, actionsRER),
-            (figureRepresentation, actionsFR),
-            #(borderRepresentation, actionsBR),
-            #(firstDiagonalRepresentation, actionsFDR),
-            #(secondDiagonalRepresentation, actionsSDR)
+            #(pixelRepresentation, base_actionPR, actionsPR),
+            #(rowRepresentation, base_actionRR, actionsRR),
+            #(columnsRepresentation, base_actionCR, actionsCR),
+            #(colorLayerRepresentation, base_actionCLR, actionsCLR),
+            #(rectangleRepresentation, base_actionRER, actionsRER),
+            (figureRepresentation, base_actionFR, actionsFR),
+            #(borderRepresentation, base_actionBR, actionsBR),
+            #(firstDiagonalRepresentation, base_actionFDR, actionsFDR),
+            #(secondDiagonalRepresentation, base_actionSDR, actionsSDR)
         ]
         #rappresentazione in cui ho delle figure che posso prolungare con ostacoli e elementi sovrapposti
 
         with ProcessPoolExecutor() as executor:
-            futures = [executor.submit(generate_representation, rep, demo_pairs, actions) for rep, actions in reps]
+            futures = [executor.submit(generate_representation, rep, demo_pairs, base_act, actions) for rep, base_act, actions in reps]
             possibleSolutionRep = [f.result() for f in futures]
 
         #I choose the best solution based on the error rate and apply it to the test input grid

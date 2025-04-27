@@ -19,7 +19,7 @@ def parent_selection(population):
 #add a new action to the parent generating a new individual
 def add_mutation(p: Individual, available_actions):
     new_gen = copy.deepcopy(p.genome)
-    for _ in range(0, 5):
+    for i in range(0, 5):
         #take a random action
         x = np.random.randint(0, len(available_actions))
         action = available_actions[x]
@@ -29,6 +29,8 @@ def add_mutation(p: Individual, available_actions):
         r = action(new_gen, s)
         if r == 0:
             break
+    if i == 4:
+        return None
     new_selection = p.performed_selection.copy()
     new_selection.append(s)
     new_paction = p.performed_actions.copy()
