@@ -73,6 +73,7 @@ def generate_representation_solution(rep, demo_pairs, base_act, act, indice):
     population2 = list()
     for _ in range(0, POPULATION_SIZE//2):
         population2.append(Individual(copy.deepcopy(rappresentationX), [], [], (rappresentationX.score(rappresentationY), 0)))
+    '''
     for _ in range(MAX_GENERATIONS_1):
         #genero gli offspring
         offspring = list()
@@ -88,7 +89,7 @@ def generate_representation_solution(rep, demo_pairs, base_act, act, indice):
         population2.extend(offspring)
         population2.sort(key=lambda i: i.fitness, reverse = True)
         population2 = population2[:POPULATION_SIZE//2]
-    
+    '''
     #second part of the evolutionary algorithm: we improve the individuals created
     population = list()
     population.extend(population1)
@@ -189,9 +190,9 @@ class Agent(ArcAgent):
         actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
         base_actionRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
-        base_actionFR = [figureRepresentation.moveFigure, figureRepresentation.duplicateFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
-        actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure_row, figureRepresentation.addElementFigure_column, figureRepresentation.removeElementFigure, figureRepresentation.duplicateFigure, figureRepresentation.rotateFigure, figureRepresentation.mergeFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
-        #,  , figureRepresentation.divideFigure, faccio prima operazioni base su meta popolazione e poi quelle piu complesse
+        base_actionFR = [figureRepresentation.duplicateFigure, figureRepresentation.removeFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
+        actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure_row, figureRepresentation.addElementFigure_column, figureRepresentation.removeElementFigure, figureRepresentation.duplicateFigure, figureRepresentation.removeFigure, figureRepresentation.rotateFigure, figureRepresentation.mergeFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
+        #,  , figureRepresentation.divideFigure,
         base_actionBR = [borderRepresentation.moveBorder, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
         actionsBR = [borderRepresentation.moveBorder, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter2, borderRepresentation.changeColorCenter3, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
         base_actionFDR = [firstDiagonalRepresentation.moveDiagonal, firstDiagonalRepresentation.expandGrid, firstDiagonalRepresentation.reduceGrid]

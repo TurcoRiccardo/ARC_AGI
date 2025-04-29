@@ -166,6 +166,7 @@ We can apply different types of actions to figures:
 - **addElementFigure_column:** add a element in the figure in the selected column
 - **removeElementFigure:** remove a element to the selected figure
 - **duplicateFigure:** duplicate the selected figure from the figure list in one direction
+- **removeFigure:** remove a figure from the figure list based on the index
 - **rotateFigure:** rotate the selected figure from the figure list to the right or the left
 - **mergeFigure:** merge two figures that are next to each other of the same color
 - **divideFigure:** divide the selected figure in the direction direction generating a new figure

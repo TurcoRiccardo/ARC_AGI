@@ -319,9 +319,6 @@ class figureRepresentation:
                     self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[0:self.figureList[adapted_index].h-1,:]
                     self.figureList[adapted_index].h -= 1
                     count += 1
-                else:
-                    self.figureList.pop(adapted_index)
-                    count += 1
             elif (s.direction % 4) == 1:
                 #up
                 if self.figureList[adapted_index].h > 1:
@@ -329,17 +326,11 @@ class figureRepresentation:
                     self.figureList[adapted_index].pos.x += 1
                     self.figureList[adapted_index].h -= 1
                     count += 1
-                else:
-                    self.figureList.pop(adapted_index)
-                    count += 1
             elif (s.direction % 4) == 2:
                 #right
                 if self.figureList[adapted_index].w > 1:
                     self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[:,0:self.figureList[adapted_index].w-1]
                     self.figureList[adapted_index].w -= 1
-                    count += 1
-                else:
-                    self.figureList.pop(adapted_index)
                     count += 1
             elif (s.direction % 4) == 3:
                 #left
@@ -347,9 +338,6 @@ class figureRepresentation:
                     self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[:,1:self.figureList[adapted_index].w]
                     self.figureList[adapted_index].pos.y += 1
                     self.figureList[adapted_index].w -= 1
-                    count += 1
-                else:
-                    self.figureList.pop(adapted_index)
                     count += 1
         if count != 0:
             return 0
@@ -367,33 +355,67 @@ class figureRepresentation:
                 if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h * 2 <= self.nr:
                     fig = Figure(self.figureList[adapted_index].grid.copy(), PixelNode(self.figureList[adapted_index].pos.x, self.figureList[adapted_index].pos.y), self.figureList[adapted_index].h, self.figureList[adapted_index].w, self.figureList[adapted_index].color)
                     fig.pos.x += self.figureList[adapted_index].h
-                    self.figureList.append(fig)
+                    for i in range(0, len(self.figureList)):
+                        if fig.pos.x < self.figureList[i].pos.x:
+                            self.figureList.insert(i, fig)
+                        elif fig.pos.x == self.figureList[i].pos.x:
+                            if fig.pos.y < self.figureList[i].pos.y:
+                                self.figureList.insert(i, fig)
                     count += 1
             elif (s.direction % 4) == 1:
                 #up
                 if self.figureList[adapted_index].pos.x - self.figureList[adapted_index].h >= 0:
                     fig = Figure(self.figureList[adapted_index].grid.copy(), PixelNode(self.figureList[adapted_index].pos.x, self.figureList[adapted_index].pos.y), self.figureList[adapted_index].h, self.figureList[adapted_index].w, self.figureList[adapted_index].color)
                     fig.pos.x -= self.figureList[adapted_index].h
-                    self.figureList.append(fig)
+                    for i in range(0, len(self.figureList)):
+                        if fig.pos.x < self.figureList[i].pos.x:
+                            self.figureList.insert(i, fig)
+                        elif fig.pos.x == self.figureList[i].pos.x:
+                            if fig.pos.y < self.figureList[i].pos.y:
+                                self.figureList.insert(i, fig)
                     count += 1
             elif (s.direction % 4) == 2:
                 #right
                 if self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w * 2 <= self.nc:
                     fig = Figure(self.figureList[adapted_index].grid.copy(), PixelNode(self.figureList[adapted_index].pos.x, self.figureList[adapted_index].pos.y), self.figureList[adapted_index].h, self.figureList[adapted_index].w, self.figureList[adapted_index].color)
                     fig.pos.y += self.figureList[adapted_index].w
-                    self.figureList.append(fig)
+                    for i in range(0, len(self.figureList)):
+                        if fig.pos.x < self.figureList[i].pos.x:
+                            self.figureList.insert(i, fig)
+                        elif fig.pos.x == self.figureList[i].pos.x:
+                            if fig.pos.y < self.figureList[i].pos.y:
+                                self.figureList.insert(i, fig)
                     count += 1
             elif (s.direction % 4) == 3:
                 #left
                 if self.figureList[adapted_index].pos.y - self.figureList[adapted_index].w >= 0:
                     fig = Figure(self.figureList[adapted_index].grid.copy(), PixelNode(self.figureList[adapted_index].pos.x, self.figureList[adapted_index].pos.y), self.figureList[adapted_index].h, self.figureList[adapted_index].w, self.figureList[adapted_index].color)
                     fig.pos.y -= self.figureList[adapted_index].w
-                    self.figureList.append(fig)
+                    for i in range(0, len(self.figureList)):
+                        if fig.pos.x < self.figureList[i].pos.x:
+                            self.figureList.insert(i, fig)
+                        elif fig.pos.x == self.figureList[i].pos.x:
+                            if fig.pos.y < self.figureList[i].pos.y:
+                                self.figureList.insert(i, fig)
                     count += 1
         if count != 0:
             return 0
         return 1
     
+    #remove a figure from the figure list based on the index
+    def removeFigure(self, s):
+        if len(self.figureList) == 0:
+            return 1
+        count = 0
+        li = self.generateIndexList(s)
+        li.sort(key=lambda i: i, reverse=True)
+        for adapted_index in li:
+            self.figureList.pop(adapted_index)
+            count += 1
+        if count != 0:
+            return 0
+        return 1
+
     #rotate a figure based on the direction direction
     def rotateFigure(self, s):
         if len(self.figureList) == 0:
