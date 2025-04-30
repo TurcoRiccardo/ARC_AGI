@@ -201,6 +201,10 @@ class figureRepresentation:
         l = self.generateIndexList(s)
         for adapted_index in l:
             lc = self.generateComponentList_row(s, adapted_index)
+            if (s.direction % 4) == 0:
+                lc.sort(key=lambda i: i, reverse=True)
+            elif (s.direction % 4) == 1:
+                lc.sort(key=lambda i: i, reverse=False)
             for adapted_component in lc:
                 if (s.direction % 4) == 0:
                     #down
@@ -257,6 +261,10 @@ class figureRepresentation:
         l = self.generateIndexList(s)
         for adapted_index in l:
             lc = self.generateComponentList_column(s, adapted_index)
+            if (s.direction % 4) == 2:
+                lc.sort(key=lambda i: i, reverse=True)
+            elif (s.direction % 4) == 3:
+                lc.sort(key=lambda i: i, reverse=False)
             for adapted_component in lc:
                 if (s.direction % 4) == 0:
                     #down
@@ -305,39 +313,61 @@ class figureRepresentation:
             return 0
         return 1
 
-    #remove a element in the figure
-    def removeElementFigure(self, s):
+    #remove the element in the figure in the selected row
+    def removeElementFigure_row(self, s):
         if len(self.figureList) == 0:
             return 1
         count = 0
-        li = self.generateIndexList(s)
-        li.sort(key=lambda i: i, reverse=True)
-        for adapted_index in li:
-            if (s.direction % 4) == 0:
-                #down
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            lc = self.generateComponentList_row(s, adapted_index)
+            lc.sort(key=lambda i: i, reverse=True)
+            for adapted_component in lc:
                 if self.figureList[adapted_index].h > 1:
-                    self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[0:self.figureList[adapted_index].h-1,:]
-                    self.figureList[adapted_index].h -= 1
+                    ok = 0
+                    for y in range(0, self.figureList[adapted_index].w):
+                        if self.figureList[adapted_index].grid[adapted_component][y] > 0:
+                            self.figureList[adapted_index].grid[adapted_component][y] -= 1
+                        if self.figureList[adapted_index].grid[adapted_component][y] > 0:
+                            ok = 1
+                    if ok == 0:
+                        if adapted_component == 0:
+                            self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[1:self.figureList[adapted_index].h,:]
+                            self.figureList[adapted_index].pos.x += 1
+                            self.figureList[adapted_index].h -= 1
+                        else:
+                            self.figureList[adapted_index].grid = np.vstack([self.figureList[adapted_index].grid[0:adapted_component,:], self.figureList[adapted_index].grid[adapted_component+1:self.figureList[adapted_index].h,:]])
+                            self.figureList[adapted_index].h -= 1
                     count += 1
-            elif (s.direction % 4) == 1:
-                #up
-                if self.figureList[adapted_index].h > 1:
-                    self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[1:self.figureList[adapted_index].h,:]
-                    self.figureList[adapted_index].pos.x += 1
-                    self.figureList[adapted_index].h -= 1
-                    count += 1
-            elif (s.direction % 4) == 2:
-                #right
+        if count != 0:
+            return 0
+        return 1
+
+    #remove the element in the figure in the selected column
+    def removeElementFigure_column(self, s):
+        if len(self.figureList) == 0:
+            return 1
+        count = 0
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            lc = self.generateComponentList_column(s, adapted_index)
+            lc.sort(key=lambda i: i, reverse=True)
+            for adapted_component in lc:
                 if self.figureList[adapted_index].w > 1:
-                    self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[:,0:self.figureList[adapted_index].w-1]
-                    self.figureList[adapted_index].w -= 1
-                    count += 1
-            elif (s.direction % 4) == 3:
-                #left
-                if self.figureList[adapted_index].w > 1:
-                    self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[:,1:self.figureList[adapted_index].w]
-                    self.figureList[adapted_index].pos.y += 1
-                    self.figureList[adapted_index].w -= 1
+                    ok = 0
+                    for x in range(0, self.figureList[adapted_index].h):
+                        if self.figureList[adapted_index].grid[x][adapted_component] > 0:
+                            self.figureList[adapted_index].grid[x][adapted_component] -= 1
+                        if self.figureList[adapted_index].grid[x][adapted_component] > 0:
+                            ok = 1
+                    if ok == 0:
+                        if adapted_component == 0:
+                            self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[:,1:self.figureList[adapted_index].w]
+                            self.figureList[adapted_index].pos.y += 1
+                            self.figureList[adapted_index].w -= 1
+                        else:
+                            self.figureList[adapted_index].grid = np.hstack([self.figureList[adapted_index].grid[:,0:adapted_component], self.figureList[adapted_index].grid[:,adapted_component+1:self.figureList[adapted_index].w]])
+                            self.figureList[adapted_index].w -= 1
                     count += 1
         if count != 0:
             return 0
@@ -655,110 +685,54 @@ class figureRepresentation:
             return 0
         return 1
 
-    #divide a figure 
-    def divideFigure(self, s):
+    #divide the selected figure based on the selected row
+    def divideFigure_row(self, s):
         if len(self.figureList) == 0:
             return 1
         count = 0
         l = self.generateIndexList(s)
+        dividedFigure = []
         for adapted_index in l:
-            if (s.direction % 4) == 0:
-                #down
-                height = (self.figureList[adapted_index].xMax - self.figureList[adapted_index].xMin + 1)
-                if height > 1:
-                    fig = Figure([], 0, 1000, 0, 1000, self.figureList[adapted_index].color)
-                    rim = list()
-                    for x in range(0, len(self.figureList[adapted_index].l)):
-                        if self.figureList[adapted_index].l[x].x == self.figureList[adapted_index].xMax:
-                            rim.append(x)
-                    for x in sorted(rim, reverse=True):
-                        fig.l.append(self.figureList[adapted_index].l.pop(x))
-                    self.figureList[adapted_index].xMax -= 1
-                    fig.l.sort(key=lambda i: (i.x, i.y), reverse=False)
-                    for p in fig.l:
-                        if fig.xMax < p.x:
-                            fig.xMax = p.x
-                        if fig.xMin > p.x:
-                            fig.xMin = p.x
-                        if fig.yMax < p.y:
-                            fig.yMax = p.y
-                        if fig.yMin > p.y:
-                            fig.yMin = p.y
-                    self.figureList.append(fig)
-                    count += 1
-            elif (s.direction % 4) == 1:
-                #up
-                height = (self.figureList[adapted_index].xMax - self.figureList[adapted_index].xMin + 1)
-                if height > 1:
-                    fig = Figure([], 0, 1000, 0, 1000, self.figureList[adapted_index].color)
-                    rim = list()
-                    for x in range(0, len(self.figureList[adapted_index].l)):
-                        if self.figureList[adapted_index].l[x].x == self.figureList[adapted_index].xMin:
-                            rim.append(x)
-                    for x in sorted(rim, reverse=True):
-                        fig.l.append(self.figureList[adapted_index].l.pop(x))
-                    self.figureList[adapted_index].xMin += 1
-                    fig.l.sort(key=lambda i: (i.x, i.y), reverse=False)
-                    for p in fig.l:
-                        if fig.xMax < p.x:
-                            fig.xMax = p.x
-                        if fig.xMin > p.x:
-                            fig.xMin = p.x
-                        if fig.yMax < p.y:
-                            fig.yMax = p.y
-                        if fig.yMin > p.y:
-                            fig.yMin = p.y
-                    self.figureList.append(fig)
-                    count += 1
-            elif (s.direction % 4) == 2:
-                #right
-                width = (self.figureList[adapted_index].yMax - self.figureList[adapted_index].yMin + 1)
-                if width > 1:
-                    fig = Figure([], 0, 1000, 0, 1000, self.figureList[adapted_index].color)
-                    rim = list()
-                    for x in range(0, len(self.figureList[adapted_index].l)):
-                        if self.figureList[adapted_index].l[x].y == self.figureList[adapted_index].yMax:
-                            rim.append(x)
-                    for x in sorted(rim, reverse=True):
-                        fig.l.append(self.figureList[adapted_index].l.pop(x))
-                    self.figureList[adapted_index].yMax -= 1
-                    fig.l.sort(key=lambda i: (i.x, i.y), reverse=False)
-                    for p in fig.l:
-                        if fig.xMax < p.x:
-                            fig.xMax = p.x
-                        if fig.xMin > p.x:
-                            fig.xMin = p.x
-                        if fig.yMax < p.y:
-                            fig.yMax = p.y
-                        if fig.yMin > p.y:
-                            fig.yMin = p.y
-                    self.figureList.append(fig)
-                    count += 1
-            elif (s.direction % 4) == 3:
-                #left
-                width = (self.figureList[adapted_index].yMax - self.figureList[adapted_index].yMin + 1)
-                if width > 1:
-                    fig = Figure([], 0, 1000, 0, 1000, self.figureList[adapted_index].color)
-                    rim = list()
-                    for x in range(0, len(self.figureList[adapted_index].l)):
-                        if self.figureList[adapted_index].l[x].y == self.figureList[adapted_index].yMin:
-                            rim.append(x)
-                    for x in sorted(rim, reverse=True):
-                        fig.l.append(self.figureList[adapted_index].l.pop(x))
-                    self.figureList[adapted_index].yMin += 1
-                    fig.l.sort(key=lambda i: (i.x, i.y), reverse=False)
-                    for p in fig.l:
-                        if fig.xMax < p.x:
-                            fig.xMax = p.x
-                        if fig.xMin > p.x:
-                            fig.xMin = p.x
-                        if fig.yMax < p.y:
-                            fig.yMax = p.y
-                        if fig.yMin > p.y:
-                            fig.yMin = p.y
-                    self.figureList.append(fig)
+            lc = self.generateComponentList_row(s, adapted_index)
+            lc.sort(key=lambda i: i, reverse=True)
+            for adapted_component in lc:
+                if self.figureList[adapted_index].h > 1 and adapted_component+1 < self.figureList[adapted_index].h:
+                    fig = Figure(self.figureList[adapted_index].grid[adapted_component+1:self.figureList[adapted_index].h,:], PixelNode(self.figureList[adapted_index].pos.x+adapted_component+1, self.figureList[adapted_index].pos.y), self.figureList[adapted_index].h-(adapted_component+1), self.figureList[adapted_index].w, self.figureList[adapted_index].color)
+                    self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[0:adapted_component+1,:]
+                    self.figureList[adapted_index].h -= (self.figureList[adapted_index].h - (adapted_component+1))
+                    dividedFigure.append((adapted_index+1, fig))
                     count += 1
         if count != 0:
+            dividedFigure.sort(key=lambda i: i[0], reverse=True)
+            for (index, fig) in dividedFigure:
+                self.figureList.insert(index, fig)
+            return 0
+        return 1
+    
+    #divide the selected figure based on the selected column
+    def divideFigure_column(self, s):
+        if len(self.figureList) == 0:
+            return 1
+        count = 0
+        l = self.generateIndexList(s)
+        dividedFigure = []
+        for adapted_index in l:
+            lc = self.generateComponentList_column(s, adapted_index)
+            lc.sort(key=lambda i: i, reverse=True)
+            for adapted_component in lc:
+                if self.figureList[adapted_index].h > 1 and adapted_component+1 < self.figureList[adapted_index].h:
+
+
+
+                    fig = Figure(self.figureList[adapted_index].grid[adapted_component+1:self.figureList[adapted_index].h,:], PixelNode(self.figureList[adapted_index].pos.x+adapted_component+1, self.figureList[adapted_index].pos.y), self.figureList[adapted_index].h-(adapted_component+1), self.figureList[adapted_index].w, self.figureList[adapted_index].color)
+                    self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[0:adapted_component+1,:]
+                    self.figureList[adapted_index].h -= (self.figureList[adapted_index].h - (adapted_component+1))
+                    dividedFigure.append((adapted_index+1, fig))
+                    count += 1
+        if count != 0:
+            dividedFigure.sort(key=lambda i: i[0], reverse=True)
+            for (index, fig) in dividedFigure:
+                self.figureList.insert(index, fig)
             return 0
         return 1
 
@@ -902,7 +876,7 @@ class figureRepresentation:
         for x in range(0, len(performed_actions)):
             if performed_selection[x].allElement < 3: 
                 score += 0.5
-            if performed_actions[x] == figureRepresentation.removeElementFigure or performed_actions[x] == figureRepresentation.mergeFigure or performed_actions[x] == figureRepresentation.divideFigure:
+            if performed_actions[x] == figureRepresentation.rotateFigure or performed_actions[x] == figureRepresentation.removeFigure or performed_actions[x] == figureRepresentation.mergeFigure or performed_actions[x] == figureRepresentation.divideFigure_row:
                 score += 0.5
             score += 1
         return -score

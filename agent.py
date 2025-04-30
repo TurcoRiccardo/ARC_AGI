@@ -121,7 +121,7 @@ def generate_representation_solution(rep, demo_pairs, base_act, act, indice):
         population.sort(key=lambda i: i.fitness, reverse = True)
         population = population[:POPULATION_SIZE]
     
-    '''
+    
     print("azioni")
     print(population[0].performed_actions)
     print(len(population[0].performed_actions))
@@ -131,7 +131,7 @@ def generate_representation_solution(rep, demo_pairs, base_act, act, indice):
     prediction.plot(show=True, title=f"Input-Output")
     prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
     prediction.plot(show=True, title=f"Output-OutputGenerato")
-    '''
+    
 
     return population[0]
 
@@ -191,8 +191,8 @@ class Agent(ArcAgent):
         base_actionRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         base_actionFR = [figureRepresentation.duplicateFigure, figureRepresentation.removeFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
-        actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure_row, figureRepresentation.addElementFigure_column, figureRepresentation.removeElementFigure, figureRepresentation.duplicateFigure, figureRepresentation.removeFigure, figureRepresentation.rotateFigure, figureRepresentation.mergeFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
-        #,  , figureRepresentation.divideFigure,
+        actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure_row, figureRepresentation.addElementFigure_column, figureRepresentation.removeElementFigure_row, figureRepresentation.removeElementFigure_column, figureRepresentation.duplicateFigure, figureRepresentation.removeFigure, figureRepresentation.rotateFigure,  figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
+        #figureRepresentation.mergeFigure, figureRepresentation.divideFigure_row,
         base_actionBR = [borderRepresentation.moveBorder, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
         actionsBR = [borderRepresentation.moveBorder, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter2, borderRepresentation.changeColorCenter3, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
         base_actionFDR = [firstDiagonalRepresentation.moveDiagonal, firstDiagonalRepresentation.expandGrid, firstDiagonalRepresentation.reduceGrid]
