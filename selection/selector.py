@@ -14,13 +14,19 @@ class Selector:
 #generates a new random selector from scratch
 def generateNewSelector(rappresentation):
     index = 0
-    component = 0
+    component = (0,)
     allElement = 0
     allComponent = 0
-    if rappresentation.getNElement() != 0:
-        index = np.random.randint(0, rappresentation.getNElement())
-        if rappresentation.getElementComponent(index) != 0:
-            component = np.random.randint(0, rappresentation.getElementComponent(index))
+    ok = 0
+    ne = rappresentation.getNElement()
+    if ne != 0:
+        index = np.random.randint(0, ne)
+        ec = rappresentation.getElementComponent(index)
+        for val in ec:
+            if val <= 0:
+                ok = 1
+        if ok == 0:
+            component = np.random.randint(0, ec)
     allElement = np.random.randint(0, 5)
     allComponent = np.random.randint(0, 5)
     color = np.random.randint(1, 10)

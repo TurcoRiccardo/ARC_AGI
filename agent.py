@@ -121,7 +121,7 @@ def generate_representation_solution(rep, demo_pairs, base_act, act, indice):
         population.sort(key=lambda i: i.fitness, reverse = True)
         population = population[:POPULATION_SIZE]
     
-    
+    '''
     print("azioni")
     print(population[0].performed_actions)
     print(len(population[0].performed_actions))
@@ -131,7 +131,7 @@ def generate_representation_solution(rep, demo_pairs, base_act, act, indice):
     prediction.plot(show=True, title=f"Input-Output")
     prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
     prediction.plot(show=True, title=f"Output-OutputGenerato")
-    
+    '''
 
     return population[0]
 
@@ -191,8 +191,7 @@ class Agent(ArcAgent):
         base_actionRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         base_actionFR = [figureRepresentation.duplicateFigure, figureRepresentation.removeFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
-        actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure_row, figureRepresentation.addElementFigure_column, figureRepresentation.removeElementFigure_row, figureRepresentation.removeElementFigure_column, figureRepresentation.duplicateFigure, figureRepresentation.removeFigure, figureRepresentation.rotateFigure,  figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
-        #figureRepresentation.mergeFigure, figureRepresentation.divideFigure_row,
+        actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure_row, figureRepresentation.addElementFigure_column, figureRepresentation.removeElementFigure_row, figureRepresentation.removeElementFigure_column, figureRepresentation.duplicateFigure, figureRepresentation.removeFigure, figureRepresentation.rotateFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure_row, figureRepresentation.divideFigure_column, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]    
         base_actionBR = [borderRepresentation.moveBorder, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
         actionsBR = [borderRepresentation.moveBorder, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter2, borderRepresentation.changeColorCenter3, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
         base_actionFDR = [firstDiagonalRepresentation.moveDiagonal, firstDiagonalRepresentation.expandGrid, firstDiagonalRepresentation.reduceGrid]
@@ -201,15 +200,15 @@ class Agent(ArcAgent):
         actionsSDR = [secondDiagonalRepresentation.moveDiagonal, secondDiagonalRepresentation.changeColorDiagonal, secondDiagonalRepresentation.modifyDiagonalAdd, secondDiagonalRepresentation.modifyDiagonalDel, secondDiagonalRepresentation.modifyDiagonalMove, secondDiagonalRepresentation.expandGrid, secondDiagonalRepresentation.reduceGrid]
         possibleSolutionRep = list()
         reps = [
-            #(pixelRepresentation, base_actionPR, actionsPR),
-            #(rowRepresentation, base_actionRR, actionsRR),
-            #(columnsRepresentation, base_actionCR, actionsCR),
-            #(colorLayerRepresentation, base_actionCLR, actionsCLR),
-            #(rectangleRepresentation, base_actionRER, actionsRER),
+            (pixelRepresentation, base_actionPR, actionsPR),
+            (rowRepresentation, base_actionRR, actionsRR),
+            (columnsRepresentation, base_actionCR, actionsCR),
+            (colorLayerRepresentation, base_actionCLR, actionsCLR),
+            (rectangleRepresentation, base_actionRER, actionsRER),
             (figureRepresentation, base_actionFR, actionsFR),
-            #(borderRepresentation, base_actionBR, actionsBR),
-            #(firstDiagonalRepresentation, base_actionFDR, actionsFDR),
-            #(secondDiagonalRepresentation, base_actionSDR, actionsSDR)
+            (borderRepresentation, base_actionBR, actionsBR),
+            (firstDiagonalRepresentation, base_actionFDR, actionsFDR),
+            (secondDiagonalRepresentation, base_actionSDR, actionsSDR)
         ]
         #rappresentazione in cui ho delle figure che posso prolungare con ostacoli e elementi sovrapposti
 

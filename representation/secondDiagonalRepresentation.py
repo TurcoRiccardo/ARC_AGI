@@ -43,7 +43,7 @@ class secondDiagonalRepresentation:
     
     #return the total number of element in the diagonal
     def getElementComponent(self, index):
-        return len(self.DiagonaleList[index])
+        return (len(self.DiagonaleList[index]),)
 
     #return the list of diagonal index
     def generateIndexList(self, s):
@@ -80,7 +80,7 @@ class secondDiagonalRepresentation:
         l = list()
         if s.allComponent == 1:
             #da destra
-            l.append(len(self.DiagonaleList[adapted_index]) - (s.component % len(self.DiagonaleList[adapted_index])) - 1)
+            l.append(len(self.DiagonaleList[adapted_index]) - (s.component[0] % len(self.DiagonaleList[adapted_index])) - 1)
         elif s.allComponent == 2:
             #centro
             if len(self.DiagonaleList[adapted_index]) % 2 == 1:
@@ -98,7 +98,7 @@ class secondDiagonalRepresentation:
                     l.append(c)
         else:
             #da sinistra
-            l.append(s.component % len(self.DiagonaleList[adapted_index]))
+            l.append(s.component[0] % len(self.DiagonaleList[adapted_index]))
         return l
 
     #moves the diagonal index if possible based on the direction

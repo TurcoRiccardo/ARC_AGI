@@ -49,7 +49,7 @@ class rectangleRepresentation:
     #return the total number of pixel in the rectangle
     def getElementComponent(self, index):
         adapted_index = index % len(self.rectangleList)
-        return self.rectangleList[adapted_index].h * self.rectangleList[adapted_index].w
+        return (self.rectangleList[adapted_index].h * self.rectangleList[adapted_index].w,)
     
     #return the list of rectangle index
     def generateIndexList(self, s):

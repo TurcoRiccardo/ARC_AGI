@@ -20,7 +20,7 @@ class rowRepresentation:
     
     #return the total number of column
     def getElementComponent(self, index):
-        return self.nc
+        return (self.nc,)
 
     #return the list of row index
     def generateIndexList(self, s):
@@ -57,7 +57,7 @@ class rowRepresentation:
         l = list()
         if s.allComponent == 1:
             #da destra
-            l.append(self.nc - (s.component % self.nc) - 1)
+            l.append(self.nc - (s.component[0] % self.nc) - 1)
         elif s.allComponent == 2:
             #centro
             if self.nc % 2 == 1:
@@ -75,7 +75,7 @@ class rowRepresentation:
                     l.append(c)
         else:
             #da sinistra
-            l.append(s.component % self.nc)
+            l.append(s.component[0] % self.nc)
         return l
 
     #moves the row index if possible based on the direction

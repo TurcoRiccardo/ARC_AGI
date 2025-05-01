@@ -143,7 +143,7 @@ class borderRepresentation:
     
     #return the total number of element in the border index
     def getElementComponent(self, index):
-        return len(self.borderList[index].border)
+        return (len(self.borderList[index].border),)
     
     #return the list of border index
     def generateIndexList(self, s):
@@ -176,7 +176,7 @@ class borderRepresentation:
         l = list()
         if s.allComponent == 1:
             #da destra
-            l.append(len(self.borderList[adapted_index].border) - (s.component % len(self.borderList[adapted_index].border)) - 1)
+            l.append(len(self.borderList[adapted_index].border) - (s.component[0] % len(self.borderList[adapted_index].border)) - 1)
         elif s.allComponent == 2:
             #centro
             if len(self.borderList[adapted_index].border) % 2 == 1:
@@ -189,7 +189,7 @@ class borderRepresentation:
             l = [x for x in range(0, len(self.borderList[adapted_index].border))]
         else:
             #da sinistra
-            l.append(s.component % len(self.borderList[adapted_index].border))
+            l.append(s.component[0] % len(self.borderList[adapted_index].border))
         return l
 
     #moves the border index based on the direction

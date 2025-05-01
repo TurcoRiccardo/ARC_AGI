@@ -30,7 +30,7 @@ class colorLayerRepresentation:
     #return the total number of pixel in the layer index
     def getElementComponent(self, index):
         adapted_index = (index - 1) % 9
-        return len(self.FigureListLayer[adapted_index])
+        return (len(self.FigureListLayer[adapted_index]),)
     
     #return the list of layer index
     def generateIndexList(self, s):
@@ -48,7 +48,7 @@ class colorLayerRepresentation:
         l = list()
         if s.allComponent == 1:
             #da destra
-            l.append(len(self.FigureListLayer[adapted_index]) - (s.component % len(self.FigureListLayer[adapted_index])) - 1)
+            l.append(len(self.FigureListLayer[adapted_index]) - (s.component[0] % len(self.FigureListLayer[adapted_index])) - 1)
         elif s.allComponent == 2:
             #centro
             if len(self.FigureListLayer[adapted_index]) % 2 == 1:
@@ -61,7 +61,7 @@ class colorLayerRepresentation:
             l = [x for x in range(0, len(self.FigureListLayer[adapted_index]))]
         else:
             #da sinistra
-            l.append(s.component % len(self.FigureListLayer[adapted_index]))
+            l.append(s.component[0] % len(self.FigureListLayer[adapted_index]))
         return l
 
     #moves all the pixel in the layer index based on the direction

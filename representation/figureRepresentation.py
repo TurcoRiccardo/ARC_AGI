@@ -379,56 +379,15 @@ class figureRepresentation:
             return 1
         count = 0
         l = self.generateIndexList(s)
+        duplicatedFigure = []
         for adapted_index in l:
-            if (s.direction % 4) == 0:
-                #down
-                if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h * 2 <= self.nr:
-                    fig = Figure(self.figureList[adapted_index].grid.copy(), PixelNode(self.figureList[adapted_index].pos.x, self.figureList[adapted_index].pos.y), self.figureList[adapted_index].h, self.figureList[adapted_index].w, self.figureList[adapted_index].color)
-                    fig.pos.x += self.figureList[adapted_index].h
-                    for i in range(0, len(self.figureList)):
-                        if fig.pos.x < self.figureList[i].pos.x:
-                            self.figureList.insert(i, fig)
-                        elif fig.pos.x == self.figureList[i].pos.x:
-                            if fig.pos.y < self.figureList[i].pos.y:
-                                self.figureList.insert(i, fig)
-                    count += 1
-            elif (s.direction % 4) == 1:
-                #up
-                if self.figureList[adapted_index].pos.x - self.figureList[adapted_index].h >= 0:
-                    fig = Figure(self.figureList[adapted_index].grid.copy(), PixelNode(self.figureList[adapted_index].pos.x, self.figureList[adapted_index].pos.y), self.figureList[adapted_index].h, self.figureList[adapted_index].w, self.figureList[adapted_index].color)
-                    fig.pos.x -= self.figureList[adapted_index].h
-                    for i in range(0, len(self.figureList)):
-                        if fig.pos.x < self.figureList[i].pos.x:
-                            self.figureList.insert(i, fig)
-                        elif fig.pos.x == self.figureList[i].pos.x:
-                            if fig.pos.y < self.figureList[i].pos.y:
-                                self.figureList.insert(i, fig)
-                    count += 1
-            elif (s.direction % 4) == 2:
-                #right
-                if self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w * 2 <= self.nc:
-                    fig = Figure(self.figureList[adapted_index].grid.copy(), PixelNode(self.figureList[adapted_index].pos.x, self.figureList[adapted_index].pos.y), self.figureList[adapted_index].h, self.figureList[adapted_index].w, self.figureList[adapted_index].color)
-                    fig.pos.y += self.figureList[adapted_index].w
-                    for i in range(0, len(self.figureList)):
-                        if fig.pos.x < self.figureList[i].pos.x:
-                            self.figureList.insert(i, fig)
-                        elif fig.pos.x == self.figureList[i].pos.x:
-                            if fig.pos.y < self.figureList[i].pos.y:
-                                self.figureList.insert(i, fig)
-                    count += 1
-            elif (s.direction % 4) == 3:
-                #left
-                if self.figureList[adapted_index].pos.y - self.figureList[adapted_index].w >= 0:
-                    fig = Figure(self.figureList[adapted_index].grid.copy(), PixelNode(self.figureList[adapted_index].pos.x, self.figureList[adapted_index].pos.y), self.figureList[adapted_index].h, self.figureList[adapted_index].w, self.figureList[adapted_index].color)
-                    fig.pos.y -= self.figureList[adapted_index].w
-                    for i in range(0, len(self.figureList)):
-                        if fig.pos.x < self.figureList[i].pos.x:
-                            self.figureList.insert(i, fig)
-                        elif fig.pos.x == self.figureList[i].pos.x:
-                            if fig.pos.y < self.figureList[i].pos.y:
-                                self.figureList.insert(i, fig)
-                    count += 1
+            fig = Figure(self.figureList[adapted_index].grid.copy(), PixelNode(self.figureList[adapted_index].pos.x, self.figureList[adapted_index].pos.y), self.figureList[adapted_index].h, self.figureList[adapted_index].w, self.figureList[adapted_index].color)
+            duplicatedFigure.append((adapted_index, fig))
+            count += 1
         if count != 0:
+            duplicatedFigure.sort(key=lambda i: i[0], reverse=True)
+            for (index, fig) in duplicatedFigure:
+                self.figureList.insert(index, fig)
             return 0
         return 1
     
@@ -720,13 +679,10 @@ class figureRepresentation:
             lc = self.generateComponentList_column(s, adapted_index)
             lc.sort(key=lambda i: i, reverse=True)
             for adapted_component in lc:
-                if self.figureList[adapted_index].h > 1 and adapted_component+1 < self.figureList[adapted_index].h:
-
-
-
-                    fig = Figure(self.figureList[adapted_index].grid[adapted_component+1:self.figureList[adapted_index].h,:], PixelNode(self.figureList[adapted_index].pos.x+adapted_component+1, self.figureList[adapted_index].pos.y), self.figureList[adapted_index].h-(adapted_component+1), self.figureList[adapted_index].w, self.figureList[adapted_index].color)
-                    self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[0:adapted_component+1,:]
-                    self.figureList[adapted_index].h -= (self.figureList[adapted_index].h - (adapted_component+1))
+                if self.figureList[adapted_index].w > 1 and adapted_component+1 < self.figureList[adapted_index].w:
+                    fig = Figure(self.figureList[adapted_index].grid[:,adapted_component+1:self.figureList[adapted_index].w], PixelNode(self.figureList[adapted_index].pos.x, self.figureList[adapted_index].pos.y+adapted_component+1), self.figureList[adapted_index].h, self.figureList[adapted_index].w-(adapted_component+1), self.figureList[adapted_index].color)
+                    self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[:,0:adapted_component+1]
+                    self.figureList[adapted_index].w -= (self.figureList[adapted_index].w - (adapted_component+1))
                     dividedFigure.append((adapted_index+1, fig))
                     count += 1
         if count != 0:
@@ -876,7 +832,7 @@ class figureRepresentation:
         for x in range(0, len(performed_actions)):
             if performed_selection[x].allElement < 3: 
                 score += 0.5
-            if performed_actions[x] == figureRepresentation.rotateFigure or performed_actions[x] == figureRepresentation.removeFigure or performed_actions[x] == figureRepresentation.mergeFigure or performed_actions[x] == figureRepresentation.divideFigure_row:
+            if performed_actions[x] == figureRepresentation.rotateFigure or performed_actions[x] == figureRepresentation.removeFigure or performed_actions[x] == figureRepresentation.mergeFigure or performed_actions[x] == figureRepresentation.divideFigure_row or performed_actions[x] == figureRepresentation.divideFigure_column:
                 score += 0.5
             score += 1
         return -score

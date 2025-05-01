@@ -25,7 +25,7 @@ class pixelRepresentation:
     
     #return the total number of pixel
     def getElementComponent(self, index):
-        return self.nr * self.nc
+        return (self.nr * self.nc,)
     
     #return the list of pixel index
     def generateIndexList(self, s):
