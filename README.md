@@ -51,7 +51,7 @@ We can apply different types of actions to pixels:
 - **movePixel:** moves the selected pixels of one in one direction
 - **changeColorPixel:** slightly changes the color of selected pixels
 - **removePixel:** removes selected pixels from the list
-- **duplicateNearPixel:** duplicates the selected pixels next to the pixel in one direction
+- **duplicatePixel:** duplicates the selected pixels
 - **expandGrid:** expands the grid size
 - **reduceGrid:** reduce the grid size
 

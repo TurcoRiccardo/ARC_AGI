@@ -149,63 +149,20 @@ class pixelRepresentation:
             return 0
         return 1
 
-    #generate a copy of the pixel index in the direction direction
-    def duplicateNearPixel(self, s):
+    #generate a copy of the pixel index
+    def duplicatePixel(self, s):
         if len(self.pixelList) == 0:
             return 1
         count = 0
         l = self.generateIndexList(s)
+        newPixel = []
         for adapted_index in l:
             new_pixel = PixelNode(self.pixelList[adapted_index].x, self.pixelList[adapted_index].y, self.pixelList[adapted_index].color)
-            if (s.direction % 4) == 0:
-                #down
-                if new_pixel.x + 1 < self.nr:
-                    ok = 0
-                    for pixel in self.pixelList:
-                        if new_pixel.x + 1 == pixel.x and new_pixel.y == pixel.y:
-                            ok = 1
-                            break
-                    if ok == 0:
-                        new_pixel.x += 1
-                        self.pixelList.append(new_pixel)
-                        count += 1
-            elif (s.direction % 4) == 1:
-                #up
-                if new_pixel.x > 0:
-                    ok = 0
-                    for pixel in self.pixelList:
-                        if new_pixel.x - 1 == pixel.x and new_pixel.y == pixel.y:
-                            ok = 1
-                            break
-                    if ok == 0:
-                        new_pixel.x -= 1
-                        self.pixelList.append(new_pixel)
-                        count += 1
-            elif (s.direction % 4) == 2:
-                #right
-                if new_pixel.y + 1 < self.nc:
-                    ok = 0
-                    for pixel in self.pixelList:
-                        if new_pixel.x == pixel.x and new_pixel.y + 1 == pixel.y:
-                            ok = 1
-                            break
-                    if ok == 0:
-                        new_pixel.y += 1
-                        self.pixelList.append(new_pixel)
-                        count += 1
-            elif (s.direction % 4) == 3:
-                #left
-                if new_pixel.y > 0:
-                    ok = 0
-                    for pixel in self.pixelList:
-                        if new_pixel.x == pixel.x and new_pixel.y - 1 == pixel.y:
-                            ok = 1
-                            break
-                    if ok == 0:
-                        new_pixel.y -= 1
-                        self.pixelList.append(new_pixel)
-                        count += 1
+            newPixel.append((adapted_index+1, new_pixel))
         if count != 0:
+            newPixel.sort(key=lambda i: i[0], reverse=True)
+            for (index, fig) in newPixel:
+                self.pixelList.insert(index, fig)
             return 0
         return 1
 
@@ -323,7 +280,7 @@ class pixelRepresentation:
         for x in range(0, len(performed_actions)):
             if performed_selection[x].allElement < 3: 
                 score += 0.5
-            if performed_actions[x] == pixelRepresentation.duplicateNearPixel or performed_actions[x] == pixelRepresentation.removePixel:
+            if performed_actions[x] == pixelRepresentation.duplicatePixel or performed_actions[x] == pixelRepresentation.removePixel:
                 score += 0.5
             score += 1
         return -score
