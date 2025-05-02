@@ -162,7 +162,7 @@ class rowRepresentation:
             return 0
         return 1
 
-    #changes the color of the colored pixel in the row index based on color
+    #changes the color of the colored pixels in the row index based on color
     def changeColorRow(self, s):
         count = 0
         l = self.generateIndexList(s)
@@ -176,6 +176,26 @@ class rowRepresentation:
                     else:
                         if self.RigheList[adapted_index][x] != 1:
                             self.RigheList[adapted_index][x] -= 1
+                            count += 1
+        if count != 0:
+            return 0
+        return 1
+
+    #changes the color of the selected pixel in the row index based on color
+    def changeColorRowPixel(self, s):
+        count = 0
+        li = self.generateIndexList(s)
+        for adapted_index in li:
+            lc = self.generateComponentList(s, adapted_index)
+            for adapted_component in lc:
+                if self.RigheList[adapted_index][adapted_component] != 0:
+                    if s.color % 2 == 0:
+                        if self.RigheList[adapted_index][adapted_component] != 9:
+                            self.RigheList[adapted_index][adapted_component] += 1
+                            count += 1
+                    else:
+                        if self.RigheList[adapted_index][adapted_component] != 1:
+                            self.RigheList[adapted_index][adapted_component] -= 1
                             count += 1
         if count != 0:
             return 0
@@ -373,7 +393,7 @@ class rowRepresentation:
         for x in range(0, len(performed_actions)):
             if performed_selection[x].allElement < 3: 
                 score += 0.5
-            if performed_actions[x] == rowRepresentation.modifyRowAdd or performed_actions[x] == rowRepresentation.modifyRowDel:
+            if performed_actions[x] == rowRepresentation.changeColorRowPixel or performed_actions[x] == rowRepresentation.modifyRowAdd or performed_actions[x] == rowRepresentation.modifyRowDel or performed_actions[x] == rowRepresentation.modifyRowMove:
                 score += 0.5
             score += 1
         return -score

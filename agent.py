@@ -181,13 +181,13 @@ def generate_representation(rep, demo_pairs, base_act, act):
 class Agent(ArcAgent):
     def predict(self, demo_pairs: List[ArcIOPair], test_grids: List[ArcGrid]) -> List[ArcPrediction]:
         base_actionPR = [pixelRepresentation.movePixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid]
-        actionsPR = [pixelRepresentation.movePixel, pixelRepresentation.changeColorPixel, pixelRepresentation.removePixel, pixelRepresentation.duplicatePixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid]
+        actionsPR = [pixelRepresentation.movePixel, pixelRepresentation.changeColorPixel, pixelRepresentation.duplicatePixel, pixelRepresentation.removePixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid]
         base_actionRR = [rowRepresentation.moveRow, rowRepresentation.expandGrid, rowRepresentation.reduceGrid]
-        actionsRR = [rowRepresentation.moveRow, rowRepresentation.changeColorRow, rowRepresentation.modifyRowAdd, rowRepresentation.modifyRowDel, rowRepresentation.modifyRowMove, rowRepresentation.expandGrid, rowRepresentation.reduceGrid]
+        actionsRR = [rowRepresentation.moveRow, rowRepresentation.changeColorRow, rowRepresentation.changeColorRowPixel, rowRepresentation.modifyRowAdd, rowRepresentation.modifyRowDel, rowRepresentation.modifyRowMove, rowRepresentation.expandGrid, rowRepresentation.reduceGrid]
         base_actionCR = [columnsRepresentation.moveColumn, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
-        actionsCR = [columnsRepresentation.moveColumn, columnsRepresentation.changeColorColumn, columnsRepresentation.modifyColumnAdd, columnsRepresentation.modifyColumnDel, columnsRepresentation.modifyColumnMove, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
+        actionsCR = [columnsRepresentation.moveColumn, columnsRepresentation.changeColorColumn, columnsRepresentation.changeColorColumnPixel, columnsRepresentation.modifyColumnAdd, columnsRepresentation.modifyColumnDel, columnsRepresentation.modifyColumnMove, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
         base_actionCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
-        actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
+        actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.moveLayerPixel, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
         base_actionRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateNearRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         base_actionFR = [figureRepresentation.duplicateFigure, figureRepresentation.removeFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
@@ -200,10 +200,10 @@ class Agent(ArcAgent):
         actionsSDR = [secondDiagonalRepresentation.moveDiagonal, secondDiagonalRepresentation.changeColorDiagonal, secondDiagonalRepresentation.modifyDiagonalAdd, secondDiagonalRepresentation.modifyDiagonalDel, secondDiagonalRepresentation.modifyDiagonalMove, secondDiagonalRepresentation.expandGrid, secondDiagonalRepresentation.reduceGrid]
         possibleSolutionRep = list()
         reps = [
-            (pixelRepresentation, base_actionPR, actionsPR),
+            #(pixelRepresentation, base_actionPR, actionsPR),
             #(rowRepresentation, base_actionRR, actionsRR),
             #(columnsRepresentation, base_actionCR, actionsCR),
-            #(colorLayerRepresentation, base_actionCLR, actionsCLR),
+            (colorLayerRepresentation, base_actionCLR, actionsCLR),
             #(rectangleRepresentation, base_actionRER, actionsRER),
             #(figureRepresentation, base_actionFR, actionsFR),
             #(borderRepresentation, base_actionBR, actionsBR),

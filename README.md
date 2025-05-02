@@ -45,7 +45,7 @@ A grid can have any height or width between 1x1 and 30x30 inclusive (average hei
 We can visualize our grid with different representations
 
 ### Pixel Representation: 
-We represent the colored pixels of the grid as a list of pixels, we do not allow overlapping pixels.
+We represent the colored pixels of the grid as a list of pixels, pixels can be overlapped.
 
 We can apply different types of actions to pixels: 
 - **movePixel:** moves the selected pixels of one in one direction
@@ -67,7 +67,8 @@ We can represent the grid as a list of rows.
 
 We can apply different types of actions to rows: 
 - **moveRow:** moves the selected row of one in one direction
-- **changeColorRow:** slightly changes the color of the colored pixel in the selected row
+- **changeColorRow:** slightly changes the color of the colored pixels in the selected row
+- **changeColorRowPixel:** slightly changes the color of the selected pixel in the selected row
 - **modifyRowAdd:** add a new colored pixel in the selected row
 - **modifyRowDel:** delete a colored pixel in the selected row
 - **modifyRowMove:** modify the selected row by swapping two pixel
@@ -93,7 +94,8 @@ We can represent the grid as a list of columns.
 
 We can apply different types of actions to columns: 
 - **moveColumn:** moves the selected column of one in one direction
-- **changeColorColumn:** slightly changes the color of the colored pixel in the selected column
+- **changeColorColumn:** slightly changes the color of the colored pixels in the selected column
+- **changeColorColumnPixel:** slightly changes the color of the secected pixel in the selected column
 - **modifyColumnAdd:** add a new colored pixel in the selected column
 - **modifyColumnDel:** delete a colored pixel in the selected column
 - **modifyColumnMove:** modify the selected column by swapping two pixel
@@ -119,6 +121,7 @@ We can represent the grid as a list of layer composed of all the pixels of one c
 
 We can apply different types of actions to layers: 
 - **moveLayer:** moves the selected layer of one in one direction
+- **moveLayerPixel:** moves the selected pixel in the layer of one in one direction
 - **layerUnion:** move the pixel of the selected layer in another closest layer
 - **delPixelLayer:** delete a pixel in the selected layer
 - **addPixelLayer:** add a new pixel in the selected layer

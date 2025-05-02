@@ -59,59 +59,27 @@ class pixelRepresentation:
             return 1
         count = 0
         l = self.generateIndexList(s)
-        if (s.direction % 4) == 0:
-            l.sort(key=lambda i: self.pixelList[i].x, reverse=True)
-        elif (s.direction % 4) == 1:
-            l.sort(key=lambda i: self.pixelList[i].x, reverse=False)
-        elif (s.direction % 4) == 2:
-            l.sort(key=lambda i: self.pixelList[i].y, reverse=True)
-        elif (s.direction % 4) == 3:
-            l.sort(key=lambda i: self.pixelList[i].y, reverse=False)
         for adapted_index in l:
             if (s.direction % 4) == 0:
                 if self.pixelList[adapted_index].x + 1 < self.nr:
                     #down
-                    ok = 0
-                    for pixel in self.pixelList:
-                        if self.pixelList[adapted_index].x + 1 == pixel.x and self.pixelList[adapted_index].y == pixel.y:
-                            ok = 1
-                            break
-                    if ok == 0:
-                        self.pixelList[adapted_index].x += 1
-                        count += 1
+                    self.pixelList[adapted_index].x += 1
+                    count += 1
             elif (s.direction % 4) == 1:
                 if self.pixelList[adapted_index].x > 0:
                     #up
-                    ok = 0
-                    for pixel in self.pixelList:
-                        if self.pixelList[adapted_index].x - 1 == pixel.x and self.pixelList[adapted_index].y == pixel.y:
-                            ok = 1
-                            break
-                    if ok == 0:
-                        self.pixelList[adapted_index].x -= 1
-                        count += 1
+                    self.pixelList[adapted_index].x -= 1
+                    count += 1
             elif (s.direction % 4) == 2:
                 if self.pixelList[adapted_index].y + 1 < self.nc:
                     #right
-                    ok = 0
-                    for pixel in self.pixelList:
-                        if self.pixelList[adapted_index].x == pixel.x and self.pixelList[adapted_index].y + 1 == pixel.y:
-                            ok = 1
-                            break
-                    if ok == 0:
-                        self.pixelList[adapted_index].y += 1
-                        count += 1
+                    self.pixelList[adapted_index].y += 1
+                    count += 1
             elif (s.direction % 4) == 3:
                 if self.pixelList[adapted_index].y > 0:
                     #left
-                    ok = 0
-                    for pixel in self.pixelList:
-                        if self.pixelList[adapted_index].x == pixel.x and self.pixelList[adapted_index].y - 1 == pixel.y:
-                            ok = 1
-                            break
-                    if ok == 0:
-                        self.pixelList[adapted_index].y -= 1
-                        count += 1
+                    self.pixelList[adapted_index].y -= 1
+                    count += 1
         if count != 0:
             return 0
         return 1
@@ -265,8 +233,8 @@ class pixelRepresentation:
                     break
                 c += 1
             if ok != 1:
-                score += 1
-        score += sum(mask) * 1.2
+                score += 1 * 1.2
+        score += sum(mask) * 1.5
         return -score
 
     def rappToGrid(self):
