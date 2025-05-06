@@ -213,6 +213,26 @@ class firstDiagonalRepresentation:
             return 0
         return 1
     
+    #changes the color of the selected pixel in the diagonal index based on color
+    def changeColorDiagonalPixel(self, s):
+        count = 0
+        li = self.generateIndexList(s)
+        for adapted_index in li:
+            lc = self.generateComponentList(s, adapted_index)
+            for adapted_component in lc:
+                if self.DiagonaleList[adapted_index][adapted_component] != 0:
+                    if s.color % 2 == 0:
+                        if self.DiagonaleList[adapted_index][adapted_component] != 9:
+                            self.DiagonaleList[adapted_index][adapted_component] += 1
+                            count += 1
+                    else:
+                        if self.DiagonaleList[adapted_index][adapted_component] != 1:
+                            self.DiagonaleList[adapted_index][adapted_component] -= 1
+                            count += 1
+        if count != 0:
+            return 0
+        return 1
+    
     #add a new colored pixel in the diagonal index
     def modifyDiagonalAdd(self, s):
         count = 0
@@ -440,7 +460,7 @@ class firstDiagonalRepresentation:
         for x in range(0, len(performed_actions)):
             if performed_selection[x].allElement < 3: 
                 score += 0.5
-            if performed_actions[x] == firstDiagonalRepresentation.modifyDiagonalAdd or performed_actions[x] == firstDiagonalRepresentation.modifyDiagonalDel or performed_actions[x] == firstDiagonalRepresentation.reduceGrid or performed_actions[x] == firstDiagonalRepresentation.expandGrid:
+            if performed_actions[x] == firstDiagonalRepresentation.modifyDiagonalAdd or performed_actions[x] == firstDiagonalRepresentation.modifyDiagonalDel or performed_actions[x] == firstDiagonalRepresentation.modifyDiagonalMove:
                 score += 0.5
             score += 1
         return -score

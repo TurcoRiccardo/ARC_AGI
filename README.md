@@ -145,7 +145,7 @@ We can apply different types of actions to rectangles:
 - **moveRectangle:** moves the selected rectangle of one in one direction
 - **changeColorRectangle:** slightly changes the color of the selected rectangle
 - **removeRectangle:** delete the selected rectangle from the rectangle list
-- **duplicateNearRectangle:** duplicate the selected rectangle from the rectangle list in one direction
+- **duplicateRectangle:** duplicate the selected rectangle
 - **changeOrder:** change the display order of the rectangles
 - **scaleUpRectangle:** scale up the selected rectangle in the direction direction
 - **scaleDownRectangle:** scale down the selected rectangle in the direction direction
@@ -197,6 +197,15 @@ We can select or group the components of the figure in various ways:
 - based on the central column in the figure
 - we can select all the columns in the figure
 
+### Color Figure Representation
+We can represent the grid as a group of figures composed by pixels of different color, figures can be overlapped.
+
+We can apply different types of actions to figures: 
+- **moveFigure:** moves the selected figure of one in one direction
+
+
+
+
 ### Border Representation
 We can represent the grid as a group of border having the same color having an central area, we do not allow overlapping border.
 
@@ -228,6 +237,7 @@ We can represent the grid as a list of diagonal. The diagonals run from the top 
 We can apply different types of actions to diagonals: 
 - **moveDiagonal:** moves the selected diagonal of one in one direction
 - **changeColorDiagonal:** slightly changes the color of the colored pixel in the selected diagonal
+- **changeColorDiagonalPixel:** changes the color of the selected pixel in the diagonal index based on color
 - **modifyDiagonalAdd:** add a new colored pixel in the selected diagonal
 - **modifyDiagonalDel:** delete a colored pixel in the selected diagonal
 - **modifyDiagonalMove:** modify the selected diagonal by swapping two pixel
@@ -254,6 +264,7 @@ We can represent the grid as a list of diagonal. The diagonals run from the top 
 We can apply different types of actions to diagonals: 
 - **moveDiagonal:** moves the selected diagonal of one in one direction
 - **changeColorDiagonal:** slightly changes the color of the colored pixel in the selected diagonal
+- **changeColorDiagonalPixel:** changes the color of the selected pixel in the diagonal index based on color
 - **modifyDiagonalAdd:** add a new colored pixel in the selected diagonal
 - **modifyDiagonalDel:** delete a colored pixel in the selected diagonal
 - **modifyDiagonalMove:** modify the selected diagonal by swapping two pixel

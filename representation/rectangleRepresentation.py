@@ -149,39 +149,21 @@ class rectangleRepresentation:
             return 0
         return 1
 
-    #generate a new rectangle near the rectangle index in the direction direction
-    def duplicateNearRectangle(self, s):
+    #duplicate the selected rectangle
+    def duplicateRectangle(self, s):
         if len(self.rectangleList) == 0:
             return 1
         count = 0
         l = self.generateIndexList(s)
+        duplicatedRectangle = []
         for adapted_index in l:
             new_rectangle = Rectangle(self.rectangleList[adapted_index].x, self.rectangleList[adapted_index].y, self.rectangleList[adapted_index].h, self.rectangleList[adapted_index].w, self.rectangleList[adapted_index].color)
-            if (s.direction % 4) == 0:
-                #down
-                if self.rectangleList[adapted_index].x + 2 * self.rectangleList[adapted_index].h < self.nr:
-                    new_rectangle.x += new_rectangle.h
-                    self.rectangleList.append(new_rectangle)
-                    count += 1
-            elif (s.direction % 4) == 1:
-                #up
-                if self.rectangleList[adapted_index].x - new_rectangle.h >= 0:
-                    new_rectangle.x -= new_rectangle.h
-                    self.rectangleList.append(new_rectangle)
-                    count += 1
-            elif (s.direction % 4) == 2:
-                #right
-                if self.rectangleList[adapted_index].y + 2 * self.rectangleList[adapted_index].w < self.nc:
-                    new_rectangle.y += new_rectangle.w
-                    self.rectangleList.append(new_rectangle)
-                    count += 1
-            elif (s.direction % 4) == 3:
-                #left
-                if self.rectangleList[adapted_index].y - new_rectangle.w >= 0:
-                    new_rectangle.y -= new_rectangle.w
-                    self.rectangleList.append(new_rectangle)
-                    count += 1
+            duplicatedRectangle.append((adapted_index, new_rectangle))
+            count += 1
         if count != 0:
+            duplicatedRectangle.sort(key=lambda i: i[0], reverse=True)
+            for (index, fig) in duplicatedRectangle:
+                self.rectangleList.insert(index, fig)
             return 0
         return 1
 
@@ -377,7 +359,7 @@ class rectangleRepresentation:
                 score += self.rectangleList[z].h * self.rectangleList[z].w
         if len(output.rectangleList) - len(self.rectangleList) > 0:
             for z in range(len(self.rectangleList), len(output.rectangleList)):
-                score += output.rectangleList[z].h * output.rectangleList[z].w * 1.2
+                score += output.rectangleList[z].h * output.rectangleList[z].w * 1.5
         return -score
 
     def rappToGrid(self):
@@ -393,7 +375,7 @@ class rectangleRepresentation:
         for x in range(0, len(performed_actions)):
             if performed_selection[x].allElement < 3: 
                 score += 0.5
-            if performed_actions[x] == rectangleRepresentation.removeRectangle or performed_actions[x] == rectangleRepresentation.duplicateNearRectangle or performed_actions[x] == rectangleRepresentation.changeOrder:
+            if performed_actions[x] == rectangleRepresentation.removeRectangle or performed_actions[x] == rectangleRepresentation.duplicateRectangle or performed_actions[x] == rectangleRepresentation.changeOrder:
                 score += 0.5
             score += 1
         return -score
