@@ -53,6 +53,26 @@ def ricFindFigure(grid, posX, posY, pixel, mask, nc, nr):
             ricFindFigure(grid, posX, posY-1, pixel, mask, nc, nr)
     return 
 
+#return 0 if we are in a closed border
+def ricEscapeLine(grid, posX, posY):
+    cnt = 0
+    if posX == 0 or posX == grid.shape[0]-1 or posY == 0 or posY == grid.shape[1]-1:
+        return cnt + 1
+    grid[posX][posY] = 1
+    #up
+    if grid[posX+1][posY] == 0:
+        cnt += ricEscapeLine(grid, posX+1, posY)
+    #right
+    if cnt == 0 and grid[posX][posY+1] == 0:
+        cnt += ricEscapeLine(grid, posX, posY+1)
+    #down
+    if cnt == 0 and grid[posX-1][posY] == 0:
+        cnt += ricEscapeLine(grid, posX-1, posY)
+    #left
+    if cnt == 0 and grid[posX][posY-1] == 0:
+        cnt += ricEscapeLine(grid, posX, posY-1)
+    return cnt
+
 class coloredFigureRepresentation:
     def __init__(self, input_grid):
         self.nr = input_grid.shape[0]
@@ -156,6 +176,52 @@ class coloredFigureRepresentation:
             return 0
         return 1
     
+    #changes the color of the border of the figure index based on color
+    def changeColorFigureBorder(self, s):
+        if len(self.figureList) == 0:
+            return 1
+        count = 0
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            for x in range(0, self.figureList[adapted_index].h):
+                for y in range(0, self.figureList[adapted_index].w):
+                    if self.figureList[adapted_index].grid[x][y] > 0:
+                        if ricEscapeLine(self.figureList[adapted_index].grid.copy(), x, y) > 0:
+                            if s.color % 2 == 0:
+                                if self.figureList[adapted_index].grid[x][y] != 9:
+                                    self.figureList[adapted_index].grid[x][y] += 1
+                                    count += 1
+                            else:
+                                if self.figureList[adapted_index].grid[x][y] != 1:
+                                    self.figureList[adapted_index].grid[x][y] -= 1
+                                    count += 1
+        if count != 0:
+            return 0
+        return 1
+    
+    #changes the color of the center of the figure index based on color
+    def changeColorFigureCenter(self, s):
+        if len(self.figureList) == 0:
+            return 1
+        count = 0
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            for x in range(0, self.figureList[adapted_index].h):
+                for y in range(0, self.figureList[adapted_index].w):
+                    if self.figureList[adapted_index].grid[x][y] > 0:
+                        if ricEscapeLine(self.figureList[adapted_index].grid.copy(), x, y) == 0:
+                            if s.color % 2 == 0:
+                                if self.figureList[adapted_index].grid[x][y] != 9:
+                                    self.figureList[adapted_index].grid[x][y] += 1
+                                    count += 1
+                            else:
+                                if self.figureList[adapted_index].grid[x][y] != 1:
+                                    self.figureList[adapted_index].grid[x][y] -= 1
+                                    count += 1
+        if count != 0:
+            return 0
+        return 1
+
     #expand the grid in the direction direction
     def expandGrid(self, s):
         if (s.direction % 4) == 0:

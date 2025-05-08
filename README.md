@@ -202,6 +202,11 @@ We can represent the grid as a group of figures composed by pixels of different 
 
 We can apply different types of actions to figures: 
 - **moveFigure:** moves the selected figure of one in one direction
+- **changeColorFigureBorder:** changes the color of the border of the figure index based on color
+- **changeColorFigureCenter:** changes the color of the center of the figure index based on color
+- **expandGrid:** expands the grid size
+- **reduceGrid:** reduce the grid size
+
 
 
 
