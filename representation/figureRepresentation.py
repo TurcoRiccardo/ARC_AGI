@@ -373,7 +373,7 @@ class figureRepresentation:
             return 0
         return 1
 
-    #duplicate the selected figure based on the direction direction
+    #duplicate the selected figure from the figure list
     def duplicateFigure(self, s):
         if len(self.figureList) == 0:
             return 1
