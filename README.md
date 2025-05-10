@@ -205,6 +205,9 @@ We can apply different types of actions to figures:
 - **changeColorFigureBorder:** changes the color of the border of the figure index based on color
 - **changeColorFigureCenter:** changes the color of the center of the figure index based on color
 - **fillFigureCenter:** fill the center of the figure index based on color
+- **addElementFigure_row:** add a element in the figure in the selected row
+- **addElementFigure_column:** add a element in the figure in the selected column
+
 - **duplicateFigure:** duplicate the selected figure from the figure list
 - **removeFigure:** remove a figure from the figure list based on the index
 - **rotateFigure:** rotate the selected figure from the figure list to the right or the left
@@ -213,9 +216,23 @@ We can apply different types of actions to figures:
 - **expandGrid:** expands the grid size
 - **reduceGrid:** reduce the grid size
 
+We can select or group figures in various ways:
+- based on the order of the figure list
+- based on the reverse order of the figure list
+- based on the central figure in the figure list
+- based on whether a figure contains a certain color
+- we can select all the figure
 
+We can select or group the components of the figure in various ways:
+- based on the order of the row in the figure
+- based on the reverse order of the row in the figure
+- based on the central row in the figure
+- we can select all the rows in the figure
 
-
+- based on the order of the column in the figure
+- based on the reverse order of the column in the figure
+- based on the central column in the figure
+- we can select all the columns in the figure
 
 ### Border Representation
 We can represent the grid as a group of border having the same color having an central area, we do not allow overlapping border.

@@ -105,7 +105,7 @@ class figureRepresentation:
     def generateComponentList_row(self, s, adapted_index):
         l = list()
         if s.allComponent == 1:
-            #da destra
+            #dal basso
             l.append(self.figureList[adapted_index].h - (s.component[0] % self.figureList[adapted_index].h) - 1)
         elif s.allComponent == 2:
             #centro
@@ -139,9 +139,10 @@ class figureRepresentation:
             #all color
             l = [x for x in range(0, self.figureList[adapted_index].w)]
         else:
-            #dall'alto
+            #da sinistra
             l.append(s.component[1] % self.figureList[adapted_index].w)
         return l
+
 
     #moves the figure index based on the direction
     def moveFigure(self, s):
@@ -230,7 +231,7 @@ class figureRepresentation:
                         count += 1
                 elif (s.direction % 4) == 2:
                     #right
-                    if self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w <= self.nc:
+                    if self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w < self.nc:
                         if self.figureList[adapted_index].grid[adapted_component][-1] == 1:
                             self.figureList[adapted_index].grid = np.hstack([self.figureList[adapted_index].grid, np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1)])
                             self.figureList[adapted_index].w += 1
@@ -268,7 +269,7 @@ class figureRepresentation:
             for adapted_component in lc:
                 if (s.direction % 4) == 0:
                     #down
-                    if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h <= self.nr:
+                    if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h < self.nr:
                         if self.figureList[adapted_index].grid[-1][adapted_component] == 1:
                             self.figureList[adapted_index].grid = np.vstack([self.figureList[adapted_index].grid, np.zeros((1, self.figureList[adapted_index].w), dtype=int)])
                             self.figureList[adapted_index].h += 1

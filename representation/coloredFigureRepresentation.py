@@ -11,6 +11,7 @@ class PixelNode:
 @dataclass
 class Figure:
     grid: np.ndarray
+    gtype: np.ndarray
     pos: PixelNode
     h: int
     w: int
@@ -97,9 +98,18 @@ class coloredFigureRepresentation:
                             yMax = p.y
                         if yMin > p.y:
                             yMin = p.y
-                    fig = Figure(np.zeros((xMax-xMin+1, yMax-yMin+1), dtype=int), PixelNode(xMin, yMin), xMax-xMin+1, yMax-yMin+1)
+                    fig = Figure(np.zeros((xMax-xMin+1, yMax-yMin+1), dtype=int), np.zeros((xMax-xMin+1, yMax-yMin+1), dtype=int), PixelNode(xMin, yMin), xMax-xMin+1, yMax-yMin+1)
                     for p in pixelList:
                         fig.grid[p.x - xMin][p.y - yMin] = p.color
+                    for x in range(0, fig.h):
+                        for y in range(0, fig.w):
+                            if fig.grid[x][y] > 0:
+                                if ricEscapeLine(fig.grid.copy(), x, y) > 0:
+                                    #border pixel
+                                    fig.gtype[x][y] = 1
+                                else:
+                                    #center pixel
+                                    fig.gtype[x][y] = 2
                     self.figureList.append(fig)
 
     #return the total number of figure
@@ -142,7 +152,47 @@ class coloredFigureRepresentation:
             l.append(s.index % len(self.figureList))
         return l
     
+    #return the list of component index
+    def generateComponentList_row(self, s, adapted_index):
+        l = list()
+        if s.allComponent == 1:
+            #da destra
+            l.append(self.figureList[adapted_index].h - (s.component[0] % self.figureList[adapted_index].h) - 1)
+        elif s.allComponent == 2:
+            #centro
+            if self.figureList[adapted_index].h % 2 == 1:
+                l.append(self.figureList[adapted_index].h // 2)
+            else:
+                l.append(self.figureList[adapted_index].h // 2 - 1)
+                l.append(self.figureList[adapted_index].h // 2)
+        elif s.allComponent >= 3:
+            #all color
+            l = [x for x in range(0, self.figureList[adapted_index].h)]
+        else:
+            #dall'alto
+            l.append(s.component[0] % self.figureList[adapted_index].h)
+        return l
 
+    #return the list of component index
+    def generateComponentList_column(self, s, adapted_index):
+        l = list()
+        if s.allComponent == 1:
+            #da destra
+            l.append(self.figureList[adapted_index].w - (s.component[1] % self.figureList[adapted_index].w) - 1)
+        elif s.allComponent == 2:
+            #centro
+            if self.figureList[adapted_index].w % 2 == 1:
+                l.append(self.figureList[adapted_index].w // 2)
+            else:
+                l.append(self.figureList[adapted_index].w // 2 - 1)
+                l.append(self.figureList[adapted_index].w // 2)
+        elif s.allComponent >= 3:
+            #all color
+            l = [x for x in range(0, self.figureList[adapted_index].w)]
+        else:
+            #da sinistra
+            l.append(s.component[1] % self.figureList[adapted_index].w)
+        return l
 
 
     #moves the figure index based on the direction
@@ -185,16 +235,15 @@ class coloredFigureRepresentation:
         for adapted_index in l:
             for x in range(0, self.figureList[adapted_index].h):
                 for y in range(0, self.figureList[adapted_index].w):
-                    if self.figureList[adapted_index].grid[x][y] > 0:
-                        if ricEscapeLine(self.figureList[adapted_index].grid.copy(), x, y) > 0:
-                            if s.color % 2 == 0:
-                                if self.figureList[adapted_index].grid[x][y] != 9:
-                                    self.figureList[adapted_index].grid[x][y] += 1
-                                    count += 1
-                            else:
-                                if self.figureList[adapted_index].grid[x][y] != 1:
-                                    self.figureList[adapted_index].grid[x][y] -= 1
-                                    count += 1
+                    if self.figureList[adapted_index].grid[x][y] > 0 and self.figureList[adapted_index].gtype[x][y] == 1:
+                        if s.color % 2 == 0:
+                            if self.figureList[adapted_index].grid[x][y] != 9:
+                                self.figureList[adapted_index].grid[x][y] += 1
+                                count += 1
+                        else:
+                            if self.figureList[adapted_index].grid[x][y] != 1:
+                                self.figureList[adapted_index].grid[x][y] -= 1
+                                count += 1  
         if count != 0:
             return 0
         return 1
@@ -208,16 +257,15 @@ class coloredFigureRepresentation:
         for adapted_index in l:
             for x in range(0, self.figureList[adapted_index].h):
                 for y in range(0, self.figureList[adapted_index].w):
-                    if self.figureList[adapted_index].grid[x][y] > 0:
-                        if ricEscapeLine(self.figureList[adapted_index].grid.copy(), x, y) == 0:
-                            if s.color % 2 == 0:
-                                if self.figureList[adapted_index].grid[x][y] != 9:
-                                    self.figureList[adapted_index].grid[x][y] += 1
-                                    count += 1
-                            else:
-                                if self.figureList[adapted_index].grid[x][y] != 1:
-                                    self.figureList[adapted_index].grid[x][y] -= 1
-                                    count += 1
+                    if self.figureList[adapted_index].grid[x][y] > 0 and self.figureList[adapted_index].gtype[x][y] == 2:
+                        if s.color % 2 == 0:
+                            if self.figureList[adapted_index].grid[x][y] != 9:
+                                self.figureList[adapted_index].grid[x][y] += 1
+                                count += 1
+                        else:
+                            if self.figureList[adapted_index].grid[x][y] != 1:
+                                self.figureList[adapted_index].grid[x][y] -= 1
+                                count += 1
         if count != 0:
             return 0
         return 1
@@ -231,12 +279,213 @@ class coloredFigureRepresentation:
         for adapted_index in l:
             for x in range(0, self.figureList[adapted_index].h):
                 for y in range(0, self.figureList[adapted_index].w):
-                    if ricEscapeLine(self.figureList[adapted_index].grid.copy(), x, y) == 0:
-                        self.figureList[adapted_index].grid[x][y] = s.color
+                    if self.figureList[adapted_index].grid[x][y] == 0:
+                        if ricEscapeLine(self.figureList[adapted_index].grid.copy(), x, y) == 0:
+                            self.figureList[adapted_index].grid[x][y] = s.color
+                            self.figureList[adapted_index].gtype[x][y] = 2
+                            count += 1
+        if count != 0:
+            return 0
+        return 1
+
+    #add a element in the figure in the selected row
+    def addElementFigure_row(self, s):
+        if len(self.figureList) == 0:
+            return 1
+        count = 0
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            lc = self.generateComponentList_row(s, adapted_index)
+            if (s.direction % 4) == 0:
+                lc.sort(key=lambda i: i, reverse=True)
+            elif (s.direction % 4) == 1:
+                lc.sort(key=lambda i: i, reverse=False)
+            for adapted_component in lc:
+                if (s.direction % 4) == 0:
+                    #down
+                    if self.figureList[adapted_index].pos.x + adapted_component + 1 < self.nr:
+                        if adapted_component == self.figureList[adapted_index].h - 1:
+                            self.figureList[adapted_index].grid = np.vstack([self.figureList[adapted_index].grid, np.zeros((1, self.figureList[adapted_index].w), dtype=int)])
+                            self.figureList[adapted_index].gtype = np.vstack([self.figureList[adapted_index].gtype, np.zeros((1, self.figureList[adapted_index].w), dtype=int)])
+                            self.figureList[adapted_index].h += 1
+                        for y in range(0, self.figureList[adapted_index].w):
+                            if self.figureList[adapted_index].grid[adapted_component][y] > 0:
+                                self.figureList[adapted_index].grid[adapted_component + 1][y] = self.figureList[adapted_index].grid[adapted_component][y]
+                        count += 1
+                elif (s.direction % 4) == 1:
+                    #up
+                    if self.figureList[adapted_index].pos.x > 0:
+                        if adapted_component == 0:
+                            self.figureList[adapted_index].grid = np.vstack([np.zeros((1, self.figureList[adapted_index].w), dtype=int), self.figureList[adapted_index].grid])
+                            self.figureList[adapted_index].gtype = np.vstack([np.zeros((1, self.figureList[adapted_index].w), dtype=int), self.figureList[adapted_index].gtype])
+                            self.figureList[adapted_index].pos.x -= 1
+                            self.figureList[adapted_index].h += 1
+                            adapted_component += 1
+                        for y in range(0, self.figureList[adapted_index].w):
+                            if self.figureList[adapted_index].grid[adapted_component][y] > 0:
+                                self.figureList[adapted_index].grid[adapted_component - 1][y] = self.figureList[adapted_index].grid[adapted_component][y]
+                        count += 1
+                elif (s.direction % 4) == 2:
+                    #right
+                    if self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w < self.nc:
+                        if self.figureList[adapted_index].grid[adapted_component][-1] > 0:
+                            self.figureList[adapted_index].grid = np.hstack([self.figureList[adapted_index].grid, np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1)])
+                            self.figureList[adapted_index].gtype = np.hstack([self.figureList[adapted_index].gtype, np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1)])
+                            self.figureList[adapted_index].w += 1
+                        for y in range(0, self.figureList[adapted_index].w - 1):
+                            if self.figureList[adapted_index].grid[adapted_component][y] > 0:
+                                self.figureList[adapted_index].grid[adapted_component][y + 1] = self.figureList[adapted_index].grid[adapted_component][y]
+                        count += 1
+                elif (s.direction % 4) == 3:
+                    #left
+                    if self.figureList[adapted_index].pos.y > 0:
+                        if self.figureList[adapted_index].grid[adapted_component][0] > 0:
+                            self.figureList[adapted_index].grid = np.hstack([np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1), self.figureList[adapted_index].grid])
+                            self.figureList[adapted_index].gtype = np.hstack([np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1), self.figureList[adapted_index].gtype])
+                            self.figureList[adapted_index].pos.y -= 1
+                            self.figureList[adapted_index].w += 1
+                        for y in range(1, self.figureList[adapted_index].w):
+                            if self.figureList[adapted_index].grid[adapted_component][y] > 0:
+                                self.figureList[adapted_index].grid[adapted_component][y - 1] = self.figureList[adapted_index].grid[adapted_component][y]
+                        count += 1
+        if count != 0:
+            for adapted_index in l:
+                for x in range(0, self.figureList[adapted_index].h):
+                    for y in range(0, self.figureList[adapted_index].w):
+                        if self.figureList[adapted_index].grid[x][y] > 0:
+                            if ricEscapeLine(self.figureList[adapted_index].grid.copy(), x, y) > 0:
+                                #border pixel
+                                self.figureList[adapted_index].gtype[x][y] = 1
+                            else:
+                                #center pixel
+                                self.figureList[adapted_index].gtype[x][y] = 2
+            return 0
+        return 1
+    
+    #add a element in the figure in the selected column
+    def addElementFigure_column(self, s):
+        if len(self.figureList) == 0:
+            return 1
+        count = 0
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            lc = self.generateComponentList_column(s, adapted_index)
+            if (s.direction % 4) == 2:
+                lc.sort(key=lambda i: i, reverse=True)
+            elif (s.direction % 4) == 3:
+                lc.sort(key=lambda i: i, reverse=False)
+            for adapted_component in lc:
+                if (s.direction % 4) == 0:
+                    #down
+                    if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h < self.nr:
+                        if self.figureList[adapted_index].grid[-1][adapted_component] > 0:
+                            self.figureList[adapted_index].grid = np.vstack([self.figureList[adapted_index].grid, np.zeros((1, self.figureList[adapted_index].w), dtype=int)])
+                            self.figureList[adapted_index].gtype = np.vstack([self.figureList[adapted_index].gtype, np.zeros((1, self.figureList[adapted_index].w), dtype=int)])
+                            self.figureList[adapted_index].h += 1
+                        for x in range(0, self.figureList[adapted_index].h - 1):
+                            if self.figureList[adapted_index].grid[x][adapted_component] > 0:
+                                self.figureList[adapted_index].grid[x + 1][adapted_component] = self.figureList[adapted_index].grid[x][adapted_component]
+                        count += 1
+                elif (s.direction % 4) == 1:
+                    #up
+                    if self.figureList[adapted_index].pos.x > 0:
+                        if self.figureList[adapted_index].grid[0][adapted_component] > 0:
+                            self.figureList[adapted_index].grid = np.vstack([np.zeros((1, self.figureList[adapted_index].w), dtype=int), self.figureList[adapted_index].grid])
+                            self.figureList[adapted_index].gtype = np.vstack([np.zeros((1, self.figureList[adapted_index].w), dtype=int), self.figureList[adapted_index].gtype])
+                            self.figureList[adapted_index].pos.x -= 1
+                            self.figureList[adapted_index].h += 1
+                        for x in range(1, self.figureList[adapted_index].h):
+                            if self.figureList[adapted_index].grid[x][adapted_component] > 0:
+                                self.figureList[adapted_index].grid[x - 1][adapted_component] = self.figureList[adapted_index].grid[x][adapted_component]
+                        count += 1
+                elif (s.direction % 4) == 2:
+                    #right
+                    if self.figureList[adapted_index].pos.y + adapted_component + 1 < self.nc:
+                        if adapted_component == self.figureList[adapted_index].w - 1:
+                            self.figureList[adapted_index].grid = np.hstack([self.figureList[adapted_index].grid, np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1)])
+                            self.figureList[adapted_index].gtype = np.hstack([self.figureList[adapted_index].gtype, np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1)])
+                            self.figureList[adapted_index].w += 1
+                        for x in range(0, self.figureList[adapted_index].h):
+                            if self.figureList[adapted_index].grid[x][adapted_component] > 0:
+                                self.figureList[adapted_index].grid[x][adapted_component + 1] = self.figureList[adapted_index].grid[x][adapted_component]
+                        count += 1
+                elif (s.direction % 4) == 3:
+                    #left
+                    if self.figureList[adapted_index].pos.y > 0:
+                        if adapted_component == 0:
+                            self.figureList[adapted_index].grid = np.hstack([np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1), self.figureList[adapted_index].grid])
+                            self.figureList[adapted_index].gtype = np.hstack([np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1), self.figureList[adapted_index].gtype])
+                            self.figureList[adapted_index].pos.y -= 1
+                            self.figureList[adapted_index].w += 1
+                            adapted_component += 1
+                        for x in range(0, self.figureList[adapted_index].h):
+                            if self.figureList[adapted_index].grid[x][adapted_component] > 0:
+                                self.figureList[adapted_index].grid[x][adapted_component - 1] = self.figureList[adapted_index].grid[x][adapted_component]
+                        count += 1
+        if count != 0:
+            for adapted_index in l:
+                for x in range(0, self.figureList[adapted_index].h):
+                    for y in range(0, self.figureList[adapted_index].w):
+                        if self.figureList[adapted_index].grid[x][y] > 0:
+                            if ricEscapeLine(self.figureList[adapted_index].grid.copy(), x, y) > 0:
+                                #border pixel
+                                self.figureList[adapted_index].gtype[x][y] = 1
+                            else:
+                                #center pixel
+                                self.figureList[adapted_index].gtype[x][y] = 2
+            return 0
+        return 1
+
+    #move a row in the figure based on the direction
+    def moveElementFigure_row(self, s):
+        if len(self.figureList) == 0:
+            return 1
+        count = 0
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            lc = self.generateComponentList_row(s, adapted_index)
+            if (s.direction % 4) == 0:
+                lc.sort(key=lambda i: i, reverse=True)
+            elif (s.direction % 4) == 1:
+                lc.sort(key=lambda i: i, reverse=False)
+            for adapted_component in lc:
+                if (s.direction % 4) == 0:
+                    #down
+                    if adapted_component + 1 < self.figureList[adapted_index].h:
+                        vet = []
+                        for y in range(0, self.figureList[adapted_index].w):
+                            vet.append(self.figureList[adapted_index].grid[adapted_component][y])
+                        for y in range(0, self.figureList[adapted_index].w):
+                            self.figureList[adapted_index].grid[adapted_component][y] = self.figureList[adapted_index].grid[adapted_component + 1][y]
+                        for y in range(0, self.figureList[adapted_index].w):
+                            self.figureList[adapted_index].grid[adapted_component + 1][y] = vet[y]
+                        count += 1
+                elif (s.direction % 4) == 1:
+                    #up
+                    if adapted_component > 0:
+                        vet = []
+                        for y in range(0, self.figureList[adapted_index].w):
+                            vet.append(self.figureList[adapted_index].grid[adapted_component][y])
+                        for y in range(0, self.figureList[adapted_index].w):
+                            self.figureList[adapted_index].grid[adapted_component][y] = self.figureList[adapted_index].grid[adapted_component - 1][y]
+                        for y in range(0, self.figureList[adapted_index].w):
+                            self.figureList[adapted_index].grid[adapted_component - 1][y] = vet[y]
+                        count += 1
+                elif (s.direction % 4) == 2:
+                    #right
+                    if self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w < self.nc:
+
+                        count += 1
+                elif (s.direction % 4) == 3:
+                    #left
+                    if self.figureList[adapted_index].pos.y > 0:
+
                         count += 1
         if count != 0:
             return 0
         return 1
+
+
 
     #duplicate the selected figure based on the direction direction
     def duplicateFigure(self, s):
@@ -246,7 +495,7 @@ class coloredFigureRepresentation:
         l = self.generateIndexList(s)
         duplicatedFigure = []
         for adapted_index in l:
-            fig = Figure(self.figureList[adapted_index].grid.copy(), PixelNode(self.figureList[adapted_index].pos.x, self.figureList[adapted_index].pos.y), self.figureList[adapted_index].h, self.figureList[adapted_index].w)
+            fig = Figure(self.figureList[adapted_index].grid.copy(), self.figureList[adapted_index].gtype.copy(), PixelNode(self.figureList[adapted_index].pos.x, self.figureList[adapted_index].pos.y), self.figureList[adapted_index].h, self.figureList[adapted_index].w)
             duplicatedFigure.append((adapted_index, fig))
             count += 1
         if count != 0:
@@ -280,11 +529,19 @@ class coloredFigureRepresentation:
             if (s.direction % 2) == 0:
                 #rotate to the right
                 if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].w <= self.nr and self.figureList[adapted_index].pos.y + self.figureList[adapted_index].h <= self.nc:
+                    #rotate grid
                     newGrid = np.zeros([self.figureList[adapted_index].w, self.figureList[adapted_index].h], dtype=np.uint8)
                     for x in range(self.figureList[adapted_index].h):
                         for y in range(self.figureList[adapted_index].w):
                             newGrid[y][self.figureList[adapted_index].h - x - 1] = self.figureList[adapted_index].grid[x][y]
                     self.figureList[adapted_index].grid = newGrid
+                    #rotate gtype
+                    newGrid = np.zeros([self.figureList[adapted_index].w, self.figureList[adapted_index].h], dtype=np.uint8)
+                    for x in range(self.figureList[adapted_index].h):
+                        for y in range(self.figureList[adapted_index].w):
+                            newGrid[y][self.figureList[adapted_index].h - x - 1] = self.figureList[adapted_index].gtype[x][y]
+                    self.figureList[adapted_index].gtype = newGrid
+                    #reverse dimensions
                     tmp = self.figureList[adapted_index].h
                     self.figureList[adapted_index].h = self.figureList[adapted_index].w
                     self.figureList[adapted_index].w = tmp
@@ -292,11 +549,19 @@ class coloredFigureRepresentation:
             elif (s.direction % 2) == 1:
                 #rotate to the left
                 if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].w <= self.nr and self.figureList[adapted_index].pos.y + self.figureList[adapted_index].h <= self.nc:
+                    #rotate grid
                     newGrid = np.zeros([self.figureList[adapted_index].w, self.figureList[adapted_index].h], dtype=np.uint8)
                     for x in range(self.figureList[adapted_index].h):
                         for y in range(self.figureList[adapted_index].w):
                             newGrid[self.figureList[adapted_index].w - y - 1][x] = self.figureList[adapted_index].grid[x][y]
                     self.figureList[adapted_index].grid = newGrid
+                    #rotate gtype
+                    newGrid = np.zeros([self.figureList[adapted_index].w, self.figureList[adapted_index].h], dtype=np.uint8)
+                    for x in range(self.figureList[adapted_index].h):
+                        for y in range(self.figureList[adapted_index].w):
+                            newGrid[self.figureList[adapted_index].w - y - 1][x] = self.figureList[adapted_index].gtype[x][y]
+                    self.figureList[adapted_index].gtype = newGrid
+                    #reverse dimensions
                     tmp = self.figureList[adapted_index].h
                     self.figureList[adapted_index].h = self.figureList[adapted_index].w
                     self.figureList[adapted_index].w = tmp
@@ -360,6 +625,18 @@ class coloredFigureRepresentation:
                                     for y in range(0, self.figureList[f].w):
                                         if self.figureList[f].grid[x][y] > 0:
                                             self.figureList[adapted_index].grid[diffx + x][diffy + y] = self.figureList[f].grid[x][y]
+                                #ricreo gtype
+                                newGrid = np.zeros([self.figureList[adapted_index].h, self.figureList[adapted_index].w], dtype=np.uint8)
+                                for x in range(0, self.figureList[f].h):
+                                    for y in range(0, self.figureList[f].w):
+                                        if self.figureList[f].grid[x][y] > 0:
+                                            if ricEscapeLine(self.figureList[f].grid.copy(), x, y) > 0:
+                                                #border pixel
+                                                newGrid[x][y] = 1
+                                            else:
+                                                #center pixel
+                                                newGrid[x][y] = 2
+                                self.figureList[f].gtype = newGrid
                             count += 1
                 elif (s.direction % 4) == 1:
                     #up
@@ -407,6 +684,18 @@ class coloredFigureRepresentation:
                                     for y in range(0, self.figureList[f].w):
                                         if self.figureList[f].grid[x][y] > 0:
                                             self.figureList[adapted_index].grid[diffx + x][diffy + y] = self.figureList[f].grid[x][y]
+                                #ricreo gtype
+                                newGrid = np.zeros([self.figureList[adapted_index].h, self.figureList[adapted_index].w], dtype=np.uint8)
+                                for x in range(0, self.figureList[f].h):
+                                    for y in range(0, self.figureList[f].w):
+                                        if self.figureList[f].grid[x][y] > 0:
+                                            if ricEscapeLine(self.figureList[f].grid.copy(), x, y) > 0:
+                                                #border pixel
+                                                newGrid[x][y] = 1
+                                            else:
+                                                #center pixel
+                                                newGrid[x][y] = 2
+                                self.figureList[f].gtype = newGrid
                             count += 1
                 elif (s.direction % 4) == 2:
                     #right
@@ -454,6 +743,18 @@ class coloredFigureRepresentation:
                                     for y in range(0, self.figureList[f].w):
                                         if self.figureList[f].grid[x][y] > 0:
                                             self.figureList[adapted_index].grid[diffx + x][diffy + y] = self.figureList[f].grid[x][y]
+                                #ricreo gtype
+                                newGrid = np.zeros([self.figureList[adapted_index].h, self.figureList[adapted_index].w], dtype=np.uint8)
+                                for x in range(0, self.figureList[f].h):
+                                    for y in range(0, self.figureList[f].w):
+                                        if self.figureList[f].grid[x][y] > 0:
+                                            if ricEscapeLine(self.figureList[f].grid.copy(), x, y) > 0:
+                                                #border pixel
+                                                newGrid[x][y] = 1
+                                            else:
+                                                #center pixel
+                                                newGrid[x][y] = 2
+                                self.figureList[f].gtype = newGrid
                             count += 1
                 elif (s.direction % 4) == 3:
                     #left
@@ -501,6 +802,18 @@ class coloredFigureRepresentation:
                                     for y in range(0, self.figureList[f].w):
                                         if self.figureList[f].grid[x][y] > 0:
                                             self.figureList[adapted_index].grid[diffx + x][diffy + y] = self.figureList[f].grid[x][y]
+                                #ricreo gtype
+                                newGrid = np.zeros([self.figureList[adapted_index].h, self.figureList[adapted_index].w], dtype=np.uint8)
+                                for x in range(0, self.figureList[f].h):
+                                    for y in range(0, self.figureList[f].w):
+                                        if self.figureList[f].grid[x][y] > 0:
+                                            if ricEscapeLine(self.figureList[f].grid.copy(), x, y) > 0:
+                                                #border pixel
+                                                newGrid[x][y] = 1
+                                            else:
+                                                #center pixel
+                                                newGrid[x][y] = 2
+                                self.figureList[f].gtype = newGrid
                             count += 1
         if count != 0:
             #rimuovo figure unite
@@ -648,8 +961,8 @@ class coloredFigureRepresentation:
         for x in range(0, len(performed_actions)):
             if performed_selection[x].allElement < 3: 
                 score += 0.5
-            #if performed_actions[x] == coloredFigureRepresentation.rotateFigure or performed_actions[x] == coloredFigureRepresentation.removeFigure or performed_actions[x] == coloredFigureRepresentation.mergeFigure or performed_actions[x] == coloredFigureRepresentation.divideFigure_row or performed_actions[x] == coloredFigureRepresentation.divideFigure_column:
-            #    score += 0.5
+            if performed_actions[x] == coloredFigureRepresentation.rotateFigure or performed_actions[x] == coloredFigureRepresentation.removeFigure or performed_actions[x] == coloredFigureRepresentation.mergeFigure:
+                score += 0.5
             score += 1
         return -score
 
