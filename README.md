@@ -205,13 +205,14 @@ We can apply different types of actions to figures:
 - **changeColorFigureBorder:** changes the color of the border of the figure index based on color
 - **changeColorFigureCenter:** changes the color of the center of the figure index based on color
 - **fillFigureCenter:** fill the center of the figure index based on color
-- **addElementFigure_row:** add a element in the figure in the selected row
-- **addElementFigure_column:** add a element in the figure in the selected column
-
+- **addElementFigure_row_column:** add a element in the figure in the selected row and column
+- **moveElementFigure_row_column:** move a pixel in the figure based on the direction
+- **removeElementFigure_row_column:** remove the element in the figure in the selected row and column
 - **duplicateFigure:** duplicate the selected figure from the figure list
 - **removeFigure:** remove a figure from the figure list based on the index
 - **rotateFigure:** rotate the selected figure from the figure list to the right or the left
 - **mergeFigure:** merge two figures that are next to each other of the same color
+
 - **changeOrder:** change the display order of the figures
 - **expandGrid:** expands the grid size
 - **reduceGrid:** reduce the grid size
