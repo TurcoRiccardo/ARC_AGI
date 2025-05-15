@@ -16,6 +16,7 @@ class Figure:
     h: int
     w: int
 
+#fills a list with the pixels of the figure
 def ricFindFigure(grid, posX, posY, pixel, mask, nc, nr):
     if mask[posX][posY] == 1:
         mask[posX][posY] = 0
@@ -116,7 +117,7 @@ class coloredFigureRepresentation:
     def getNElement(self):
         return len(self.figureList)
     
-    #return 
+    #return the number of row and column in the figure
     def getElementComponent(self, index):
         return (self.figureList[index].h, self.figureList[index].w)
     
@@ -1065,6 +1066,8 @@ class coloredFigureRepresentation:
                     return 0
         return 1
 
+
+    #fitness function
     def score(self, output):
         score = abs(output.nr - self.nr)*min(self.nc, output.nc)*2 + abs(output.nc - self.nc)*min(self.nr,  output.nr)*2 + abs(output.nr - self.nr)*abs(output.nc - self.nc)*2
         for z in range(0, len(self.figureList)):
@@ -1095,6 +1098,7 @@ class coloredFigureRepresentation:
                 score += output.figureList[z].h * output.figureList[z].w * 1.5
         return -score
 
+    #transform the representation into an ARC grid
     def rappToGrid(self):
         grid = np.zeros([self.nr, self.nc], dtype=np.uint8)
         for f in self.figureList:
@@ -1103,6 +1107,7 @@ class coloredFigureRepresentation:
                     grid[f.pos.x + x][f.pos.y + y] = f.grid[x][y]
         return grid
     
+    #function that calculates a score based on the selectors used
     def scoreAction(performed_actions, performed_selection):
         score = 0
         for x in range(0, len(performed_actions)):
@@ -1112,3 +1117,17 @@ class coloredFigureRepresentation:
                 score += 0.5
             score += 1
         return -score
+    
+    #return the list of actions
+    def actionList(demo_pairs):     
+        l = [coloredFigureRepresentation.moveFigure, coloredFigureRepresentation.changeColorFigureBorder, coloredFigureRepresentation.changeColorFigureCenter, coloredFigureRepresentation.fillFigureCenter, coloredFigureRepresentation.addElementFigure_row_column, coloredFigureRepresentation.moveElementFigure_row_column, coloredFigureRepresentation.removeElementFigure_row_column, coloredFigureRepresentation.duplicateFigure, coloredFigureRepresentation.removeFigure, coloredFigureRepresentation.rotateFigure, coloredFigureRepresentation.mergeFigure, coloredFigureRepresentation.divideFigure_row, coloredFigureRepresentation.divideFigure_column, coloredFigureRepresentation.changeOrder, coloredFigureRepresentation.expandGrid, coloredFigureRepresentation.reduceGrid]
+        
+
+        return l
+    
+    #return the list of base actions
+    def baseActionList(demo_pairs):
+        l = [coloredFigureRepresentation.duplicateFigure, coloredFigureRepresentation.changeOrder, coloredFigureRepresentation.expandGrid, coloredFigureRepresentation.reduceGrid]
+
+
+        return l

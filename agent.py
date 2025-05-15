@@ -10,7 +10,7 @@ import copy
 from selection.selector import Selector, generateNewSelector, mutateSelector
 from concurrent.futures import ProcessPoolExecutor
 
-from utility import Individual, add_mutation, swap_mutation, tweak_mutation, error_rate, parent_selection, analyze_demo_pairs
+from utility import Individual, add_mutation, swap_mutation, tweak_mutation, error_rate, parent_selection
 from representation.pixelRepresentation import pixelRepresentation
 from representation.rowRepresentation import rowRepresentation
 from representation.columnsRepresentation import columnsRepresentation
@@ -26,7 +26,7 @@ from representation.secondDiagonalRepresentation import secondDiagonalRepresenta
 POPULATION_SIZE = 50
 OFFSPRING_SIZE = 10
 MAX_GENERATIONS_1 = 500
-MAX_GENERATIONS_2 = 2000
+MAX_GENERATIONS_2 = 2500
 
 
 @dataclass
@@ -151,22 +151,9 @@ def generate_representation(rep, demo_pairs, base_act, act):
     errMin = 1000
     indMin = 0
     bestIndividual = None
-    #for x in range(0, len(demo_pairs)):
-    #    analyze_demo_pairs(demo_pairs[x].x, demo_pairs[x].y)
-    
-
-
-
     for x in range(0, len(demo_pairs)):
         errAvg = 0
         bestIndividual = generate_representation_solution(rep, demo_pairs, base_act, act, x)
-
-        #mi serve qualcosa che mi aiuta a generalizzare la lista di azioni-selettore ad altri esempi dello stesso problema
-        #posso provare ad utilizzare un algoritmo evolutivo con mutazioni solo sul selettore e la possibilita di dupricare o cancellare coppie azioni-selettore
-        #guardo se ci sono delle mutazioni di colore senon ci sono non uso il colore, guardo se ci sono mutazioni nel numero di elementi se ...
-        #Generalizer: 
-        #new_action, new_selection = borderRepresentation.generalizer(population[0].performed_actions, population[0].performed_selection)
-
         for y in range(0, len(demo_pairs)):
             if x != y:
                 errAvg += evaluate_representation(rep, bestIndividual, demo_pairs[y].x, demo_pairs[y].y)
@@ -193,8 +180,10 @@ class Agent(ArcAgent):
         actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
         base_actionFR = [figureRepresentation.duplicateFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
         actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure_row, figureRepresentation.addElementFigure_column, figureRepresentation.removeElementFigure_row, figureRepresentation.removeElementFigure_column, figureRepresentation.duplicateFigure, figureRepresentation.removeFigure, figureRepresentation.rotateFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure_row, figureRepresentation.divideFigure_column, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]    
+        
         base_actionCFR = [coloredFigureRepresentation.duplicateFigure, coloredFigureRepresentation.changeOrder, coloredFigureRepresentation.expandGrid, coloredFigureRepresentation.reduceGrid]
         actionsCFR = [coloredFigureRepresentation.moveFigure, coloredFigureRepresentation.changeColorFigureBorder, coloredFigureRepresentation.changeColorFigureCenter, coloredFigureRepresentation.fillFigureCenter, coloredFigureRepresentation.addElementFigure_row_column, coloredFigureRepresentation.moveElementFigure_row_column, coloredFigureRepresentation.removeElementFigure_row_column, coloredFigureRepresentation.duplicateFigure, coloredFigureRepresentation.removeFigure, coloredFigureRepresentation.rotateFigure, coloredFigureRepresentation.mergeFigure, coloredFigureRepresentation.divideFigure_row, coloredFigureRepresentation.divideFigure_column, coloredFigureRepresentation.changeOrder, coloredFigureRepresentation.expandGrid, coloredFigureRepresentation.reduceGrid]
+        
         base_actionBR = [borderRepresentation.moveBorder, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
         actionsBR = [borderRepresentation.moveBorder, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter2, borderRepresentation.changeColorCenter3, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
         base_actionFDR = [firstDiagonalRepresentation.moveDiagonal, firstDiagonalRepresentation.expandGrid, firstDiagonalRepresentation.reduceGrid]
@@ -209,7 +198,7 @@ class Agent(ArcAgent):
             #(colorLayerRepresentation, base_actionCLR, actionsCLR),
             #(rectangleRepresentation, base_actionRER, actionsRER),
             #(figureRepresentation, base_actionFR, actionsFR),
-            (coloredFigureRepresentation, base_actionCFR, actionsCFR),
+            (coloredFigureRepresentation, coloredFigureRepresentation.baseActionList(demo_pairs), coloredFigureRepresentation.actionList(demo_pairs)),
             #(borderRepresentation, base_actionBR, actionsBR),
             #(firstDiagonalRepresentation, base_actionFDR, actionsFDR),
             #(secondDiagonalRepresentation, base_actionSDR, actionsSDR)
