@@ -212,7 +212,8 @@ We can apply different types of actions to figures:
 - **removeFigure:** remove a figure from the figure list based on the index
 - **rotateFigure:** rotate the selected figure from the figure list to the right or the left
 - **mergeFigure:** merge two figures that are next to each other of the same color
-
+- **divideFigure_row:** divide the selected figure based on the selected row
+- **divideFigure_column:** divide the selected figure based on the selected column
 - **changeOrder:** change the display order of the figures
 - **expandGrid:** expands the grid size
 - **reduceGrid:** reduce the grid size

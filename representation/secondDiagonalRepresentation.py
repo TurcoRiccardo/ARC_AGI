@@ -78,20 +78,20 @@ class secondDiagonalRepresentation:
     #return the list of component index
     def generateComponentList(self, s, adapted_index):
         l = list()
-        if s.allComponent == 1:
+        if s.allComponent1 == 1:
             #da destra
             l.append(len(self.DiagonaleList[adapted_index]) - (s.component[0] % len(self.DiagonaleList[adapted_index])) - 1)
-        elif s.allComponent == 2:
+        elif s.allComponent1 == 2:
             #centro
             if len(self.DiagonaleList[adapted_index]) % 2 == 1:
                 l.append(len(self.DiagonaleList[adapted_index])// 2)
             else:
                 l.append(len(self.DiagonaleList[adapted_index]) // 2 - 1)
                 l.append(len(self.DiagonaleList[adapted_index]) // 2)
-        elif s.allComponent == 3:
+        elif s.allComponent1 == 3:
             #all
             l = [x for x in range(0, len(self.DiagonaleList[adapted_index]))]
-        elif s.allComponent == 4:
+        elif s.allComponent1 == 4:
             #component of the selected color
             for c, p in enumerate(self.DiagonaleList[adapted_index]):
                 if p == s.color:
@@ -100,6 +100,7 @@ class secondDiagonalRepresentation:
             #da sinistra
             l.append(s.component[0] % len(self.DiagonaleList[adapted_index]))
         return l
+
 
     #moves the diagonal index if possible based on the direction
     def moveDiagonal(self, s):

@@ -46,23 +46,24 @@ class colorLayerRepresentation:
     #return the list of component index
     def generateComponentList(self, s, adapted_index):
         l = list()
-        if s.allComponent == 1:
+        if s.allComponent1 == 1:
             #da destra
             l.append(len(self.FigureListLayer[adapted_index]) - (s.component[0] % len(self.FigureListLayer[adapted_index])) - 1)
-        elif s.allComponent == 2:
+        elif s.allComponent1 == 2:
             #centro
             if len(self.FigureListLayer[adapted_index]) % 2 == 1:
                 l.append(len(self.FigureListLayer[adapted_index]) // 2)
             else:
                 l.append(len(self.FigureListLayer[adapted_index]) // 2 - 1)
                 l.append(len(self.FigureListLayer[adapted_index]) // 2)
-        elif s.allComponent >= 3:
+        elif s.allComponent1 >= 3:
             #all color
             l = [x for x in range(0, len(self.FigureListLayer[adapted_index]))]
         else:
             #da sinistra
             l.append(s.component[0] % len(self.FigureListLayer[adapted_index]))
         return l
+
 
     #moves all the pixel in the layer index based on the direction
     def moveLayer(self, s):

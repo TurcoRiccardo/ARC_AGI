@@ -53,6 +53,7 @@ class pixelRepresentation:
             l.append(s.index % len(self.pixelList))
         return l
 
+
     #moves the pixel index if possible based on the direction
     def movePixel(self, s):
         if len(self.pixelList) == 0:

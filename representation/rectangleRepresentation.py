@@ -76,6 +76,7 @@ class rectangleRepresentation:
             #sopra
             l.append(s.index % len(self.rectangleList))
         return l
+    
 
     #moves the rectangle index based on the direction
     def moveRectangle(self, s):

@@ -155,17 +155,17 @@ class coloredFigureRepresentation:
     #return the list of component index
     def generateComponentList_row(self, s, adapted_index):
         l = list()
-        if s.allComponent == 1:
+        if s.allComponent1 == 1:
             #dal basso
             l.append(self.figureList[adapted_index].h - (s.component[0] % self.figureList[adapted_index].h) - 1)
-        elif s.allComponent == 2:
+        elif s.allComponent1 == 2:
             #centro
             if self.figureList[adapted_index].h % 2 == 1:
                 l.append(self.figureList[adapted_index].h // 2)
             else:
                 l.append(self.figureList[adapted_index].h // 2 - 1)
                 l.append(self.figureList[adapted_index].h // 2)
-        elif s.allComponent >= 3:
+        elif s.allComponent1 >= 3:
             #all color
             l = [x for x in range(0, self.figureList[adapted_index].h)]
         else:
@@ -176,17 +176,17 @@ class coloredFigureRepresentation:
     #return the list of component index
     def generateComponentList_column(self, s, adapted_index):
         l = list()
-        if s.allComponent == 1:
+        if s.allComponent2 == 1:
             #da destra
             l.append(self.figureList[adapted_index].w - (s.component[1] % self.figureList[adapted_index].w) - 1)
-        elif s.allComponent == 2:
+        elif s.allComponent2 == 2:
             #centro
             if self.figureList[adapted_index].w % 2 == 1:
                 l.append(self.figureList[adapted_index].w // 2)
             else:
                 l.append(self.figureList[adapted_index].w // 2 - 1)
                 l.append(self.figureList[adapted_index].w // 2)
-        elif s.allComponent >= 3:
+        elif s.allComponent2 >= 3:
             #all color
             l = [x for x in range(0, self.figureList[adapted_index].w)]
         else:

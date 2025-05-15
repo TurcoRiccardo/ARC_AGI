@@ -174,23 +174,24 @@ class borderRepresentation:
     #return the list of component index
     def generateComponentList(self, s, adapted_index):
         l = list()
-        if s.allComponent == 1:
+        if s.allComponent1 == 1:
             #da destra
             l.append(len(self.borderList[adapted_index].border) - (s.component[0] % len(self.borderList[adapted_index].border)) - 1)
-        elif s.allComponent == 2:
+        elif s.allComponent1 == 2:
             #centro
             if len(self.borderList[adapted_index].border) % 2 == 1:
                 l.append(len(self.borderList[adapted_index].border) // 2)
             else:
                 l.append(len(self.borderList[adapted_index].border) // 2 - 1)
                 l.append(len(self.borderList[adapted_index].border) // 2)
-        elif s.allComponent >= 3:
+        elif s.allComponent1 >= 3:
             #all
             l = [x for x in range(0, len(self.borderList[adapted_index].border))]
         else:
             #da sinistra
             l.append(s.component[0] % len(self.borderList[adapted_index].border))
         return l
+
 
     #moves the border index based on the direction
     def moveBorder(self, s):

@@ -9,7 +9,8 @@ class Selector:
     color: int
     direction: int
     allElement: int #0 sopra, 1 sotto, 2 centro, 3 all, 4 color
-    allComponent: int #0 sopra, 1 sotto, 2 centro, 3 all, 4 color
+    allComponent1: int #0 sopra, 1 sotto, 2 centro, 3 all, 4 color
+    allComponent2: int #0 sopra, 1 sotto, 2 centro, 3 all, 4 color
 
 #generates a new random selector from scratch
 def generateNewSelector(rappresentation):
@@ -28,21 +29,28 @@ def generateNewSelector(rappresentation):
         if ok == 0:
             component = np.random.randint(0, ec)
     allElement = np.random.randint(0, 5)
-    allComponent = np.random.randint(0, 5)
+    allComponent1 = np.random.randint(0, 5)
+    allComponent2 = np.random.randint(0, 5)
     color = np.random.randint(1, 10)
     direction = np.random.randint(0, 4)
-    return Selector(index, component, color, direction, allElement, allComponent)
+    return Selector(index, component, color, direction, allElement, allComponent1, allComponent2)
 
 #generates a new selector mutating the received selector
 def mutateSelector(s: Selector):
     new_allElement = s.allElement
-    new_allComponent = s.allComponent
-    if np.random.randint(0, 2) == 0:
+    new_allComponent1 = s.allComponent1
+    new_allComponent2 = s.allComponent2
+    c = np.random.randint(0, 3)
+    if c == 0:
         l = [i for i in range(0, 5)]
         l.remove(s.allElement)
         new_allElement = l[np.random.randint(0, len(l))]
+    elif c == 1:
+        l = [i for i in range(0, 5)]
+        l.remove(s.allComponent1)
+        new_allComponent1 = l[np.random.randint(0, len(l))]
     else:
         l = [i for i in range(0, 5)]
-        l.remove(s.allComponent)
-        new_allComponent = l[np.random.randint(0, len(l))]
-    return Selector(s.index, s.component, s.color, s.direction, new_allElement, new_allComponent)
+        l.remove(s.allComponent2)
+        new_allComponent2 = l[np.random.randint(0, len(l))]
+    return Selector(s.index, s.component, s.color, s.direction, new_allElement, new_allComponent1, new_allComponent2)

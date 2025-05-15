@@ -55,20 +55,20 @@ class columnsRepresentation:
     #return the list of component index
     def generateComponentList(self, s, adapted_index):
         l = list()
-        if s.allComponent == 1:
+        if s.allComponent1 == 1:
             #da destra
             l.append(self.nr - (s.component[0] % self.nr) - 1)
-        elif s.allComponent == 2:
+        elif s.allComponent1 == 2:
             #centro
             if self.nc % 2 == 1:
                 l.append(self.nr // 2)
             else:
                 l.append(self.nr // 2 - 1)
                 l.append(self.nr // 2)
-        elif s.allComponent == 3:
+        elif s.allComponent1 == 3:
             #all
             l = [x for x in range(0, self.nr)]
-        elif s.allComponent == 4:
+        elif s.allComponent1 == 4:
             #component of the selected color
             for c, p in enumerate(self.ColonneList[adapted_index]):
                 if p == s.color:
@@ -77,6 +77,7 @@ class columnsRepresentation:
             #da sinistra
             l.append(s.component[0] % self.nr)
         return l
+
 
     #moves the column index if possible based on the direction
     def moveColumn(self, s):

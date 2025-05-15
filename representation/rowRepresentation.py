@@ -55,20 +55,20 @@ class rowRepresentation:
     #return the list of component index
     def generateComponentList(self, s, adapted_index):
         l = list()
-        if s.allComponent == 1:
+        if s.allComponent1 == 1:
             #da destra
             l.append(self.nc - (s.component[0] % self.nc) - 1)
-        elif s.allComponent == 2:
+        elif s.allComponent1 == 2:
             #centro
             if self.nc % 2 == 1:
                 l.append(self.nc // 2)
             else:
                 l.append(self.nc // 2 - 1)
                 l.append(self.nc // 2)
-        elif s.allComponent == 3:
+        elif s.allComponent1 == 3:
             #all
             l = [x for x in range(0, self.nc)]
-        elif s.allComponent == 4:
+        elif s.allComponent1 == 4:
             #component of the selected color
             for c, p in enumerate(self.RigheList[adapted_index]):
                 if p == s.color:
@@ -77,6 +77,7 @@ class rowRepresentation:
             #da sinistra
             l.append(s.component[0] % self.nc)
         return l
+
 
     #moves the row index if possible based on the direction
     def moveRow(self, s):
