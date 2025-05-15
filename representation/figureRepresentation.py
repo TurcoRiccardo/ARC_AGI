@@ -16,6 +16,7 @@ class Figure:
     w: int
     color: int
 
+#fills a list with the pixels of the figure
 def ricFindFigure(grid, posX, posY, pixelList, color, mask, nc, nr):
     if mask[posX][posY] == 1 and grid[posX][posY] == color:
         mask[posX][posY] = 0
@@ -71,7 +72,7 @@ class figureRepresentation:
     def getNElement(self):
         return len(self.figureList)
     
-    #return 
+    #return the number of row and column in the figure
     def getElementComponent(self, index):
         return (self.figureList[index].h, self.figureList[index].w)
     
@@ -796,6 +797,8 @@ class figureRepresentation:
                     return 0
         return 1
 
+
+    #fitness function
     def score(self, output):
         score = abs(output.nr - self.nr)*min(self.nc, output.nc)*2 + abs(output.nc - self.nc)*min(self.nr,  output.nr)*2 + abs(output.nr - self.nr)*abs(output.nc - self.nc)*2
         for z in range(0, len(self.figureList)):
@@ -819,6 +822,7 @@ class figureRepresentation:
                 score += output.figureList[z].h * output.figureList[z].w * 1.5
         return -score
 
+    #transform the representation into an ARC grid
     def rappToGrid(self):
         grid = np.zeros([self.nr, self.nc], dtype=np.uint8)
         for f in self.figureList:
@@ -828,6 +832,7 @@ class figureRepresentation:
                         grid[f.pos.x + x][f.pos.y + y] = f.color
         return grid
     
+    #function that calculates a score based on the selectors used
     def scoreAction(performed_actions, performed_selection):
         score = 0
         for x in range(0, len(performed_actions)):
@@ -837,3 +842,17 @@ class figureRepresentation:
                 score += 0.5
             score += 1
         return -score
+    
+    #return the list of actions
+    def actionList(demo_pairs):     
+        l = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure_row, figureRepresentation.addElementFigure_column, figureRepresentation.removeElementFigure_row, figureRepresentation.removeElementFigure_column, figureRepresentation.duplicateFigure, figureRepresentation.removeFigure, figureRepresentation.rotateFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure_row, figureRepresentation.divideFigure_column, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]    
+       
+
+        return l
+    
+    #return the list of base actions
+    def baseActionList(demo_pairs):
+        l = [figureRepresentation.duplicateFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
+
+
+        return l

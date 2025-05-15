@@ -168,40 +168,18 @@ def generate_representation(rep, demo_pairs, base_act, act):
 #Class where I compare the results received from the various representations and apply the best one to the test grid
 class Agent(ArcAgent):
     def predict(self, demo_pairs: List[ArcIOPair], test_grids: List[ArcGrid]) -> List[ArcPrediction]:
-        base_actionPR = [pixelRepresentation.movePixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid]
-        actionsPR = [pixelRepresentation.movePixel, pixelRepresentation.changeColorPixel, pixelRepresentation.duplicatePixel, pixelRepresentation.removePixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid]
-        base_actionRR = [rowRepresentation.moveRow, rowRepresentation.expandGrid, rowRepresentation.reduceGrid]
-        actionsRR = [rowRepresentation.moveRow, rowRepresentation.changeColorRow, rowRepresentation.changeColorRowPixel, rowRepresentation.modifyRowAdd, rowRepresentation.modifyRowDel, rowRepresentation.modifyRowMove, rowRepresentation.expandGrid, rowRepresentation.reduceGrid]
-        base_actionCR = [columnsRepresentation.moveColumn, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
-        actionsCR = [columnsRepresentation.moveColumn, columnsRepresentation.changeColorColumn, columnsRepresentation.changeColorColumnPixel, columnsRepresentation.modifyColumnAdd, columnsRepresentation.modifyColumnDel, columnsRepresentation.modifyColumnMove, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
-        base_actionCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
-        actionsCLR = [colorLayerRepresentation.moveLayer, colorLayerRepresentation.moveLayerPixel, colorLayerRepresentation.layerUnion, colorLayerRepresentation.delPixelLayer, colorLayerRepresentation.addPixelLayer, colorLayerRepresentation.expandGrid, colorLayerRepresentation.reduceGrid]
-        base_actionRER = [rectangleRepresentation.duplicateRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
-        actionsRER = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
-        base_actionFR = [figureRepresentation.duplicateFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
-        actionsFR = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure_row, figureRepresentation.addElementFigure_column, figureRepresentation.removeElementFigure_row, figureRepresentation.removeElementFigure_column, figureRepresentation.duplicateFigure, figureRepresentation.removeFigure, figureRepresentation.rotateFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure_row, figureRepresentation.divideFigure_column, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]    
-        
-        base_actionCFR = [coloredFigureRepresentation.duplicateFigure, coloredFigureRepresentation.changeOrder, coloredFigureRepresentation.expandGrid, coloredFigureRepresentation.reduceGrid]
-        actionsCFR = [coloredFigureRepresentation.moveFigure, coloredFigureRepresentation.changeColorFigureBorder, coloredFigureRepresentation.changeColorFigureCenter, coloredFigureRepresentation.fillFigureCenter, coloredFigureRepresentation.addElementFigure_row_column, coloredFigureRepresentation.moveElementFigure_row_column, coloredFigureRepresentation.removeElementFigure_row_column, coloredFigureRepresentation.duplicateFigure, coloredFigureRepresentation.removeFigure, coloredFigureRepresentation.rotateFigure, coloredFigureRepresentation.mergeFigure, coloredFigureRepresentation.divideFigure_row, coloredFigureRepresentation.divideFigure_column, coloredFigureRepresentation.changeOrder, coloredFigureRepresentation.expandGrid, coloredFigureRepresentation.reduceGrid]
-        
-        base_actionBR = [borderRepresentation.moveBorder, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
-        actionsBR = [borderRepresentation.moveBorder, borderRepresentation.changeColorBorder, borderRepresentation.changeColorCenter2, borderRepresentation.changeColorCenter3, borderRepresentation.modifyBorderFigure, borderRepresentation.expandGrid, borderRepresentation.reduceGrid]
-        base_actionFDR = [firstDiagonalRepresentation.moveDiagonal, firstDiagonalRepresentation.expandGrid, firstDiagonalRepresentation.reduceGrid]
-        actionsFDR = [firstDiagonalRepresentation.moveDiagonal, firstDiagonalRepresentation.changeColorDiagonal, firstDiagonalRepresentation.changeColorDiagonalPixel, firstDiagonalRepresentation.modifyDiagonalAdd, firstDiagonalRepresentation.modifyDiagonalDel, firstDiagonalRepresentation.modifyDiagonalMove, firstDiagonalRepresentation.expandGrid, firstDiagonalRepresentation.reduceGrid]
-        base_actionSDR = [secondDiagonalRepresentation.moveDiagonal, secondDiagonalRepresentation.expandGrid, secondDiagonalRepresentation.reduceGrid]
-        actionsSDR = [secondDiagonalRepresentation.moveDiagonal, secondDiagonalRepresentation.changeColorDiagonal, secondDiagonalRepresentation.changeColorDiagonalPixel, secondDiagonalRepresentation.modifyDiagonalAdd, secondDiagonalRepresentation.modifyDiagonalDel, secondDiagonalRepresentation.modifyDiagonalMove, secondDiagonalRepresentation.expandGrid, secondDiagonalRepresentation.reduceGrid]
         possibleSolutionRep = list()
         reps = [
-            #(pixelRepresentation, base_actionPR, actionsPR),
-            #(rowRepresentation, base_actionRR, actionsRR),
-            #(columnsRepresentation, base_actionCR, actionsCR),
-            #(colorLayerRepresentation, base_actionCLR, actionsCLR),
-            #(rectangleRepresentation, base_actionRER, actionsRER),
-            #(figureRepresentation, base_actionFR, actionsFR),
+            #(pixelRepresentation, pixelRepresentation.baseActionList(demo_pairs), pixelRepresentation.actionList(demo_pairs)),
+            #(rowRepresentation, rowRepresentation.baseActionList(demo_pairs), rowRepresentation.actionList(demo_pairs)),
+            #(columnsRepresentation, columnsRepresentation.baseActionList(demo_pairs), columnsRepresentation.actionList(demo_pairs)),
+            #(colorLayerRepresentation, colorLayerRepresentation.baseActionList(demo_pairs), colorLayerRepresentation.actionList(demo_pairs)),
+            #(rectangleRepresentation, rectangleRepresentation.baseActionList(demo_pairs), rectangleRepresentation.actionList(demo_pairs)),
+            #(figureRepresentation, figureRepresentation.baseActionList(demo_pairs), figureRepresentation.actionList(demo_pairs)),
             (coloredFigureRepresentation, coloredFigureRepresentation.baseActionList(demo_pairs), coloredFigureRepresentation.actionList(demo_pairs)),
-            #(borderRepresentation, base_actionBR, actionsBR),
-            #(firstDiagonalRepresentation, base_actionFDR, actionsFDR),
-            #(secondDiagonalRepresentation, base_actionSDR, actionsSDR)
+            #(borderRepresentation, borderRepresentation.baseActionList(demo_pairs), borderRepresentation.actionList(demo_pairs)),
+            #(firstDiagonalRepresentation, firstDiagonalRepresentation.baseActionList(demo_pairs), firstDiagonalRepresentation.actionList(demo_pairs)),
+            #(secondDiagonalRepresentation, secondDiagonalRepresentation.baseActionList(demo_pairs), secondDiagonalRepresentation.actionList(demo_pairs))
         ]
         #rappresentazione in cui ho delle figure che posso prolungare con ostacoli e elementi sovrapposti
         #un idea e quella di inserire azioni nelle base_action in base ad un analisi iniziale delle griglie

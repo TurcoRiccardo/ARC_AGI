@@ -346,6 +346,8 @@ class rowRepresentation:
                 return 0
         return 1
 
+
+    #fitness function
     def score(self, output):
         score = abs(output.nr - self.nr)*min(self.nc, output.nc)*2 + abs(output.nc - self.nc)*min(self.nr,  output.nr)*2 + abs(output.nr - self.nr)*abs(output.nc - self.nc)*2
         if self.nr <= output.nr and self.nc <= output.nc:
@@ -382,6 +384,7 @@ class rowRepresentation:
                             score += abs(int(self.RigheList[x][y]) - int(output.RigheList[x][y]))/10
         return -score
 
+    #transform the representation into an ARC grid
     def rappToGrid(self):
         grid = np.zeros([self.nr, self.nc], dtype=np.uint8)
         for x in range(0, self.nr):
@@ -389,6 +392,7 @@ class rowRepresentation:
                 grid[x][y] = self.RigheList[x][y]
         return grid
     
+    #function that calculates a score based on the selectors used
     def scoreAction(performed_actions, performed_selection):
         score = 0
         for x in range(0, len(performed_actions)):
@@ -398,3 +402,17 @@ class rowRepresentation:
                 score += 0.5
             score += 1
         return -score
+    
+    #return the list of actions
+    def actionList(demo_pairs):     
+        l = [rowRepresentation.moveRow, rowRepresentation.changeColorRow, rowRepresentation.changeColorRowPixel, rowRepresentation.modifyRowAdd, rowRepresentation.modifyRowDel, rowRepresentation.modifyRowMove, rowRepresentation.expandGrid, rowRepresentation.reduceGrid]
+        
+
+        return l
+    
+    #return the list of base actions
+    def baseActionList(demo_pairs):
+        l = [rowRepresentation.moveRow, rowRepresentation.expandGrid, rowRepresentation.reduceGrid]
+
+
+        return l

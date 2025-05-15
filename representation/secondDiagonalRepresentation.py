@@ -422,6 +422,8 @@ class secondDiagonalRepresentation:
                 return 0
         return 1
 
+
+    #fitness function
     def score(self, output):
         score = abs(output.nr - self.nr)*min(self.nc, output.nc)*2 + abs(output.nc - self.nc)*min(self.nr,  output.nr)*2 + abs(output.nr - self.nr)*abs(output.nc - self.nc)*2
         for i in range(0, min(len(self.DiagonaleList), len(output.DiagonaleList))):
@@ -433,6 +435,7 @@ class secondDiagonalRepresentation:
                         score += abs(int(self.DiagonaleList[i][c]) - int(output.DiagonaleList[i][c]))/10
         return -score
 
+    #transform the representation into an ARC grid
     def rappToGrid(self):
         grid = np.zeros([self.nr, self.nc], dtype=np.uint8)
         col = 0
@@ -456,6 +459,7 @@ class secondDiagonalRepresentation:
                 m += 1
         return grid
     
+    #function that calculates a score based on the selectors used
     def scoreAction(performed_actions, performed_selection):
         score = 0
         for x in range(0, len(performed_actions)):
@@ -465,3 +469,17 @@ class secondDiagonalRepresentation:
                 score += 0.5
             score += 1
         return -score
+    
+    #return the list of actions
+    def actionList(demo_pairs):     
+        l = [secondDiagonalRepresentation.moveDiagonal, secondDiagonalRepresentation.changeColorDiagonal, secondDiagonalRepresentation.changeColorDiagonalPixel, secondDiagonalRepresentation.modifyDiagonalAdd, secondDiagonalRepresentation.modifyDiagonalDel, secondDiagonalRepresentation.modifyDiagonalMove, secondDiagonalRepresentation.expandGrid, secondDiagonalRepresentation.reduceGrid]
+        
+
+        return l
+    
+    #return the list of base actions
+    def baseActionList(demo_pairs):
+        l = [secondDiagonalRepresentation.moveDiagonal, secondDiagonalRepresentation.expandGrid, secondDiagonalRepresentation.reduceGrid]
+
+
+        return l
