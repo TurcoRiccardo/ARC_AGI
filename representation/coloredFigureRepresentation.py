@@ -392,62 +392,99 @@ class coloredFigureRepresentation:
                         if self.figureList[adapted_index].pos.x + adapted_component_row + 1 < self.nr and self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] > 0:
                             if adapted_component_row + 1 == self.figureList[adapted_index].h:
                                 self.figureList[adapted_index].grid = np.vstack([self.figureList[adapted_index].grid, np.zeros((1, self.figureList[adapted_index].w), dtype=int)])
-                                self.figureList[adapted_index].gtype = np.vstack([self.figureList[adapted_index].gtype, np.zeros((1, self.figureList[adapted_index].w), dtype=int)])
                                 self.figureList[adapted_index].h += 1
-                            if self.figureList[adapted_index].grid[adapted_component_row + 1][adapted_component_column] == 0:
-                                self.figureList[adapted_index].grid[adapted_component_row + 1][adapted_component_column] = self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] 
-                                self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] = 0
-                                count += 1
+                            tmp = self.figureList[adapted_index].grid[adapted_component_row + 1][adapted_component_column]
+                            self.figureList[adapted_index].grid[adapted_component_row + 1][adapted_component_column] = self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] 
+                            self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] = tmp
+                            count += 1
                     elif (s.direction % 4) == 1:
                         #up
                         if self.figureList[adapted_index].pos.x > 0 and self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] > 0:
                             if adapted_component_row == 0:
                                 self.figureList[adapted_index].grid = np.vstack([np.zeros((1, self.figureList[adapted_index].w), dtype=int), self.figureList[adapted_index].grid])
-                                self.figureList[adapted_index].gtype = np.vstack([np.zeros((1, self.figureList[adapted_index].w), dtype=int), self.figureList[adapted_index].gtype])
                                 self.figureList[adapted_index].pos.x -= 1
                                 self.figureList[adapted_index].h += 1
                                 adapted_component_row += 1
-                            if self.figureList[adapted_index].grid[adapted_component_row - 1][adapted_component_column] == 0:
-                                self.figureList[adapted_index].grid[adapted_component_row - 1][adapted_component_column] = self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] 
-                                self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] = 0
-                                count += 1
+                            tmp = self.figureList[adapted_index].grid[adapted_component_row - 1][adapted_component_column]
+                            self.figureList[adapted_index].grid[adapted_component_row - 1][adapted_component_column] = self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] 
+                            self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] = tmp
+                            count += 1
                     elif (s.direction % 4) == 2:
                         #right
                         if self.figureList[adapted_index].pos.y + adapted_component_column + 1 < self.nc and self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] > 0:
                             if adapted_component_column + 1 == self.figureList[adapted_index].w:
                                 self.figureList[adapted_index].grid = np.hstack([self.figureList[adapted_index].grid, np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1)])
-                                self.figureList[adapted_index].gtype = np.hstack([self.figureList[adapted_index].gtype, np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1)])
                                 self.figureList[adapted_index].w += 1
-                            if self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column + 1] == 0:
-                                self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column + 1] = self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] 
-                                self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] = 0
-                                count += 1
+                            tmp = self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column + 1]
+                            self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column + 1] = self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] 
+                            self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] = tmp
+                            count += 1
                     elif (s.direction % 4) == 3:
                         #left
                         if self.figureList[adapted_index].pos.y > 0 and self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] > 0:
                             if adapted_component_column == 0:
                                 self.figureList[adapted_index].grid = np.hstack([np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1), self.figureList[adapted_index].grid])
-                                self.figureList[adapted_index].gtype = np.hstack([np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1), self.figureList[adapted_index].gtype])
                                 self.figureList[adapted_index].pos.y -= 1
                                 self.figureList[adapted_index].w += 1
                                 adapted_component_column += 1
-                            if self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column - 1] == 0:
-                                self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column - 1] = self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] 
-                                self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] = 0
-                                count += 1
+                            tmp = self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column - 1]
+                            self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column - 1] = self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] 
+                            self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] = tmp
+                            count += 1
+            #guardo riga
+            vet = []
+            for x in range(0, self.figureList[adapted_index].h):
+                ok = 0
+                for y in range(0, self.figureList[adapted_index].w):
+                    if self.figureList[adapted_index].grid[x][y] > 0:
+                        ok = 1
+                        break
+                if ok == 0:
+                    vet.append(x)
+            for x in sorted(vet, reverse = True):
+                if x == 0:
+                    self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[1:self.figureList[adapted_index].h,:]
+                    self.figureList[adapted_index].pos.x += 1
+                    self.figureList[adapted_index].h -= 1
+                elif x == self.figureList[adapted_index].h - 1:
+                    self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[0:self.figureList[adapted_index].h - 1,:]
+                    self.figureList[adapted_index].h -= 1
+                else:
+                    self.figureList[adapted_index].grid = np.vstack([self.figureList[adapted_index].grid[0:x,:], self.figureList[adapted_index].grid[x+1:self.figureList[adapted_index].h,:]])
+                    self.figureList[adapted_index].h -= 1
+            #guardo colonna
+            vet = []
+            for y in range(0, self.figureList[adapted_index].w):
+                ok = 0
+                for x in range(0, self.figureList[adapted_index].h):
+                    if self.figureList[adapted_index].grid[x][y] > 0:
+                        ok = 1
+                if ok == 0:
+                    vet.append(y)
+            for y in sorted(vet, reverse = True):
+                if y == 0:
+                    self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[:,1:self.figureList[adapted_index].w]
+                    self.figureList[adapted_index].pos.y += 1
+                    self.figureList[adapted_index].w -= 1
+                elif y == self.figureList[adapted_index].w - 1:
+                    self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[:,0:self.figureList[adapted_index].w - 1]
+                    self.figureList[adapted_index].w -= 1
+                else:
+                    self.figureList[adapted_index].grid = np.hstack([self.figureList[adapted_index].grid[:,0:y], self.figureList[adapted_index].grid[:,y+1:self.figureList[adapted_index].w]])
+                    self.figureList[adapted_index].w -= 1
         if count != 0:
             for adapted_index in l:
+                newGrid = np.zeros((self.figureList[adapted_index].h, self.figureList[adapted_index].w), dtype=int)
                 for x in range(0, self.figureList[adapted_index].h):
                     for y in range(0, self.figureList[adapted_index].w):
                         if self.figureList[adapted_index].grid[x][y] > 0:
                             if ricEscapeLine(self.figureList[adapted_index].grid.copy(), x, y) > 0:
                                 #border pixel
-                                self.figureList[adapted_index].gtype[x][y] = 1
+                                newGrid[x][y] = 1
                             else:
                                 #center pixel
-                                self.figureList[adapted_index].gtype[x][y] = 2
-                        else:
-                            self.figureList[adapted_index].gtype[x][y] = 0
+                                newGrid[x][y] = 2
+                self.figureList[adapted_index].gtype = newGrid
             return 0
         return 1
 
@@ -474,8 +511,6 @@ class coloredFigureRepresentation:
                         if self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] > 0:
                             self.figureList[adapted_index].grid[adapted_component_row][adapted_component_column] = 0
                             count += 1
-        if count != 0:
-            for adapted_index in l:
                 #guardo riga
                 vet = []
                 for x in range(0, self.figureList[adapted_index].h):
@@ -517,6 +552,8 @@ class coloredFigureRepresentation:
                     else:
                         self.figureList[adapted_index].grid = np.hstack([self.figureList[adapted_index].grid[:,0:y], self.figureList[adapted_index].grid[:,y+1:self.figureList[adapted_index].w]])
                         self.figureList[adapted_index].w -= 1
+        if count != 0:
+            for adapted_index in l:
                 #aggiusto valori gtype
                 newGrid = np.zeros((self.figureList[adapted_index].h, self.figureList[adapted_index].w), dtype=int)
                 for x in range(0, self.figureList[adapted_index].h):
@@ -1120,9 +1157,50 @@ class coloredFigureRepresentation:
     
     #return the list of actions
     def actionList(demo_pairs):     
-        l = [coloredFigureRepresentation.moveFigure, coloredFigureRepresentation.changeColorFigureBorder, coloredFigureRepresentation.changeColorFigureCenter, coloredFigureRepresentation.fillFigureCenter, coloredFigureRepresentation.addElementFigure_row_column, coloredFigureRepresentation.moveElementFigure_row_column, coloredFigureRepresentation.removeElementFigure_row_column, coloredFigureRepresentation.duplicateFigure, coloredFigureRepresentation.removeFigure, coloredFigureRepresentation.rotateFigure, coloredFigureRepresentation.mergeFigure, coloredFigureRepresentation.divideFigure_row, coloredFigureRepresentation.divideFigure_column, coloredFigureRepresentation.changeOrder, coloredFigureRepresentation.expandGrid, coloredFigureRepresentation.reduceGrid]
-        
-
+        l = [coloredFigureRepresentation.moveFigure, coloredFigureRepresentation.moveElementFigure_row_column, coloredFigureRepresentation.rotateFigure, coloredFigureRepresentation.mergeFigure, coloredFigureRepresentation.divideFigure_row, coloredFigureRepresentation.divideFigure_column, coloredFigureRepresentation.changeOrder]
+        countDim = 0
+        countColor = 0
+        countRemove = 0
+        countAdd = 0
+        for i in range(0, len(demo_pairs)):
+            colorListInput = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            colorListOutput = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            for x in range(0, demo_pairs[i].x.shape[0]):
+                for y in range(0, demo_pairs[i].x.shape[1]):
+                    colorListInput[demo_pairs[i].x[x][y]] += 1
+            for x in range(0, demo_pairs[i].y.shape[0]):
+                for y in range(0, demo_pairs[i].y.shape[1]):
+                    colorListOutput[demo_pairs[i].y[x][y]] += 1
+            #guardo dimensione griglia
+            if demo_pairs[i].x.shape[0] == demo_pairs[i].y.shape[0] and demo_pairs[i].x.shape[1] == demo_pairs[i].y.shape[1]:
+                countDim += 1
+            #guardo colore
+            ok = 0
+            for c in range(1, 10):
+                if colorListInput[c] != colorListOutput[c]:
+                    ok = 1
+            if ok == 0:
+                countColor += 1
+            #guardo aggiunta nuovi pixel
+            if colorListInput[0] > colorListOutput[0]:
+                #rimozione 
+                countRemove += 1
+            elif colorListInput[0] < colorListOutput[0]:
+                #aggiunta
+                countAdd += 1
+        if countDim != len(demo_pairs):
+            l.append(coloredFigureRepresentation.expandGrid)
+            l.append(coloredFigureRepresentation.reduceGrid)
+        if countColor != len(demo_pairs):
+            l.append(coloredFigureRepresentation.changeColorFigureBorder)
+            l.append(coloredFigureRepresentation.changeColorFigureCenter)
+        if countRemove > 0:
+            l.append(coloredFigureRepresentation.removeElementFigure_row_column)
+            l.append(coloredFigureRepresentation.removeFigure)
+        if countAdd > 0:
+            l.append(coloredFigureRepresentation.fillFigureCenter)
+            l.append(coloredFigureRepresentation.addElementFigure_row_column)
+            l.append(coloredFigureRepresentation.duplicateFigure)
         return l
     
     #return the list of base actions
