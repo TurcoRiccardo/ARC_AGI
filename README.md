@@ -167,6 +167,8 @@ We can apply different types of actions to figures:
 - **changeColorFigure:** slightly changes the color of the selected figure
 - **addElementFigure_row:** add a element in the figure in the selected row
 - **addElementFigure_column:** add a element in the figure in the selected column
+- **moveElementFigure_row:** move the selected row in the figure
+- **moveElementFigure_column:** move the selected column in the figure
 - **removeElementFigure_row:** remove the element in the selected figure row
 - **removeElementFigure_column:** remove the element in the selected figure column
 - **duplicateFigure:** duplicate the selected figure from the figure list

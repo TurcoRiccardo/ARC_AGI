@@ -26,7 +26,7 @@ from representation.secondDiagonalRepresentation import secondDiagonalRepresenta
 POPULATION_SIZE = 50
 OFFSPRING_SIZE = 10
 MAX_GENERATIONS_1 = 500
-MAX_GENERATIONS_2 = 2500
+MAX_GENERATIONS_2 = 2000
 
 
 @dataclass
@@ -175,8 +175,8 @@ class Agent(ArcAgent):
             #(columnsRepresentation, columnsRepresentation.baseActionList(demo_pairs), columnsRepresentation.actionList(demo_pairs)),
             #(colorLayerRepresentation, colorLayerRepresentation.baseActionList(demo_pairs), colorLayerRepresentation.actionList(demo_pairs)),
             #(rectangleRepresentation, rectangleRepresentation.baseActionList(demo_pairs), rectangleRepresentation.actionList(demo_pairs)),
-            #(figureRepresentation, figureRepresentation.baseActionList(demo_pairs), figureRepresentation.actionList(demo_pairs)),
-            (coloredFigureRepresentation, coloredFigureRepresentation.baseActionList(demo_pairs), coloredFigureRepresentation.actionList(demo_pairs)),
+            (figureRepresentation, figureRepresentation.baseActionList(demo_pairs), figureRepresentation.actionList(demo_pairs)),
+            #(coloredFigureRepresentation, coloredFigureRepresentation.baseActionList(demo_pairs), coloredFigureRepresentation.actionList(demo_pairs)),
             #(borderRepresentation, borderRepresentation.baseActionList(demo_pairs), borderRepresentation.actionList(demo_pairs)),
             #(firstDiagonalRepresentation, firstDiagonalRepresentation.baseActionList(demo_pairs), firstDiagonalRepresentation.actionList(demo_pairs)),
             #(secondDiagonalRepresentation, secondDiagonalRepresentation.baseActionList(demo_pairs), secondDiagonalRepresentation.actionList(demo_pairs))

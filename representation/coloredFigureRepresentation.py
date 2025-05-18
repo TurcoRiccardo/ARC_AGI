@@ -1183,12 +1183,12 @@ class coloredFigureRepresentation:
                 countColor += 1
             #guardo aggiunta nuovi pixel
             if colorListInput[0] > colorListOutput[0]:
-                #rimozione 
-                countRemove += 1
-            elif colorListInput[0] < colorListOutput[0]:
                 #aggiunta
                 countAdd += 1
-        if countDim != len(demo_pairs):
+            elif colorListInput[0] < colorListOutput[0]:
+                #rimozione 
+                countRemove += 1
+        if countDim > 0:
             l.append(coloredFigureRepresentation.expandGrid)
             l.append(coloredFigureRepresentation.reduceGrid)
         if countColor != len(demo_pairs):

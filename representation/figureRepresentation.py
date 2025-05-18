@@ -203,53 +203,38 @@ class figureRepresentation:
         l = self.generateIndexList(s)
         for adapted_index in l:
             lc = self.generateComponentList_row(s, adapted_index)
-            if (s.direction % 4) == 0:
-                lc.sort(key=lambda i: i, reverse=True)
-            elif (s.direction % 4) == 1:
-                lc.sort(key=lambda i: i, reverse=False)
             for adapted_component in lc:
-                if (s.direction % 4) == 0:
-                    #down
-                    if self.figureList[adapted_index].pos.x + adapted_component + 1 < self.nr:
-                        if adapted_component == self.figureList[adapted_index].h - 1:
-                            self.figureList[adapted_index].grid = np.vstack([self.figureList[adapted_index].grid, np.zeros((1, self.figureList[adapted_index].w), dtype=int)])
-                            self.figureList[adapted_index].h += 1
-                        for y in range(0, self.figureList[adapted_index].w):
-                            if self.figureList[adapted_index].grid[adapted_component][y] == 1:
-                                self.figureList[adapted_index].grid[adapted_component + 1][y] += 1
-                        count += 1
-                elif (s.direction % 4) == 1:
-                    #up
-                    if self.figureList[adapted_index].pos.x > 0:
-                        if adapted_component == 0:
-                            self.figureList[adapted_index].grid = np.vstack([np.zeros((1, self.figureList[adapted_index].w), dtype=int), self.figureList[adapted_index].grid])
-                            self.figureList[adapted_index].pos.x -= 1
-                            self.figureList[adapted_index].h += 1
-                            adapted_component += 1
-                        for y in range(0, self.figureList[adapted_index].w):
-                            if self.figureList[adapted_index].grid[adapted_component][y] == 1:
-                                self.figureList[adapted_index].grid[adapted_component - 1][y] += 1
-                        count += 1
-                elif (s.direction % 4) == 2:
+                if (s.direction % 2) == 0:
                     #right
-                    if self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w < self.nc:
-                        if self.figureList[adapted_index].grid[adapted_component][-1] == 1:
+                    indY = 0
+                    for y in range(0, self.figureList[adapted_index].w):
+                        if self.figureList[adapted_index].grid[adapted_component][y] > 0:
+                            indY = y
+                    if indY + 1 == self.figureList[adapted_index].w:
+                        if self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w + 1 < self.nc:
                             self.figureList[adapted_index].grid = np.hstack([self.figureList[adapted_index].grid, np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1)])
                             self.figureList[adapted_index].w += 1
-                        for y in range(0, self.figureList[adapted_index].w - 1):
-                            if self.figureList[adapted_index].grid[adapted_component][y] == 1:
-                                self.figureList[adapted_index].grid[adapted_component][y + 1] += 1
+                            self.figureList[adapted_index].grid[adapted_component][indY + 1] = 1
+                            count += 1
+                    else:
+                        self.figureList[adapted_index].grid[adapted_component][indY + 1] = 1
                         count += 1
-                elif (s.direction % 4) == 3:
+                elif (s.direction % 2) == 1:
                     #left
-                    if self.figureList[adapted_index].pos.y > 0:
-                        if self.figureList[adapted_index].grid[adapted_component][0] == 1:
+                    indY = 0
+                    for y in range(0, self.figureList[adapted_index].w):
+                        if self.figureList[adapted_index].grid[adapted_component][y] > 0:
+                            indY = y
+                            break
+                    if indY == 0:
+                        if self.figureList[adapted_index].pos.y > 0:
                             self.figureList[adapted_index].grid = np.hstack([np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1), self.figureList[adapted_index].grid])
                             self.figureList[adapted_index].pos.y -= 1
                             self.figureList[adapted_index].w += 1
-                        for y in range(1, self.figureList[adapted_index].w):
-                            if self.figureList[adapted_index].grid[adapted_component][y] == 1:
-                                self.figureList[adapted_index].grid[adapted_component][y - 1] += 1
+                            self.figureList[adapted_index].grid[adapted_component][indY - 1] = 1
+                            count += 1
+                    else:
+                        self.figureList[adapted_index].grid[adapted_component][indY - 1] = 1
                         count += 1
         if count != 0:
             return 0
@@ -263,6 +248,100 @@ class figureRepresentation:
         l = self.generateIndexList(s)
         for adapted_index in l:
             lc = self.generateComponentList_column(s, adapted_index)
+            for adapted_component in lc:
+                if (s.direction % 4) == 0:
+                    #down
+                    indX = 0
+                    for x in range(0, self.figureList[adapted_index].h):
+                        if self.figureList[adapted_index].grid[x][adapted_component] > 0:
+                            indX = x
+                    if indX + 1 == self.figureList[adapted_index].h:
+                        if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h + 1 < self.nr:
+                            self.figureList[adapted_index].grid = np.vstack([self.figureList[adapted_index].grid, np.zeros((1, self.figureList[adapted_index].w), dtype=int)])
+                            self.figureList[adapted_index].h += 1
+                            self.figureList[adapted_index].grid[indX + 1][adapted_component] = 1
+                            count += 1
+                    else:
+                        self.figureList[adapted_index].grid[indX + 1][adapted_component] = 1
+                        count += 1
+                elif (s.direction % 4) == 1:
+                    #up
+                    indX = 0
+                    for x in range(0, self.figureList[adapted_index].h):
+                        if self.figureList[adapted_index].grid[x][adapted_component] > 0:
+                            indX = x
+                            break
+                    if indX == 0:
+                        if self.figureList[adapted_index].pos.x > 0:
+                            self.figureList[adapted_index].grid = np.vstack([np.zeros((1, self.figureList[adapted_index].w), dtype=int), self.figureList[adapted_index].grid])
+                            self.figureList[adapted_index].pos.x -= 1
+                            self.figureList[adapted_index].h += 1
+                            self.figureList[adapted_index].grid[indX - 1][adapted_component] = 1
+                            count += 1
+                    else:
+                        self.figureList[adapted_index].grid[indX - 1][adapted_component] = 1
+                        count += 1
+        if count != 0:
+            return 0
+        return 1
+
+    #move the selected row in the figure
+    def moveElementFigure_row(self, s):
+        if len(self.figureList) == 0:
+            return 1
+        count = 0
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            lc = self.generateComponentList_row(s, adapted_index)
+            for adapted_component in lc:
+                if (s.direction % 2) == 0:
+                    #right
+                    if self.figureList[adapted_index].grid[adapted_component][-1] != 0:
+                        self.figureList[adapted_index].grid = np.hstack([self.figureList[adapted_index].grid, np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1)])
+                        self.figureList[adapted_index].w += 1
+                    for y in reversed(range(0, self.figureList[adapted_index].w-1)):
+                        self.figureList[adapted_index].grid[adapted_component][y + 1] = self.figureList[adapted_index].grid[adapted_component][y]
+                    count += 1
+                elif (s.direction % 2) == 1:
+                    #left
+                    if self.figureList[adapted_index].grid[adapted_component][0] != 0:
+                        self.figureList[adapted_index].grid = np.hstack([np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1), self.figureList[adapted_index].grid])
+                        self.figureList[adapted_index].pos.y -= 1
+                        self.figureList[adapted_index].w += 1
+                    for y in range(1, self.figureList[adapted_index].w):
+                        self.figureList[adapted_index].grid[adapted_component][y - 1] = self.figureList[adapted_index].grid[adapted_component][y]
+                    count += 1
+            #right
+            ok = 0
+            for x in range(0, self.figureList[adapted_index].h):
+                if self.figureList[adapted_index].grid[x][-1] > 0:
+                    ok = 1
+                    break
+            if ok == 0:
+                self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[:,0:self.figureList[adapted_index].w-1]
+                self.figureList[adapted_index].w -= 1
+            #left
+            ok = 0
+            for x in range(0, self.figureList[adapted_index].h):
+                if self.figureList[adapted_index].grid[x][0] > 0:
+                    ok = 1
+                    break
+            if ok == 0:
+                self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[:,1:self.figureList[adapted_index].w]
+                self.figureList[adapted_index].pos.y += 1
+                self.figureList[adapted_index].w -= 1
+        if count != 0:
+            return 0
+        return 1
+    
+    #move the selected column in the figure
+    def moveElementFigure_column(self, s):
+        if len(self.figureList) == 0:
+            return 1
+        count = 0
+        l = self.generateIndexList(s)
+        for adapted_index in l:
+            lc = self.generateComponentList_column(s, adapted_index)
             if (s.direction % 4) == 2:
                 lc.sort(key=lambda i: i, reverse=True)
             elif (s.direction % 4) == 3:
@@ -270,47 +349,40 @@ class figureRepresentation:
             for adapted_component in lc:
                 if (s.direction % 4) == 0:
                     #down
-                    if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h < self.nr:
-                        if self.figureList[adapted_index].grid[-1][adapted_component] == 1:
-                            self.figureList[adapted_index].grid = np.vstack([self.figureList[adapted_index].grid, np.zeros((1, self.figureList[adapted_index].w), dtype=int)])
-                            self.figureList[adapted_index].h += 1
-                        for x in range(0, self.figureList[adapted_index].h - 1):
-                            if self.figureList[adapted_index].grid[x][adapted_component] == 1:
-                                self.figureList[adapted_index].grid[x + 1][adapted_component] += 1
-                        count += 1
+                    if self.figureList[adapted_index].grid[-1][adapted_component] != 0:
+                        self.figureList[adapted_index].grid = np.vstack([self.figureList[adapted_index].grid, np.zeros((1, self.figureList[adapted_index].w), dtype=int)])
+                        self.figureList[adapted_index].h += 1
+                    for x in reversed(range(0, self.figureList[adapted_index].h-1)):
+                        self.figureList[adapted_index].grid[x + 1][adapted_component] = self.figureList[adapted_index].grid[x][adapted_component]
+                    count += 1
                 elif (s.direction % 4) == 1:
                     #up
-                    if self.figureList[adapted_index].pos.x > 0:
-                        if self.figureList[adapted_index].grid[0][adapted_component] == 1:
-                            self.figureList[adapted_index].grid = np.vstack([np.zeros((1, self.figureList[adapted_index].w), dtype=int), self.figureList[adapted_index].grid])
-                            self.figureList[adapted_index].pos.x -= 1
-                            self.figureList[adapted_index].h += 1
-                        for x in range(1, self.figureList[adapted_index].h):
-                            if self.figureList[adapted_index].grid[x][adapted_component] == 1:
-                                self.figureList[adapted_index].grid[x - 1][adapted_component] += 1
-                        count += 1
-                elif (s.direction % 4) == 2:
-                    #right
-                    if self.figureList[adapted_index].pos.y + adapted_component + 1 < self.nc:
-                        if adapted_component == self.figureList[adapted_index].w - 1:
-                            self.figureList[adapted_index].grid = np.hstack([self.figureList[adapted_index].grid, np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1)])
-                            self.figureList[adapted_index].w += 1
-                        for x in range(0, self.figureList[adapted_index].h):
-                            if self.figureList[adapted_index].grid[x][adapted_component] == 1:
-                                self.figureList[adapted_index].grid[x][adapted_component + 1] += 1
-                        count += 1
-                elif (s.direction % 4) == 3:
-                    #left
-                    if self.figureList[adapted_index].pos.y > 0:
-                        if adapted_component == 0:
-                            self.figureList[adapted_index].grid = np.hstack([np.zeros((1, self.figureList[adapted_index].h), dtype=int).reshape(self.figureList[adapted_index].h, 1), self.figureList[adapted_index].grid])
-                            self.figureList[adapted_index].pos.y -= 1
-                            self.figureList[adapted_index].w += 1
-                            adapted_component += 1
-                        for x in range(0, self.figureList[adapted_index].h):
-                            if self.figureList[adapted_index].grid[x][adapted_component] == 1:
-                                self.figureList[adapted_index].grid[x][adapted_component - 1] += 1
-                        count += 1
+                    if self.figureList[adapted_index].grid[0][adapted_component] != 0:
+                        self.figureList[adapted_index].grid = np.vstack([np.zeros((1, self.figureList[adapted_index].w), dtype=int), self.figureList[adapted_index].grid])
+                        self.figureList[adapted_index].pos.x -= 1
+                        self.figureList[adapted_index].h += 1
+                    for x in range(1, self.figureList[adapted_index].h):
+                        self.figureList[adapted_index].grid[x - 1][adapted_component] = self.figureList[adapted_index].grid[x][adapted_component]
+                    count += 1
+            #down
+            ok = 0
+            for y in range(0, self.figureList[adapted_index].w):
+                if self.figureList[adapted_index].grid[-1][y] > 0:
+                    ok = 1
+                    break
+            if ok == 0:
+                self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[0:self.figureList[adapted_index].h-1,:]
+                self.figureList[adapted_index].h -= 1
+            #up
+            ok = 0
+            for y in range(0, self.figureList[adapted_index].w):
+                if self.figureList[adapted_index].grid[0][y] > 0:
+                    ok = 1
+                    break
+            if ok == 0:
+                self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[1:self.figureList[adapted_index].h,:]
+                self.figureList[adapted_index].pos.x += 1
+                self.figureList[adapted_index].h -= 1
         if count != 0:
             return 0
         return 1
@@ -326,21 +398,34 @@ class figureRepresentation:
             lc.sort(key=lambda i: i, reverse=True)
             for adapted_component in lc:
                 if self.figureList[adapted_index].h > 1:
-                    ok = 0
-                    for y in range(0, self.figureList[adapted_index].w):
-                        if self.figureList[adapted_index].grid[adapted_component][y] > 0:
-                            self.figureList[adapted_index].grid[adapted_component][y] -= 1
-                        if self.figureList[adapted_index].grid[adapted_component][y] > 0:
-                            ok = 1
-                    if ok == 0:
+                    indY = 0
+                    c = 0
+                    if (s.direction % 2) == 0:
+                        #right
+                        for y in range(0, self.figureList[adapted_index].w):
+                            if self.figureList[adapted_index].grid[adapted_component][y] > 0:
+                                indY = y
+                                c += 1
+                    elif (s.direction % 2) == 1:
+                        #left
+                        for y in range(0, self.figureList[adapted_index].w):
+                            if self.figureList[adapted_index].grid[adapted_component][y] > 0:
+                                if c == 0:
+                                    indY = y
+                                c += 1
+                    if c <= 1:
                         if adapted_component == 0:
                             self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[1:self.figureList[adapted_index].h,:]
                             self.figureList[adapted_index].pos.x += 1
                             self.figureList[adapted_index].h -= 1
+                            count += 1
                         else:
                             self.figureList[adapted_index].grid = np.vstack([self.figureList[adapted_index].grid[0:adapted_component,:], self.figureList[adapted_index].grid[adapted_component+1:self.figureList[adapted_index].h,:]])
                             self.figureList[adapted_index].h -= 1
-                    count += 1
+                            count += 1
+                    else:
+                        self.figureList[adapted_index].grid[adapted_component][indY] = 0
+                        count += 1
         if count != 0:
             return 0
         return 1
@@ -356,21 +441,34 @@ class figureRepresentation:
             lc.sort(key=lambda i: i, reverse=True)
             for adapted_component in lc:
                 if self.figureList[adapted_index].w > 1:
-                    ok = 0
-                    for x in range(0, self.figureList[adapted_index].h):
-                        if self.figureList[adapted_index].grid[x][adapted_component] > 0:
-                            self.figureList[adapted_index].grid[x][adapted_component] -= 1
-                        if self.figureList[adapted_index].grid[x][adapted_component] > 0:
-                            ok = 1
-                    if ok == 0:
+                    indX = 0
+                    c = 0
+                    if (s.direction % 2) == 0:
+                        #down
+                        for x in range(0, self.figureList[adapted_index].h):
+                            if self.figureList[adapted_index].grid[x][adapted_component] > 0:
+                                indX = x
+                                c += 1
+                    elif (s.direction % 2) == 1:
+                        #up
+                        for x in range(0, self.figureList[adapted_index].h):
+                            if self.figureList[adapted_index].grid[x][adapted_component] > 0:
+                                if c == 0:
+                                    indX = x
+                                c += 1
+                    if c <= 1:
                         if adapted_component == 0:
                             self.figureList[adapted_index].grid = self.figureList[adapted_index].grid[:,1:self.figureList[adapted_index].w]
                             self.figureList[adapted_index].pos.y += 1
                             self.figureList[adapted_index].w -= 1
+                            count += 1
                         else:
                             self.figureList[adapted_index].grid = np.hstack([self.figureList[adapted_index].grid[:,0:adapted_component], self.figureList[adapted_index].grid[:,adapted_component+1:self.figureList[adapted_index].w]])
                             self.figureList[adapted_index].w -= 1
-                    count += 1
+                            count += 1
+                    else:
+                        self.figureList[adapted_index].grid[indX][adapted_component] = 0
+                        count += 1
         if count != 0:
             return 0
         return 1
@@ -845,7 +943,7 @@ class figureRepresentation:
     
     #return the list of actions
     def actionList(demo_pairs):     
-        l = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure_row, figureRepresentation.addElementFigure_column, figureRepresentation.removeElementFigure_row, figureRepresentation.removeElementFigure_column, figureRepresentation.duplicateFigure, figureRepresentation.removeFigure, figureRepresentation.rotateFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure_row, figureRepresentation.divideFigure_column, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]    
+        l = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure_row, figureRepresentation.addElementFigure_column, figureRepresentation.moveElementFigure_row, figureRepresentation.moveElementFigure_column, figureRepresentation.removeElementFigure_row, figureRepresentation.removeElementFigure_column, figureRepresentation.duplicateFigure, figureRepresentation.removeFigure, figureRepresentation.rotateFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure_row, figureRepresentation.divideFigure_column, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]    
        
 
         return l
