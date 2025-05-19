@@ -10,7 +10,7 @@ import copy
 from selection.selector import Selector, generateNewSelector, mutateSelector
 from concurrent.futures import ProcessPoolExecutor
 
-from utility import Individual, add_mutation, swap_mutation, tweak_mutation, error_rate, parent_selection
+from utility import Individual, add_mutation, swap_mutation, tweak_mutation, error_rate, parent_selection, ProblemConsideration, initial_analysis
 from representation.pixelRepresentation import pixelRepresentation
 from representation.rowRepresentation import rowRepresentation
 from representation.columnsRepresentation import columnsRepresentation
@@ -169,17 +169,18 @@ def generate_representation(rep, demo_pairs, base_act, act):
 class Agent(ArcAgent):
     def predict(self, demo_pairs: List[ArcIOPair], test_grids: List[ArcGrid]) -> List[ArcPrediction]:
         possibleSolutionRep = list()
+        pc = initial_analysis(demo_pairs)
         reps = [
-            #(pixelRepresentation, pixelRepresentation.baseActionList(demo_pairs), pixelRepresentation.actionList(demo_pairs)),
-            #(rowRepresentation, rowRepresentation.baseActionList(demo_pairs), rowRepresentation.actionList(demo_pairs)),
-            #(columnsRepresentation, columnsRepresentation.baseActionList(demo_pairs), columnsRepresentation.actionList(demo_pairs)),
-            #(colorLayerRepresentation, colorLayerRepresentation.baseActionList(demo_pairs), colorLayerRepresentation.actionList(demo_pairs)),
-            #(rectangleRepresentation, rectangleRepresentation.baseActionList(demo_pairs), rectangleRepresentation.actionList(demo_pairs)),
-            (figureRepresentation, figureRepresentation.baseActionList(demo_pairs), figureRepresentation.actionList(demo_pairs)),
-            #(coloredFigureRepresentation, coloredFigureRepresentation.baseActionList(demo_pairs), coloredFigureRepresentation.actionList(demo_pairs)),
-            #(borderRepresentation, borderRepresentation.baseActionList(demo_pairs), borderRepresentation.actionList(demo_pairs)),
-            #(firstDiagonalRepresentation, firstDiagonalRepresentation.baseActionList(demo_pairs), firstDiagonalRepresentation.actionList(demo_pairs)),
-            #(secondDiagonalRepresentation, secondDiagonalRepresentation.baseActionList(demo_pairs), secondDiagonalRepresentation.actionList(demo_pairs))
+            #(pixelRepresentation, pixelRepresentation.baseActionList(pc), pixelRepresentation.actionList(pc)),
+            #(rowRepresentation, rowRepresentation.baseActionList(pc), rowRepresentation.actionList(pc)),
+            #(columnsRepresentation, columnsRepresentation.baseActionList(pc), columnsRepresentation.actionList(pc)),
+            #(colorLayerRepresentation, colorLayerRepresentation.baseActionList(pc), colorLayerRepresentation.actionList(pc)),
+            #(rectangleRepresentation, rectangleRepresentation.baseActionList(pc), rectangleRepresentation.actionList(pc)),
+            (figureRepresentation, figureRepresentation.baseActionList(pc), figureRepresentation.actionList(pc)),
+            #(coloredFigureRepresentation, coloredFigureRepresentation.baseActionList(pc), coloredFigureRepresentation.actionList(pc)),
+            #(borderRepresentation, borderRepresentation.baseActionList(pc), borderRepresentation.actionList(pc)),
+            #(firstDiagonalRepresentation, firstDiagonalRepresentation.baseActionList(pc), firstDiagonalRepresentation.actionList(pc)),
+            #(secondDiagonalRepresentation, secondDiagonalRepresentation.baseActionList(pc), secondDiagonalRepresentation.actionList(pc))
         ]
         #rappresentazione in cui ho delle figure che posso prolungare con ostacoli e elementi sovrapposti
         #un idea e quella di inserire azioni nelle base_action in base ad un analisi iniziale delle griglie

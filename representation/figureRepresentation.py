@@ -942,15 +942,27 @@ class figureRepresentation:
         return -score
     
     #return the list of actions
-    def actionList(demo_pairs):     
-        l = [figureRepresentation.moveFigure, figureRepresentation.changeColorFigure, figureRepresentation.addElementFigure_row, figureRepresentation.addElementFigure_column, figureRepresentation.moveElementFigure_row, figureRepresentation.moveElementFigure_column, figureRepresentation.removeElementFigure_row, figureRepresentation.removeElementFigure_column, figureRepresentation.duplicateFigure, figureRepresentation.removeFigure, figureRepresentation.rotateFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure_row, figureRepresentation.divideFigure_column, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]    
-       
-
+    def actionList(pc):     
+        l = [figureRepresentation.moveFigure, figureRepresentation.moveElementFigure_row, figureRepresentation.moveElementFigure_column, figureRepresentation.rotateFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure_row, figureRepresentation.divideFigure_column, figureRepresentation.changeOrder]    
+        if pc.countDim > 0:
+            l.append(figureRepresentation.expandGrid)
+            l.append(figureRepresentation.reduceGrid)
+        if pc.countColor != pc.numProb:
+            l.append(figureRepresentation.changeColorFigure)
+        if pc.countRemove > 0:
+            l.append(figureRepresentation.removeElementFigure_row)
+            l.append(figureRepresentation.removeElementFigure_column)
+            l.append(figureRepresentation.removeFigure)
+        if pc.countAdd > 0:
+            l.append(figureRepresentation.addElementFigure_row)
+            l.append(figureRepresentation.addElementFigure_column)
+            l.append(figureRepresentation.duplicateFigure)
         return l
     
     #return the list of base actions
-    def baseActionList(demo_pairs):
-        l = [figureRepresentation.duplicateFigure, figureRepresentation.changeOrder, figureRepresentation.expandGrid, figureRepresentation.reduceGrid]
-
-
+    def baseActionList(pc):
+        l = [figureRepresentation.duplicateFigure, figureRepresentation.changeOrder]
+        if pc.countDim > 0:
+            l.append(figureRepresentation.expandGrid)
+            l.append(figureRepresentation.reduceGrid)
         return l

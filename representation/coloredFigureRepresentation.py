@@ -1156,56 +1156,27 @@ class coloredFigureRepresentation:
         return -score
     
     #return the list of actions
-    def actionList(demo_pairs):     
+    def actionList(pc):     
         l = [coloredFigureRepresentation.moveFigure, coloredFigureRepresentation.moveElementFigure_row_column, coloredFigureRepresentation.rotateFigure, coloredFigureRepresentation.mergeFigure, coloredFigureRepresentation.divideFigure_row, coloredFigureRepresentation.divideFigure_column, coloredFigureRepresentation.changeOrder]
-        countDim = 0
-        countColor = 0
-        countRemove = 0
-        countAdd = 0
-        for i in range(0, len(demo_pairs)):
-            colorListInput = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            colorListOutput = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            for x in range(0, demo_pairs[i].x.shape[0]):
-                for y in range(0, demo_pairs[i].x.shape[1]):
-                    colorListInput[demo_pairs[i].x[x][y]] += 1
-            for x in range(0, demo_pairs[i].y.shape[0]):
-                for y in range(0, demo_pairs[i].y.shape[1]):
-                    colorListOutput[demo_pairs[i].y[x][y]] += 1
-            #guardo dimensione griglia
-            if demo_pairs[i].x.shape[0] == demo_pairs[i].y.shape[0] and demo_pairs[i].x.shape[1] == demo_pairs[i].y.shape[1]:
-                countDim += 1
-            #guardo colore
-            ok = 0
-            for c in range(1, 10):
-                if colorListInput[c] != colorListOutput[c]:
-                    ok = 1
-            if ok == 0:
-                countColor += 1
-            #guardo aggiunta nuovi pixel
-            if colorListInput[0] > colorListOutput[0]:
-                #aggiunta
-                countAdd += 1
-            elif colorListInput[0] < colorListOutput[0]:
-                #rimozione 
-                countRemove += 1
-        if countDim > 0:
+        if pc.countDim > 0:
             l.append(coloredFigureRepresentation.expandGrid)
             l.append(coloredFigureRepresentation.reduceGrid)
-        if countColor != len(demo_pairs):
+        if pc.countColor != pc.numProb:
             l.append(coloredFigureRepresentation.changeColorFigureBorder)
             l.append(coloredFigureRepresentation.changeColorFigureCenter)
-        if countRemove > 0:
+        if pc.countRemove > 0:
             l.append(coloredFigureRepresentation.removeElementFigure_row_column)
             l.append(coloredFigureRepresentation.removeFigure)
-        if countAdd > 0:
+        if pc.countAdd > 0:
             l.append(coloredFigureRepresentation.fillFigureCenter)
             l.append(coloredFigureRepresentation.addElementFigure_row_column)
             l.append(coloredFigureRepresentation.duplicateFigure)
         return l
     
     #return the list of base actions
-    def baseActionList(demo_pairs):
-        l = [coloredFigureRepresentation.duplicateFigure, coloredFigureRepresentation.changeOrder, coloredFigureRepresentation.expandGrid, coloredFigureRepresentation.reduceGrid]
-
-
+    def baseActionList(pc):
+        l = [coloredFigureRepresentation.duplicateFigure, coloredFigureRepresentation.changeOrder]
+        if pc.countDim > 0:
+            l.append(coloredFigureRepresentation.expandGrid)
+            l.append(coloredFigureRepresentation.reduceGrid)
         return l

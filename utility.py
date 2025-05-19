@@ -106,3 +106,41 @@ def error_rate(input, output):
     val += abs(output.shape[0] - input.shape[0])*min(input.shape[1], output.shape[1]) + abs(output.shape[1] - input.shape[1])*min(input.shape[0], output.shape[0]) + abs(output.shape[0] - input.shape[0])*abs(output.shape[1] - input.shape[1])
     return val
 
+@dataclass
+class ProblemConsideration:
+    countDim: int
+    countColor: int
+    countRemove: int
+    countAdd: int
+    numProb: int
+
+#initial analysis in which we observe the characteristics of the problem
+def initial_analysis(demo_pairs):
+    pc = ProblemConsideration(0, 0, 0, 0, len(demo_pairs))
+    for i in range(0, len(demo_pairs)):
+        colorListInput = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        colorListOutput = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for x in range(0, demo_pairs[i].x.shape[0]):
+            for y in range(0, demo_pairs[i].x.shape[1]):
+                colorListInput[demo_pairs[i].x[x][y]] += 1
+        for x in range(0, demo_pairs[i].y.shape[0]):
+            for y in range(0, demo_pairs[i].y.shape[1]):
+                colorListOutput[demo_pairs[i].y[x][y]] += 1
+        #guardo dimensione griglia
+        if demo_pairs[i].x.shape[0] == demo_pairs[i].y.shape[0] and demo_pairs[i].x.shape[1] == demo_pairs[i].y.shape[1]:
+            pc.countDim += 1
+        #guardo colore
+        ok = 0
+        for c in range(1, 10):
+            if colorListInput[c] != colorListOutput[c]:
+                ok = 1
+        if ok == 0:
+            pc.countColor += 1
+        #guardo aggiunta nuovi pixel
+        if colorListInput[0] > colorListOutput[0]:
+            #aggiunta
+            pc.countAdd += 1
+        elif colorListInput[0] < colorListOutput[0]:
+            #rimozione 
+            pc.countRemove += 1
+    return pc
