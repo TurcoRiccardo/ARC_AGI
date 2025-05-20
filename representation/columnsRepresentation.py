@@ -404,15 +404,26 @@ class columnsRepresentation:
         return -score
     
     #return the list of actions
-    def actionList(demo_pairs):     
-        l = [columnsRepresentation.moveColumn, columnsRepresentation.changeColorColumn, columnsRepresentation.changeColorColumnPixel, columnsRepresentation.modifyColumnAdd, columnsRepresentation.modifyColumnDel, columnsRepresentation.modifyColumnMove, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
-        
-
+    def actionList(pc):     
+        l = [columnsRepresentation.moveColumn, columnsRepresentation.modifyColumnMove]
+        if pc.countDim > 0:
+            l.append(columnsRepresentation.expandGrid)
+            l.append(columnsRepresentation.reduceGrid)
+        if pc.countColor != pc.numProb:
+            l.append(columnsRepresentation.changeColorColumn)
+            l.append(columnsRepresentation.changeColorColumnPixel)
+        if pc.countRemove > 0:
+            l.append(columnsRepresentation.modifyColumnDel)
+        if pc.countAdd > 0:
+            l.append(columnsRepresentation.modifyColumnAdd)
         return l
     
     #return the list of base actions
-    def baseActionList(demo_pairs):
-        l = [columnsRepresentation.moveColumn, columnsRepresentation.expandGrid, columnsRepresentation.reduceGrid]
-
-
+    def baseActionList(pc):
+        l = [columnsRepresentation.moveColumn]
+        if pc.countColor != pc.numProb:
+            l.append(columnsRepresentation.changeColorColumn)
+        if pc.countDim > 0:
+            l.append(columnsRepresentation.expandGrid)
+            l.append(columnsRepresentation.reduceGrid)
         return l

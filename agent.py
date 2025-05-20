@@ -184,6 +184,7 @@ class Agent(ArcAgent):
         ]
         #rappresentazione in cui ho delle figure che posso prolungare con ostacoli e elementi sovrapposti
         #un idea e quella di inserire azioni nelle base_action in base ad un analisi iniziale delle griglie
+        #algoritmo evolutivo su piu test assieme
 
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(generate_representation, rep, demo_pairs, base_act, actions) for rep, base_act, actions in reps]

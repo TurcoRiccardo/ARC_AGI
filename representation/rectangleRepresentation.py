@@ -386,15 +386,27 @@ class rectangleRepresentation:
         return -score
     
     #return the list of actions
-    def actionList(demo_pairs):     
-        l = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeColorRectangle, rectangleRepresentation.removeRectangle, rectangleRepresentation.duplicateRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
-        
-
+    def actionList(pc):     
+        l = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle]
+        if pc.countDim > 0:
+            l.append(rectangleRepresentation.expandGrid)
+            l.append(rectangleRepresentation.reduceGrid)
+        if pc.countColor != pc.numProb:
+            l.append(rectangleRepresentation.changeColorRectangle)
+        if pc.countRemove > 0:
+            l.append(rectangleRepresentation.removeRectangle)
+        if pc.countAdd > 0:
+            l.append(rectangleRepresentation.duplicateRectangle)
         return l
     
     #return the list of base actions
-    def baseActionList(demo_pairs):
-        l = [rectangleRepresentation.duplicateRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.expandGrid, rectangleRepresentation.reduceGrid]
-
-
+    def baseActionList(pc):
+        l = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeOrder]
+        if pc.countColor != pc.numProb:
+            l.append(rectangleRepresentation.changeColorRectangle)
+        if pc.countAdd > 0:
+            l.append(rectangleRepresentation.duplicateRectangle)
+        if pc.countDim > 0:
+            l.append(rectangleRepresentation.expandGrid)
+            l.append(rectangleRepresentation.reduceGrid)
         return l

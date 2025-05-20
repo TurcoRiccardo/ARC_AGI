@@ -404,15 +404,26 @@ class rowRepresentation:
         return -score
     
     #return the list of actions
-    def actionList(demo_pairs):     
-        l = [rowRepresentation.moveRow, rowRepresentation.changeColorRow, rowRepresentation.changeColorRowPixel, rowRepresentation.modifyRowAdd, rowRepresentation.modifyRowDel, rowRepresentation.modifyRowMove, rowRepresentation.expandGrid, rowRepresentation.reduceGrid]
-        
-
+    def actionList(pc):     
+        l = [rowRepresentation.moveRow, rowRepresentation.modifyRowMove]
+        if pc.countDim > 0:
+            l.append(rowRepresentation.expandGrid)
+            l.append(rowRepresentation.reduceGrid)
+        if pc.countColor != pc.numProb:
+            l.append(rowRepresentation.changeColorRow)
+            l.append(rowRepresentation.changeColorRowPixel)
+        if pc.countRemove > 0:
+            l.append(rowRepresentation.modifyRowDel)
+        if pc.countAdd > 0:
+            l.append(rowRepresentation.modifyRowAdd)
         return l
     
     #return the list of base actions
-    def baseActionList(demo_pairs):
-        l = [rowRepresentation.moveRow, rowRepresentation.expandGrid, rowRepresentation.reduceGrid]
-
-
+    def baseActionList(pc):
+        l = [rowRepresentation.moveRow]
+        if pc.countColor != pc.numProb:
+            l.append(rowRepresentation.changeColorRow)
+        if pc.countDim > 0:
+            l.append(rowRepresentation.expandGrid)
+            l.append(rowRepresentation.reduceGrid)
         return l

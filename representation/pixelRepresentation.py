@@ -259,15 +259,25 @@ class pixelRepresentation:
         return -score
     
     #return the list of actions
-    def actionList(demo_pairs):     
-        l = [pixelRepresentation.movePixel, pixelRepresentation.changeColorPixel, pixelRepresentation.duplicatePixel, pixelRepresentation.removePixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid]
-
-
+    def actionList(pc):     
+        l = [pixelRepresentation.movePixel]
+        if pc.countDim > 0:
+            l.append(pixelRepresentation.expandGrid)
+            l.append(pixelRepresentation.reduceGrid)
+        if pc.countColor != pc.numProb:
+            l.append(pixelRepresentation.changeColorPixel)
+        if pc.countRemove > 0:
+            l.append(pixelRepresentation.removePixel)
+        if pc.countAdd > 0:
+            l.append(pixelRepresentation.duplicatePixel)
         return l
     
     #return the list of base actions
-    def baseActionList(demo_pairs):
-        l = [pixelRepresentation.movePixel, pixelRepresentation.expandGrid, pixelRepresentation.reduceGrid]
-
-
+    def baseActionList(pc):
+        l = [pixelRepresentation.movePixel]
+        if pc.countAdd > 0:
+            l.append(pixelRepresentation.duplicatePixel)
+        if pc.countDim > 0:
+            l.append(pixelRepresentation.expandGrid)
+            l.append(pixelRepresentation.reduceGrid)
         return l

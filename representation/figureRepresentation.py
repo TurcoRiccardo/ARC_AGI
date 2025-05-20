@@ -961,7 +961,11 @@ class figureRepresentation:
     
     #return the list of base actions
     def baseActionList(pc):
-        l = [figureRepresentation.duplicateFigure, figureRepresentation.changeOrder]
+        l = [figureRepresentation.moveFigure, figureRepresentation.changeOrder]
+        if pc.countColor != pc.numProb:
+            l.append(figureRepresentation.changeColorFigure)
+        if pc.countAdd > 0:
+            l.append(figureRepresentation.duplicateFigure)
         if pc.countDim > 0:
             l.append(figureRepresentation.expandGrid)
             l.append(figureRepresentation.reduceGrid)
