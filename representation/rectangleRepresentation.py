@@ -388,7 +388,7 @@ class rectangleRepresentation:
     #return the list of actions
     def actionList(pc):     
         l = [rectangleRepresentation.moveRectangle, rectangleRepresentation.changeOrder, rectangleRepresentation.scaleUpRectangle, rectangleRepresentation.scaleDownRectangle]
-        if pc.countDim > 0:
+        if pc.countDim != pc.numProb:
             l.append(rectangleRepresentation.expandGrid)
             l.append(rectangleRepresentation.reduceGrid)
         if pc.countColor != pc.numProb:
@@ -406,7 +406,7 @@ class rectangleRepresentation:
             l.append(rectangleRepresentation.changeColorRectangle)
         if pc.countAdd > 0:
             l.append(rectangleRepresentation.duplicateRectangle)
-        if pc.countDim > 0:
+        if pc.countDim != pc.numProb:
             l.append(rectangleRepresentation.expandGrid)
             l.append(rectangleRepresentation.reduceGrid)
         return l

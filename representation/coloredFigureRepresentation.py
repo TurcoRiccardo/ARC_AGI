@@ -1158,7 +1158,7 @@ class coloredFigureRepresentation:
     #return the list of actions
     def actionList(pc):     
         l = [coloredFigureRepresentation.moveFigure, coloredFigureRepresentation.moveElementFigure_row_column, coloredFigureRepresentation.rotateFigure, coloredFigureRepresentation.mergeFigure, coloredFigureRepresentation.divideFigure_row, coloredFigureRepresentation.divideFigure_column, coloredFigureRepresentation.changeOrder]
-        if pc.countDim > 0:
+        if pc.countDim != pc.numProb:
             l.append(coloredFigureRepresentation.expandGrid)
             l.append(coloredFigureRepresentation.reduceGrid)
         if pc.countColor != pc.numProb:
@@ -1168,9 +1168,10 @@ class coloredFigureRepresentation:
             l.append(coloredFigureRepresentation.removeElementFigure_row_column)
             l.append(coloredFigureRepresentation.removeFigure)
         if pc.countAdd > 0:
-            l.append(coloredFigureRepresentation.fillFigureCenter)
-            l.append(coloredFigureRepresentation.addElementFigure_row_column)
-            l.append(coloredFigureRepresentation.duplicateFigure)
+            #l.append(coloredFigureRepresentation.fillFigureCenter)
+            #l.append(coloredFigureRepresentation.addElementFigure_row_column)
+            #l.append(coloredFigureRepresentation.duplicateFigure)
+            print("errore?")
         return l
     
     #return the list of base actions
@@ -1181,7 +1182,7 @@ class coloredFigureRepresentation:
             l.append(coloredFigureRepresentation.changeColorFigureCenter)
         if pc.countAdd > 0:
             l.append(coloredFigureRepresentation.duplicateFigure)
-        if pc.countDim > 0:
+        if pc.countDim != pc.numProb:
             l.append(coloredFigureRepresentation.expandGrid)
             l.append(coloredFigureRepresentation.reduceGrid)
         return l

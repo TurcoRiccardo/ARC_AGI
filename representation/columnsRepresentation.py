@@ -406,7 +406,7 @@ class columnsRepresentation:
     #return the list of actions
     def actionList(pc):     
         l = [columnsRepresentation.moveColumn, columnsRepresentation.modifyColumnMove]
-        if pc.countDim > 0:
+        if pc.countDim != pc.numProb:
             l.append(columnsRepresentation.expandGrid)
             l.append(columnsRepresentation.reduceGrid)
         if pc.countColor != pc.numProb:
@@ -423,7 +423,7 @@ class columnsRepresentation:
         l = [columnsRepresentation.moveColumn]
         if pc.countColor != pc.numProb:
             l.append(columnsRepresentation.changeColorColumn)
-        if pc.countDim > 0:
+        if pc.countDim != pc.numProb:
             l.append(columnsRepresentation.expandGrid)
             l.append(columnsRepresentation.reduceGrid)
         return l

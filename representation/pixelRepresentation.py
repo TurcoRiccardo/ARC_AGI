@@ -261,7 +261,7 @@ class pixelRepresentation:
     #return the list of actions
     def actionList(pc):     
         l = [pixelRepresentation.movePixel]
-        if pc.countDim > 0:
+        if pc.countDim != pc.numProb:
             l.append(pixelRepresentation.expandGrid)
             l.append(pixelRepresentation.reduceGrid)
         if pc.countColor != pc.numProb:
@@ -277,7 +277,7 @@ class pixelRepresentation:
         l = [pixelRepresentation.movePixel]
         if pc.countAdd > 0:
             l.append(pixelRepresentation.duplicatePixel)
-        if pc.countDim > 0:
+        if pc.countDim != pc.numProb:
             l.append(pixelRepresentation.expandGrid)
             l.append(pixelRepresentation.reduceGrid)
         return l
