@@ -16,8 +16,6 @@ class Selector:
 def generateNewSelector(rappresentation):
     index = 0
     component = (0,)
-    allElement = 0
-    allComponent = 0
     ok = 0
     ne = rappresentation.getNElement()
     if ne != 0:
