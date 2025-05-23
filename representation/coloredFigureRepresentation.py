@@ -663,12 +663,13 @@ class coloredFigureRepresentation:
             if adapted_index not in removefig:
                 if (s.direction % 4) == 0:
                     #down
-                    if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h <= self.nr:
+                    if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h < self.nr:
                         indexFigure = set()
                         for y in range(0, self.figureList[adapted_index].w):
                             if self.figureList[adapted_index].grid[-1][y] > 0:
                                 for indfig in range(0, len(self.figureList)):
                                     if adapted_index != indfig:
+                                        ok = 0
                                         for j in range(0, self.figureList[indfig].h):
                                             for k in range(0, self.figureList[indfig].w):
                                                 if self.figureList[indfig].grid[j][k] != 0:
@@ -676,6 +677,10 @@ class coloredFigureRepresentation:
                                                         if indfig not in removefig:
                                                             indexFigure.add(indfig)
                                                             removefig.add(indfig)
+                                                        ok = 1
+                                                        break
+                                            if ok == 1:
+                                                break
                         if len(indexFigure) > 0:
                             for f in sorted(indexFigure, reverse=True):
                                 #guardo a sotto
@@ -709,16 +714,16 @@ class coloredFigureRepresentation:
                                             self.figureList[adapted_index].grid[diffx + x][diffy + y] = self.figureList[f].grid[x][y]
                                 #ricreo gtype
                                 newGrid = np.zeros([self.figureList[adapted_index].h, self.figureList[adapted_index].w], dtype=np.uint8)
-                                for x in range(0, self.figureList[f].h):
-                                    for y in range(0, self.figureList[f].w):
-                                        if self.figureList[f].grid[x][y] > 0:
-                                            if ricEscapeLine(self.figureList[f].grid.copy(), x, y) > 0:
+                                for x in range(0, self.figureList[adapted_index].h):
+                                    for y in range(0, self.figureList[adapted_index].w):
+                                        if self.figureList[adapted_index].grid[x][y] > 0:
+                                            if ricEscapeLine(self.figureList[adapted_index].grid.copy(), x, y) > 0:
                                                 #border pixel
                                                 newGrid[x][y] = 1
                                             else:
                                                 #center pixel
                                                 newGrid[x][y] = 2
-                                self.figureList[f].gtype = newGrid
+                                self.figureList[adapted_index].gtype = newGrid
                             count += 1
                 elif (s.direction % 4) == 1:
                     #up
@@ -728,6 +733,7 @@ class coloredFigureRepresentation:
                             if self.figureList[adapted_index].grid[0][y] > 0:
                                 for indfig in range(0, len(self.figureList)):
                                     if adapted_index != indfig:
+                                        ok = 0
                                         for j in range(0, self.figureList[indfig].h):
                                             for k in range(0, self.figureList[indfig].w):
                                                 if self.figureList[indfig].grid[j][k] != 0:
@@ -735,6 +741,10 @@ class coloredFigureRepresentation:
                                                         if indfig not in removefig:
                                                             indexFigure.add(indfig)
                                                             removefig.add(indfig)
+                                                        ok = 1
+                                                        break
+                                            if ok == 1:
+                                                break
                         if len(indexFigure) > 0:
                             for f in sorted(indexFigure, reverse=True):
                                 #guardo a sotto
@@ -768,25 +778,26 @@ class coloredFigureRepresentation:
                                             self.figureList[adapted_index].grid[diffx + x][diffy + y] = self.figureList[f].grid[x][y]
                                 #ricreo gtype
                                 newGrid = np.zeros([self.figureList[adapted_index].h, self.figureList[adapted_index].w], dtype=np.uint8)
-                                for x in range(0, self.figureList[f].h):
-                                    for y in range(0, self.figureList[f].w):
-                                        if self.figureList[f].grid[x][y] > 0:
-                                            if ricEscapeLine(self.figureList[f].grid.copy(), x, y) > 0:
+                                for x in range(0, self.figureList[adapted_index].h):
+                                    for y in range(0, self.figureList[adapted_index].w):
+                                        if self.figureList[adapted_index].grid[x][y] > 0:
+                                            if ricEscapeLine(self.figureList[adapted_index].grid.copy(), x, y) > 0:
                                                 #border pixel
                                                 newGrid[x][y] = 1
                                             else:
                                                 #center pixel
                                                 newGrid[x][y] = 2
-                                self.figureList[f].gtype = newGrid
+                                self.figureList[adapted_index].gtype = newGrid
                             count += 1
                 elif (s.direction % 4) == 2:
                     #right
-                    if self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w <= self.nc:
+                    if self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w < self.nc:
                         indexFigure = set()
                         for x in range(0, self.figureList[adapted_index].h):
                             if self.figureList[adapted_index].grid[x][-1] > 0:
                                 for indfig in range(0, len(self.figureList)):
                                     if adapted_index != indfig:
+                                        ok = 0
                                         for j in range(0, self.figureList[indfig].h):
                                             for k in range(0, self.figureList[indfig].w):
                                                 if self.figureList[indfig].grid[j][k] != 0:
@@ -794,6 +805,10 @@ class coloredFigureRepresentation:
                                                         if indfig not in removefig:
                                                             indexFigure.add(indfig)
                                                             removefig.add(indfig)
+                                                        ok = 1
+                                                        break
+                                            if ok == 1:
+                                                break
                         if len(indexFigure) > 0:
                             for f in sorted(indexFigure, reverse=True):
                                 #guardo a sotto
@@ -827,16 +842,16 @@ class coloredFigureRepresentation:
                                             self.figureList[adapted_index].grid[diffx + x][diffy + y] = self.figureList[f].grid[x][y]
                                 #ricreo gtype
                                 newGrid = np.zeros([self.figureList[adapted_index].h, self.figureList[adapted_index].w], dtype=np.uint8)
-                                for x in range(0, self.figureList[f].h):
-                                    for y in range(0, self.figureList[f].w):
-                                        if self.figureList[f].grid[x][y] > 0:
-                                            if ricEscapeLine(self.figureList[f].grid.copy(), x, y) > 0:
+                                for x in range(0, self.figureList[adapted_index].h):
+                                    for y in range(0, self.figureList[adapted_index].w):
+                                        if self.figureList[adapted_index].grid[x][y] > 0:
+                                            if ricEscapeLine(self.figureList[adapted_index].grid.copy(), x, y) > 0:
                                                 #border pixel
                                                 newGrid[x][y] = 1
                                             else:
                                                 #center pixel
                                                 newGrid[x][y] = 2
-                                self.figureList[f].gtype = newGrid
+                                self.figureList[adapted_index].gtype = newGrid
                             count += 1
                 elif (s.direction % 4) == 3:
                     #left
@@ -846,6 +861,7 @@ class coloredFigureRepresentation:
                             if self.figureList[adapted_index].grid[x][0] > 0:
                                 for indfig in range(0, len(self.figureList)):
                                     if adapted_index != indfig:
+                                        ok = 0
                                         for j in range(0, self.figureList[indfig].h):
                                             for k in range(0, self.figureList[indfig].w):
                                                 if self.figureList[indfig].grid[j][k] != 0:
@@ -853,6 +869,10 @@ class coloredFigureRepresentation:
                                                         if indfig not in removefig:
                                                             indexFigure.add(indfig)
                                                             removefig.add(indfig)
+                                                        ok = 1
+                                                        break
+                                            if ok == 1:
+                                                break
                         if len(indexFigure) > 0:
                             for f in sorted(indexFigure, reverse=True):
                                 #guardo a sotto
@@ -886,16 +906,16 @@ class coloredFigureRepresentation:
                                             self.figureList[adapted_index].grid[diffx + x][diffy + y] = self.figureList[f].grid[x][y]
                                 #ricreo gtype
                                 newGrid = np.zeros([self.figureList[adapted_index].h, self.figureList[adapted_index].w], dtype=np.uint8)
-                                for x in range(0, self.figureList[f].h):
-                                    for y in range(0, self.figureList[f].w):
-                                        if self.figureList[f].grid[x][y] > 0:
-                                            if ricEscapeLine(self.figureList[f].grid.copy(), x, y) > 0:
+                                for x in range(0, self.figureList[adapted_index].h):
+                                    for y in range(0, self.figureList[adapted_index].w):
+                                        if self.figureList[adapted_index].grid[x][y] > 0:
+                                            if ricEscapeLine(self.figureList[adapted_index].grid.copy(), x, y) > 0:
                                                 #border pixel
                                                 newGrid[x][y] = 1
                                             else:
                                                 #center pixel
                                                 newGrid[x][y] = 2
-                                self.figureList[f].gtype = newGrid
+                                self.figureList[adapted_index].gtype = newGrid
                             count += 1
         if count != 0:
             #rimuovo figure unite
@@ -1168,10 +1188,9 @@ class coloredFigureRepresentation:
             l.append(coloredFigureRepresentation.removeElementFigure_row_column)
             l.append(coloredFigureRepresentation.removeFigure)
         if pc.countAdd > 0:
-            #l.append(coloredFigureRepresentation.fillFigureCenter)
-            #l.append(coloredFigureRepresentation.addElementFigure_row_column)
-            #l.append(coloredFigureRepresentation.duplicateFigure)
-            print("errore?")
+            l.append(coloredFigureRepresentation.fillFigureCenter)
+            l.append(coloredFigureRepresentation.addElementFigure_row_column)
+            l.append(coloredFigureRepresentation.duplicateFigure)
         return l
     
     #return the list of base actions
