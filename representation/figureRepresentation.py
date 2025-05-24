@@ -575,12 +575,13 @@ class figureRepresentation:
             if adapted_index not in removefig:
                 if (s.direction % 4) == 0:
                     #down
-                    if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h <= self.nr:
+                    if self.figureList[adapted_index].pos.x + self.figureList[adapted_index].h < self.nr:
                         indexFigure = set()
                         for y in range(0, self.figureList[adapted_index].w):
-                            if self.figureList[adapted_index].grid[-1][y] == 1:
+                            if self.figureList[adapted_index].grid[-1][y] > 0:
                                 for indfig in range(0, len(self.figureList)):
                                     if self.figureList[indfig].color == self.figureList[adapted_index].color and adapted_index != indfig:
+                                        ok = 0
                                         for j in range(0, self.figureList[indfig].h):
                                             for k in range(0, self.figureList[indfig].w):
                                                 if self.figureList[indfig].grid[j][k] != 0:
@@ -588,6 +589,10 @@ class figureRepresentation:
                                                         if indfig not in removefig:
                                                             indexFigure.add(indfig)
                                                             removefig.add(indfig)
+                                                        ok = 1
+                                                        break
+                                            if ok == 1:
+                                                break
                         if len(indexFigure) > 0:
                             for f in sorted(indexFigure, reverse=True):
                                 #guardo a sotto
@@ -617,7 +622,7 @@ class figureRepresentation:
                                 diffy = self.figureList[f].pos.y - self.figureList[adapted_index].pos.y 
                                 for x in range(0, self.figureList[f].h):
                                     for y in range(0, self.figureList[f].w):
-                                        if self.figureList[f].grid[x][y] == 1:
+                                        if self.figureList[f].grid[x][y] > 0:
                                             self.figureList[adapted_index].grid[diffx + x][diffy + y] = 1
                             count += 1
                 elif (s.direction % 4) == 1:
@@ -625,9 +630,10 @@ class figureRepresentation:
                     if self.figureList[adapted_index].pos.x > 0:
                         indexFigure = set()
                         for y in range(0, self.figureList[adapted_index].w):
-                            if self.figureList[adapted_index].grid[0][y] == 1:
+                            if self.figureList[adapted_index].grid[0][y] > 0:
                                 for indfig in range(0, len(self.figureList)):
                                     if self.figureList[indfig].color == self.figureList[adapted_index].color and adapted_index != indfig:
+                                        ok = 0
                                         for j in range(0, self.figureList[indfig].h):
                                             for k in range(0, self.figureList[indfig].w):
                                                 if self.figureList[indfig].grid[j][k] != 0:
@@ -635,6 +641,10 @@ class figureRepresentation:
                                                         if indfig not in removefig:
                                                             indexFigure.add(indfig)
                                                             removefig.add(indfig)
+                                                        ok = 1
+                                                        break
+                                            if ok == 1:
+                                                break
                         if len(indexFigure) > 0:
                             for f in sorted(indexFigure, reverse=True):
                                 #guardo a sotto
@@ -664,17 +674,18 @@ class figureRepresentation:
                                 diffy = self.figureList[f].pos.y - self.figureList[adapted_index].pos.y 
                                 for x in range(0, self.figureList[f].h):
                                     for y in range(0, self.figureList[f].w):
-                                        if self.figureList[f].grid[x][y] == 1:
+                                        if self.figureList[f].grid[x][y] > 0:
                                             self.figureList[adapted_index].grid[diffx + x][diffy + y] = 1
                             count += 1
                 elif (s.direction % 4) == 2:
                     #right
-                    if self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w <= self.nc:
+                    if self.figureList[adapted_index].pos.y + self.figureList[adapted_index].w < self.nc:
                         indexFigure = set()
                         for x in range(0, self.figureList[adapted_index].h):
-                            if self.figureList[adapted_index].grid[x][-1] == 1:
+                            if self.figureList[adapted_index].grid[x][-1] > 0:
                                 for indfig in range(0, len(self.figureList)):
                                     if self.figureList[indfig].color == self.figureList[adapted_index].color and adapted_index != indfig:
+                                        ok = 0
                                         for j in range(0, self.figureList[indfig].h):
                                             for k in range(0, self.figureList[indfig].w):
                                                 if self.figureList[indfig].grid[j][k] != 0:
@@ -682,6 +693,10 @@ class figureRepresentation:
                                                         if indfig not in removefig:
                                                             indexFigure.add(indfig)
                                                             removefig.add(indfig)
+                                                        ok = 1
+                                                        break
+                                            if ok == 1:
+                                                break
                         if len(indexFigure) > 0:
                             for f in sorted(indexFigure, reverse=True):
                                 #guardo a sotto
@@ -711,7 +726,7 @@ class figureRepresentation:
                                 diffy = self.figureList[f].pos.y - self.figureList[adapted_index].pos.y 
                                 for x in range(0, self.figureList[f].h):
                                     for y in range(0, self.figureList[f].w):
-                                        if self.figureList[f].grid[x][y] == 1:
+                                        if self.figureList[f].grid[x][y] > 0:
                                             self.figureList[adapted_index].grid[diffx + x][diffy + y] = 1
                             count += 1
                 elif (s.direction % 4) == 3:
@@ -719,9 +734,10 @@ class figureRepresentation:
                     if self.figureList[adapted_index].pos.y > 0:
                         indexFigure = set()
                         for x in range(0, self.figureList[adapted_index].h):
-                            if self.figureList[adapted_index].grid[x][0] == 1:
+                            if self.figureList[adapted_index].grid[x][0] > 0:
                                 for indfig in range(0, len(self.figureList)):
                                     if self.figureList[indfig].color == self.figureList[adapted_index].color and adapted_index != indfig:
+                                        ok = 0
                                         for j in range(0, self.figureList[indfig].h):
                                             for k in range(0, self.figureList[indfig].w):
                                                 if self.figureList[indfig].grid[j][k] != 0:
@@ -729,6 +745,10 @@ class figureRepresentation:
                                                         if indfig not in removefig:
                                                             indexFigure.add(indfig)
                                                             removefig.add(indfig)
+                                                        ok = 1
+                                                        break
+                                            if ok == 1:
+                                                break
                         if len(indexFigure) > 0:
                             for f in sorted(indexFigure, reverse=True):
                                 #guardo a sotto
@@ -758,7 +778,7 @@ class figureRepresentation:
                                 diffy = self.figureList[f].pos.y - self.figureList[adapted_index].pos.y 
                                 for x in range(0, self.figureList[f].h):
                                     for y in range(0, self.figureList[f].w):
-                                        if self.figureList[f].grid[x][y] == 1:
+                                        if self.figureList[f].grid[x][y] > 0:
                                             self.figureList[adapted_index].grid[diffx + x][diffy + y] = 1
                             count += 1
         if count != 0:

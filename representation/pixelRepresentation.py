@@ -128,6 +128,7 @@ class pixelRepresentation:
         for adapted_index in l:
             new_pixel = PixelNode(self.pixelList[adapted_index].x, self.pixelList[adapted_index].y, self.pixelList[adapted_index].color)
             newPixel.append((adapted_index+1, new_pixel))
+            count += 1
         if count != 0:
             newPixel.sort(key=lambda i: i[0], reverse=True)
             for (index, fig) in newPixel:
@@ -224,20 +225,16 @@ class pixelRepresentation:
     def score(self, output):
         #-1 punti per posizione non giusta, proporzionale distanza per colore sbagliato, -2 punti dimensione griglia sbagliata per casella
         score = abs(output.nr - self.nr)*min(self.nc, output.nc)*2 + abs(output.nc - self.nc)*min(self.nr,  output.nr)*2 + abs(output.nr - self.nr)*abs(output.nc - self.nc)*2
-        mask = [1 for _ in range(0, len(output.pixelList))]
-        for px in self.pixelList:
-            ok = 0
-            c = 0
-            for py in output.pixelList:
-                if px.x == py.x and px.y == py.y and mask[c] == 1:
-                    score += abs(int(px.color) - int(py.color))/10
-                    mask[c] = 0
-                    ok = 1
-                    break
-                c += 1
-            if ok != 1:
-                score += 1 * 1.2
-        score += sum(mask) * 1.5
+        for z in range(0, len(self.pixelList)):
+            if z < len(output.pixelList):
+                #distance
+                score += abs(int(self.pixelList[z].x) - int(output.pixelList[z].x))/10 + abs(int(self.pixelList[z].y) - int(output.pixelList[z].y))/10
+                #color
+                score += abs(int(self.pixelList[z].color) - int(output.pixelList[z].color))/10
+        else:
+            score += 1 * 1.2
+        if len(output.pixelList) - len(self.pixelList) > 0:
+            score += (len(output.pixelList) - len(self.pixelList)) * 1.5
         return -score
 
     #transform the representation into an ARC grid
@@ -274,7 +271,7 @@ class pixelRepresentation:
     
     #return the list of base actions
     def baseActionList(pc):
-        l = [pixelRepresentation.movePixel]
+        l = []
         if pc.countAdd > 0:
             l.append(pixelRepresentation.duplicatePixel)
         if pc.countDim != pc.numProb:

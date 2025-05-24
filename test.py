@@ -7,35 +7,8 @@ from arc.evaluation import evaluate_agent
 from agent import Agent
 from tqdm.auto import tqdm
 from argparse import ArgumentParser
+from utility import error_rate
 
-
-#Classe in cui calcolo l'error rate semplicemente confrontando la grizioa di input e quella di output ed ogni differenza conta 1
-def error_rate(input: ArcGrid, output: ArcGrid):
-    val = 0
-    if input.shape[0] <= output.shape[0] and input.shape[1] <= output.shape[1]:
-        for x in range(input.shape[0]):
-            for y in range(input.shape[1]):
-                if input[x][y] != output[x][y]:
-                    val += 1
-    elif input.shape[0] > output.shape[0] and input.shape[1] > output.shape[1]:
-        for x in range(output.shape[0]):
-            for y in range(output.shape[1]):
-                if input[x][y] != output[x][y]:
-                    val += 1
-    elif input.shape[0] <= output.shape[0] and input.shape[1] > output.shape[1]:
-        for x in range(input.shape[0]):
-            for y in range(output.shape[1]):
-                if input[x][y] != output[x][y]:
-                    val += 1
-    elif input.shape[0] > output.shape[0] and input.shape[1] <= output.shape[1]:
-        for x in range(output.shape[0]):
-            for y in range(input.shape[1]):
-                if input[x][y] != output[x][y]:
-                    val += 1
-    else:
-        return 100
-    val += abs(output.shape[0] - input.shape[0])*min(input.shape[1], output.shape[1]) + abs(output.shape[1] - input.shape[1])*min(input.shape[0], output.shape[0]) + abs(output.shape[0] - input.shape[0])*abs(output.shape[1] - input.shape[1])
-    return val
 
 def main(args):
     describe_task_group(train_problems)
@@ -47,6 +20,7 @@ def main(args):
         prob : ArcProblem = train_problems[numprob]
 
         #visualizzo il problema prob in esame
+        print("Problem number: " + str(numprob))
         if args.show_train_pairs != False:
             for i, pair in enumerate(prob.train_pairs, start=1):
                 pair.plot(show=True, title=f"Task {numprob}: Demo {i}")
@@ -88,3 +62,5 @@ if __name__ == '__main__':
     main(parser.parse_args())
 
 #python test.py --min 0 --max 10 --show_test_pairs "false" --show_solution "false" --show_train_pairs "true"
+
+#Correctly solved problems: 1, 3, 9

@@ -26,7 +26,7 @@ from representation.secondDiagonalRepresentation import secondDiagonalRepresenta
 POPULATION_SIZE = 50
 OFFSPRING_SIZE = 10
 MAX_GENERATIONS_1 = 500
-MAX_GENERATIONS_2 = 2000
+MAX_GENERATIONS_2 = 2500
 
 
 @dataclass
@@ -122,7 +122,7 @@ def generate_representation_solution(rep, demo_pairs, base_act, act, indice):
         population.sort(key=lambda i: i.fitness, reverse = True)
         population = population[:POPULATION_SIZE]
     
-    '''
+    
     print("azioni")
     print(population[0].performed_actions)
     print(len(population[0].performed_actions))
@@ -132,7 +132,7 @@ def generate_representation_solution(rep, demo_pairs, base_act, act, indice):
     prediction.plot(show=True, title=f"Input-Output")
     prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
     prediction.plot(show=True, title=f"Output-OutputGenerato")
-    '''
+    ''''''
 
     return population[0]
 
@@ -171,13 +171,13 @@ class Agent(ArcAgent):
         possibleSolutionRep = list()
         pc = initial_analysis(demo_pairs)
         reps = [
-            #(pixelRepresentation, pixelRepresentation.baseActionList(pc), pixelRepresentation.actionList(pc)),
+            (pixelRepresentation, pixelRepresentation.baseActionList(pc), pixelRepresentation.actionList(pc)),
             #(rowRepresentation, rowRepresentation.baseActionList(pc), rowRepresentation.actionList(pc)),
             #(columnsRepresentation, columnsRepresentation.baseActionList(pc), columnsRepresentation.actionList(pc)),
             #(colorLayerRepresentation, colorLayerRepresentation.baseActionList(pc), colorLayerRepresentation.actionList(pc)), #old
             #(rectangleRepresentation, rectangleRepresentation.baseActionList(pc), rectangleRepresentation.actionList(pc)),
             #(figureRepresentation, figureRepresentation.baseActionList(pc), figureRepresentation.actionList(pc)),
-            (coloredFigureRepresentation, coloredFigureRepresentation.baseActionList(pc), coloredFigureRepresentation.actionList(pc)),
+            #(coloredFigureRepresentation, coloredFigureRepresentation.baseActionList(pc), coloredFigureRepresentation.actionList(pc)),
             #(borderRepresentation, borderRepresentation.baseActionList(pc), borderRepresentation.actionList(pc)), #old
             #(firstDiagonalRepresentation, firstDiagonalRepresentation.baseActionList(pc), firstDiagonalRepresentation.actionList(pc)),
             #(secondDiagonalRepresentation, secondDiagonalRepresentation.baseActionList(pc), secondDiagonalRepresentation.actionList(pc))

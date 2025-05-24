@@ -206,6 +206,7 @@ We can apply different types of actions to figures:
 - **moveFigure:** moves the selected figure of one in one direction
 - **changeColorFigureBorder:** changes the color of the border of the figure index based on color
 - **changeColorFigureCenter:** changes the color of the center of the figure index based on color
+- **changeColorFigure_row_column:** changes the color of a pixel in the figure index based on color
 - **fillFigureCenter:** fill the center of the figure index based on color
 - **addElementFigure_row_column:** add a element in the figure in the selected row and column
 - **moveElementFigure_row_column:** move a pixel in the figure based on the direction

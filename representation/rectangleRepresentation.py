@@ -293,7 +293,7 @@ class rectangleRepresentation:
                 self.nr -= 1
                 remove = list()
                 for x in range(0, len(self.rectangleList)):
-                    if self.rectangleList[x].x == self.nr:
+                    if self.rectangleList[x].x + self.rectangleList[x].h >= self.nr:
                         remove.append(x)
                 remove.sort(reverse = True)
                 for x in remove:
@@ -319,7 +319,7 @@ class rectangleRepresentation:
                 self.nc -= 1
                 remove = list()
                 for x in range(0, len(self.rectangleList)):
-                    if self.rectangleList[x].y == self.nc:
+                    if self.rectangleList[x].y + self.rectangleList[x].w >= self.nc:
                         remove.append(x)
                 remove.sort(reverse = True)
                 for x in remove:
