@@ -126,9 +126,30 @@ class pixelRepresentation:
         l = self.generateIndexList(s)
         newPixel = []
         for adapted_index in l:
-            new_pixel = PixelNode(self.pixelList[adapted_index].x, self.pixelList[adapted_index].y, self.pixelList[adapted_index].color)
-            newPixel.append((adapted_index+1, new_pixel))
-            count += 1
+            if (s.direction % 4) == 0:
+                if self.pixelList[adapted_index].x + 1 < self.nr:
+                    #down
+                    new_pixel = PixelNode(self.pixelList[adapted_index].x+1, self.pixelList[adapted_index].y, self.pixelList[adapted_index].color)
+                    newPixel.append((adapted_index+1, new_pixel))
+                    count += 1
+            elif (s.direction % 4) == 1:
+                if self.pixelList[adapted_index].x > 0:
+                    #up
+                    new_pixel = PixelNode(self.pixelList[adapted_index].x-1, self.pixelList[adapted_index].y, self.pixelList[adapted_index].color)
+                    newPixel.append((adapted_index, new_pixel))
+                    count += 1
+            elif (s.direction % 4) == 2:
+                if self.pixelList[adapted_index].y + 1 < self.nc:
+                    #right
+                    new_pixel = PixelNode(self.pixelList[adapted_index].x, self.pixelList[adapted_index].y+1, self.pixelList[adapted_index].color)
+                    newPixel.append((adapted_index+1, new_pixel))
+                    count += 1
+            elif (s.direction % 4) == 3:
+                if self.pixelList[adapted_index].y > 0:
+                    #left
+                    new_pixel = PixelNode(self.pixelList[adapted_index].x, self.pixelList[adapted_index].y-1, self.pixelList[adapted_index].color)
+                    newPixel.append((adapted_index, new_pixel))
+                    count += 1
         if count != 0:
             newPixel.sort(key=lambda i: i[0], reverse=True)
             for (index, fig) in newPixel:
@@ -231,9 +252,9 @@ class pixelRepresentation:
                 score += abs(int(self.pixelList[z].x) - int(output.pixelList[z].x))/10 + abs(int(self.pixelList[z].y) - int(output.pixelList[z].y))/10
                 #color
                 score += abs(int(self.pixelList[z].color) - int(output.pixelList[z].color))/10
-        else:
-            score += 1 * 1.2
-        if len(output.pixelList) - len(self.pixelList) > 0:
+            else:
+                score += 1 * 1.2
+        if len(output.pixelList) > len(self.pixelList):
             score += (len(output.pixelList) - len(self.pixelList)) * 1.5
         return -score
 
@@ -271,9 +292,7 @@ class pixelRepresentation:
     
     #return the list of base actions
     def baseActionList(pc):
-        l = []
-        if pc.countAdd > 0:
-            l.append(pixelRepresentation.duplicatePixel)
+        l = [pixelRepresentation.duplicatePixel]
         if pc.countDim != pc.numProb:
             l.append(pixelRepresentation.expandGrid)
             l.append(pixelRepresentation.reduceGrid)
