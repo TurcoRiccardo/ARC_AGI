@@ -10,7 +10,7 @@ import copy
 from selection.selector import Selector, generateNewSelector, mutateSelector
 from concurrent.futures import ProcessPoolExecutor
 
-from utility import Individual, add_mutation, swap_mutation, tweak_mutation, error_rate, parent_selection, ProblemConsideration, initial_analysis
+from utility1 import Individual, add_mutation, swap_mutation, tweak_mutation, error_rate, parent_selection, ProblemConsideration, initial_analysis
 from representation.pixelRepresentation import pixelRepresentation
 from representation.rowRepresentation import rowRepresentation
 from representation.columnsRepresentation import columnsRepresentation
@@ -31,29 +31,39 @@ MAX_GENERATIONS_2 = 2500
 
 @dataclass
 class PossibleSolution:
-    train: int
+    classe: classmethod
     actions: list
     selectors: List[Selector]
     err: int
-
-@dataclass
-class PossibleSolutionRepresentation:
-    classe: classmethod
-    list: List[PossibleSolution]
     errAvg: int
     errMin: int
-    indMin: int
 
-#Evolutionary algorithm on rep representation trained on example i and returns the best individual
-def generate_representation_solution(rep, demo_pairs, base_act, act, indice):
-    rappresentationX = rep(demo_pairs[indice].x)
-    rappresentationY = rep(demo_pairs[indice].y)
+
+#Validation: I apply the set of actions to the example and find the error rate
+def evaluate_representation(rep, individual, inputGrid, outputGrid):
+    rappresentationX = rep(inputGrid)
+    for action, selector in zip(individual.performed_actions, individual.performed_selection):
+        action(rappresentationX, selector)
+    err = error_rate(outputGrid, rappresentationX.rappToGrid())
+    return err + abs(individual.fitness[0]) + abs(individual.fitness[1]/10)
+
+#I perform the operations on all the combinations of the examples received
+def generate_representation(rep, demo_pairs, base_act, act):
+    rappresentationX = []
+    rappresentationY = []
+    for i in range(0, len(demo_pairs)):
+        rappresentationX.append(rep(demo_pairs[i].x))
+        rappresentationY.append(rep(demo_pairs[i].y))
 
     #first part of the evolutionary algorithm: we start creating individuals from scratch with base actions
-    #generating the first part of the initial population with base_act
+    #--------------------------------------generating the first part of the initial population with base_act--------------------------------------
     population1 = list()
     for _ in range(0, POPULATION_SIZE//2):
-        population1.append(Individual(copy.deepcopy(rappresentationX), [], [], (rappresentationX.score(rappresentationY), 0)))
+        new_individual = Individual([], [], [], (0, 0))
+        for i in range(0, len(demo_pairs)):
+            new_individual.genome.append(copy.deepcopy(rappresentationX[i]))
+            new_individual.fitness[0] += float(rappresentationX[i].score(rappresentationY[i]))
+        population1.append(new_individual)
     for _ in range(MAX_GENERATIONS_1):
         #genero gli offspring
         offspring = list()
@@ -64,34 +74,25 @@ def generate_representation_solution(rep, demo_pairs, base_act, act, indice):
                 offspring.append(o)
         #valuto il genome calcolando fitness
         for i in offspring:
-            i.fitness = (i.genome.score(rappresentationY), rep.scoreAction(i.performed_actions, i.performed_selection))  
+            val = 0
+            for c in range(0, len(demo_pairs)):
+                val += i.genome[c].score(rappresentationY[c])
+            i.fitness = (val, rep.scoreAction(i.performed_actions, i.performed_selection))  
         #reinserisco gli offspring nella popolazione e tengo solo i primi POPULATION_SIZE individui
         population1.extend(offspring)
         population1.sort(key=lambda i: i.fitness, reverse = True)
         population1 = population1[:POPULATION_SIZE//2]
     
-    #generating the second part of the initial population with act
+    #--------------------------------------generating the second part of the initial population with act--------------------------------------
     population2 = list()
     for _ in range(0, POPULATION_SIZE//2):
-        population2.append(Individual(copy.deepcopy(rappresentationX), [], [], (rappresentationX.score(rappresentationY), 0)))
-    '''
-    for _ in range(MAX_GENERATIONS_1):
-        #genero gli offspring
-        offspring = list()
-        for _ in range(OFFSPRING_SIZE):
-            p = parent_selection(population2)
-            o: Individual = add_mutation(p, act)
-            if o != None:
-                offspring.append(o)
-        #valuto il genome calcolando fitness
-        for i in offspring:
-            i.fitness = (i.genome.score(rappresentationY), rep.scoreAction(i.performed_actions, i.performed_selection))  
-        #reinserisco gli offspring nella popolazione e tengo solo i primi POPULATION_SIZE individui
-        population2.extend(offspring)
-        population2.sort(key=lambda i: i.fitness, reverse = True)
-        population2 = population2[:POPULATION_SIZE//2]
-    '''
-    #second part of the evolutionary algorithm: we improve the individuals created
+        new_individual = Individual([], [], [], (0, 0))
+        for i in range(0, len(demo_pairs)):
+            new_individual.genome.append(copy.deepcopy(rappresentationX[i]))
+            new_individual.fitness[0] += rappresentationX[i].score(rappresentationY[i])
+        population2.append(new_individual)
+
+    #-----------------------------------second part of the evolutionary algorithm: we improve the individuals created-----------------------------------
     population = list()
     population.extend(population1)
     population.extend(population2)
@@ -116,12 +117,15 @@ def generate_representation_solution(rep, demo_pairs, base_act, act, indice):
                 offspring.append(o)
         #valuto il genome calcolando fitness
         for i in offspring:
-            i.fitness = (i.genome.score(rappresentationY), rep.scoreAction(i.performed_actions, i.performed_selection))  
+            val = 0
+            for c in range(0, len(demo_pairs)):
+                val += i.genome[c].score(rappresentationY[c])
+            i.fitness = (val, rep.scoreAction(i.performed_actions, i.performed_selection))  
         #reinserisco gli offspring nella popolazione e tengo solo i primi POPULATION_SIZE individui
         population.extend(offspring)
         population.sort(key=lambda i: i.fitness, reverse = True)
         population = population[:POPULATION_SIZE]
-    
+
     '''
     print("azioni")
     print(population[0].performed_actions)
@@ -134,41 +138,18 @@ def generate_representation_solution(rep, demo_pairs, base_act, act, indice):
     prediction.plot(show=True, title=f"Output-OutputGenerato")
     '''
 
-    return population[0]
-
-#Validation: I apply the set of actions to the example and find the error rate
-def evaluate_representation(rep, individual, inputGrid, outputGrid):
-    rappresentationX = rep(inputGrid)
-    for action, selector in zip(individual.performed_actions, individual.performed_selection):
-        action(rappresentationX, selector)
-    err = error_rate(outputGrid, rappresentationX.rappToGrid())
-    return err + abs(individual.fitness[0]) + abs(individual.fitness[1]/10)
-
-#I perform the operations on all the combinations of the examples received
-def generate_representation(rep, demo_pairs, base_act, act):
-    possibleSolution = list()
-    AvgTot = 0
-    errMin = 1000
-    indMin = 0
-    bestIndividual = None
-    for x in range(0, len(demo_pairs)):
-        errAvg = 0
-        bestIndividual = generate_representation_solution(rep, demo_pairs, base_act, act, x)
-        for y in range(0, len(demo_pairs)):
-            if x != y:
-                errAvg += evaluate_representation(rep, bestIndividual, demo_pairs[y].x, demo_pairs[y].y)
-        if len(demo_pairs) > 1:
-            possibleSolution.append(PossibleSolution(x, copy.deepcopy(bestIndividual.performed_actions), copy.deepcopy(bestIndividual.performed_selection), errAvg/(len(demo_pairs)-1)))
-            AvgTot += possibleSolution[-1].err
-            if possibleSolution[-1].err < errMin:
-                errMin = possibleSolution[-1].err
-                indMin = x
-    return PossibleSolutionRepresentation(rep, possibleSolution, AvgTot/len(demo_pairs), errMin, indMin)
+    errMin = 10000
+    sum = 0
+    for i in range(0, len(demo_pairs)):
+        val = population[0].genome[i].score(rappresentationY[i])
+        sum += val
+        if val < errMin:
+            errMin = val
+    return PossibleSolution(rep, copy.deepcopy(population[0].performed_actions), copy.deepcopy(population[0].performed_selection), population[0].fitness, sum/len(demo_pairs), errMin)
 
 #Class where I compare the results received from the various representations and apply the best one to the test grid
 class Agent(ArcAgent):
     def predict(self, demo_pairs: List[ArcIOPair], test_grids: List[ArcGrid]) -> List[ArcPrediction]:
-        possibleSolutionRep = list()
         pc = initial_analysis(demo_pairs)
         reps = [
             #(pixelRepresentation, pixelRepresentation.baseActionList(pc), pixelRepresentation.actionList(pc)),
@@ -188,18 +169,17 @@ class Agent(ArcAgent):
 
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(generate_representation, rep, demo_pairs, base_act, actions) for rep, base_act, actions in reps]
-            possibleSolutionRep = [f.result() for f in futures]
+            possibleSolution = [f.result() for f in futures]
 
         #I choose the best solution based on the error rate and apply it to the test input grid
         outputs = []
-        possibleSolutionRep.sort(key=lambda i: i.errAvg, reverse = False)
-        print("Representation: " + str(possibleSolutionRep[0].classe))
-        print("Avg Error: " + str(possibleSolutionRep[0].errAvg))
-        print("Min Error: " + str(possibleSolutionRep[0].errMin))
+        possibleSolution.sort(key=lambda i: i.errAvg, reverse = False)
+        print("Representation: " + str(possibleSolution[0].classe))
+        print("Avg Error: " + str(possibleSolution[0].errAvg))
+        print("Min Error: " + str(possibleSolution[0].errMin))
         for x in range(0, len(test_grids)):
-            rappInput = possibleSolutionRep[0].classe(copy.deepcopy(test_grids[x]))
-            ind = possibleSolutionRep[0].indMin
-            for action, selector in zip(possibleSolutionRep[0].list[ind].actions, possibleSolutionRep[0].list[ind].selectors):
+            rappInput = possibleSolution[0].classe(copy.deepcopy(test_grids[x]))
+            for action, selector in zip(possibleSolution[0].actions, possibleSolution[0].selectors):
                 action(rappInput, selector)
             outputs.append([rappInput.rappToGrid()])
         return outputs

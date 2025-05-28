@@ -4,7 +4,7 @@ from arc import train_problems, validation_problems, ArcProblem, plot_grid, desc
 from arc.types import verify_is_arc_grid, ArcIOPair, ArcGrid, ArcPrediction
 from arc.agents import ArcAgent
 from arc.evaluation import evaluate_agent
-from agent import Agent
+from agent1 import Agent
 from tqdm.auto import tqdm
 from argparse import ArgumentParser
 from utility import error_rate
