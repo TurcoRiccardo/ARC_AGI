@@ -1193,8 +1193,8 @@ class coloredFigureRepresentation:
                             if self.figureList[z].grid[x][y] != output.figureList[z].grid[x][y]:
                                 score += 1
                 #figure con diverse dimensioni
-                score += abs(self.figureList[z].h - output.figureList[z].h)*min(self.figureList[z].w, output.figureList[z].w) + abs(self.figureList[z].w - output.figureList[z].w)*min(self.figureList[z].h, output.figureList[z].h) + abs(output.figureList[z].h - self.figureList[z].h)*abs(output.figureList[z].w - self.figureList[z].w)
-
+                #score += abs(self.figureList[z].h - output.figureList[z].h)*min(self.figureList[z].w, output.figureList[z].w) + abs(self.figureList[z].w - output.figureList[z].w)*min(self.figureList[z].h, output.figureList[z].h) + abs(output.figureList[z].h - self.figureList[z].h)*abs(output.figureList[z].w - self.figureList[z].w)
+                score += abs(self.figureList[z].h - output.figureList[z].h) + abs(self.figureList[z].w - output.figureList[z].w)
                 #distance figure
                 score += abs(int(self.figureList[z].pos.x) - int(output.figureList[z].pos.x))/10 + abs(int(self.figureList[z].pos.y) - int(output.figureList[z].pos.y))/10
             else:

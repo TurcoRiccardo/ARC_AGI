@@ -26,7 +26,7 @@ from representation.secondDiagonalRepresentation import secondDiagonalRepresenta
 POPULATION_SIZE = 50
 OFFSPRING_SIZE = 10
 MAX_GENERATIONS_1 = 500
-MAX_GENERATIONS_2 = 2500
+MAX_GENERATIONS_2 = 2500 * 4
 
 
 @dataclass
@@ -59,10 +59,12 @@ def generate_representation(rep, demo_pairs, base_act, act):
     #--------------------------------------generating the first part of the initial population with base_act--------------------------------------
     population1 = list()
     for _ in range(0, POPULATION_SIZE//2):
-        new_individual = Individual([], [], [], (0, 0))
+        new_individual = Individual([], [], [])
+        val = 0
         for i in range(0, len(demo_pairs)):
             new_individual.genome.append(copy.deepcopy(rappresentationX[i]))
-            new_individual.fitness[0] += float(rappresentationX[i].score(rappresentationY[i]))
+            val += rappresentationX[i].score(rappresentationY[i])
+        new_individual.fitness = (float(val), 0)
         population1.append(new_individual)
     for _ in range(MAX_GENERATIONS_1):
         #genero gli offspring
@@ -86,10 +88,12 @@ def generate_representation(rep, demo_pairs, base_act, act):
     #--------------------------------------generating the second part of the initial population with act--------------------------------------
     population2 = list()
     for _ in range(0, POPULATION_SIZE//2):
-        new_individual = Individual([], [], [], (0, 0))
+        new_individual = Individual([], [], [])
+        val = 0
         for i in range(0, len(demo_pairs)):
             new_individual.genome.append(copy.deepcopy(rappresentationX[i]))
-            new_individual.fitness[0] += rappresentationX[i].score(rappresentationY[i])
+            val += rappresentationX[i].score(rappresentationY[i])
+        new_individual.fitness = (float(val), 0)
         population2.append(new_individual)
 
     #-----------------------------------second part of the evolutionary algorithm: we improve the individuals created-----------------------------------
@@ -132,16 +136,18 @@ def generate_representation(rep, demo_pairs, base_act, act):
     print(len(population[0].performed_actions))
     print(population[0].performed_selection)
     print(population[0].fitness)
-    prediction = ArcIOPair(rappresentationX.rappToGrid(), rappresentationY.rappToGrid())
+    prediction = ArcIOPair(rappresentationX[0].rappToGrid(), rappresentationY[0].rappToGrid())
     prediction.plot(show=True, title=f"Input-Output")
-    prediction = ArcIOPair(rappresentationY.rappToGrid(), population[0].genome.rappToGrid())
+    prediction = ArcIOPair(rappresentationY[0].rappToGrid(), population[0].genome[0].rappToGrid())
+    prediction.plot(show=True, title=f"Output-OutputGenerato")
+    prediction = ArcIOPair(rappresentationY[1].rappToGrid(), population[0].genome[1].rappToGrid())
     prediction.plot(show=True, title=f"Output-OutputGenerato")
     '''
 
     errMin = 10000
     sum = 0
     for i in range(0, len(demo_pairs)):
-        val = population[0].genome[i].score(rappresentationY[i])
+        val = abs(population[0].genome[i].score(rappresentationY[i]))
         sum += val
         if val < errMin:
             errMin = val

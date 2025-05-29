@@ -23,13 +23,15 @@ def add_mutation(p: Individual, available_actions):
         #take a random action
         x = np.random.randint(0, len(available_actions))
         action = available_actions[x]
-        #generate a new selector
-        s = generateNewSelector(p.genome)
+        #generate a new selector ------------> da vedere come generare il selettore
+        s = generateNewSelector(p.genome[0])
         #execute the action with the selector
-        r = action(new_gen, s)
-        if r == 0:
+        r = 0
+        for c in range(0, len(p.genome)):
+            r += action(new_gen[c], s)
+        if r > 0:
             break
-    if i == 4:
+    if r == 0:
         return None
     new_selection = p.performed_selection.copy()
     new_selection.append(s)
@@ -41,7 +43,9 @@ def add_mutation(p: Individual, available_actions):
 def tweak_mutation(p: Individual, available_actions, initial_representation):
     if len(p.performed_actions) == 0:
         return add_mutation(p, available_actions)
-    new_gen = copy.deepcopy(initial_representation)
+    new_gen = []
+    for i in range(0, len(initial_representation)):
+        new_gen.append(copy.deepcopy(initial_representation[i]))
     new_paction = []
     new_selection = []
     x = np.random.randint(0, len(p.performed_actions))
@@ -50,7 +54,8 @@ def tweak_mutation(p: Individual, available_actions, initial_representation):
             new_selector = mutateSelector(selector)
         else:
             new_selector = copy.deepcopy(selector)
-        action(new_gen, new_selector)
+        for c in range(0, len(new_gen)):
+            action(new_gen[c], new_selector)
         new_paction.append(action)
         new_selection.append(new_selector)
     return Individual(new_gen, new_selection, new_paction)
@@ -59,7 +64,9 @@ def tweak_mutation(p: Individual, available_actions, initial_representation):
 def swap_mutation(p: Individual, available_actions, initial_representation):
     if len(p.performed_actions) <= 1:
         return add_mutation(p, available_actions)
-    new_gen = copy.deepcopy(initial_representation)
+    new_gen = []
+    for i in range(0, len(initial_representation)):
+        new_gen.append(copy.deepcopy(initial_representation[i]))
     new_paction = []
     new_selection = []
     x = np.random.randint(0, len(p.performed_actions) - 1)
@@ -73,7 +80,8 @@ def swap_mutation(p: Individual, available_actions, initial_representation):
         else:
             selector = copy.deepcopy(p.performed_selection[i])
             action = p.performed_actions[i]
-        action(new_gen, selector)
+        for c in range(0, len(new_gen)):
+            action(new_gen[c], selector)
         new_paction.append(action)
         new_selection.append(selector)
     return Individual(new_gen, new_selection, new_paction)
