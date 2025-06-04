@@ -1,6 +1,6 @@
 import numpy as np
 import copy
-from selection.selector import Selector, generateNewSelector, mutateSelector
+from selection.selector import Selector, generateNewSelector_new, mutateSelector
 from dataclasses import dataclass
 
 
@@ -19,12 +19,12 @@ def parent_selection(population):
 #add a new action to the parent generating a new individual
 def add_mutation(p: Individual, available_actions):
     new_gen = copy.deepcopy(p.genome)
-    for i in range(0, 3):
+    for _ in range(0, 5):
         #take a random action
         x = np.random.randint(0, len(available_actions))
         action = available_actions[x]
         #generate a new selector ------------> da vedere come generare il selettore
-        s = generateNewSelector(p.genome[0])
+        s = generateNewSelector_new(p.genome)
         #execute the action with the selector
         r = 0
         for c in range(0, len(p.genome)):

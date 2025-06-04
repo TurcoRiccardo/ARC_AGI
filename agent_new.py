@@ -10,7 +10,7 @@ import copy
 from selection.selector import Selector, generateNewSelector, mutateSelector
 from concurrent.futures import ProcessPoolExecutor
 
-from utility1 import Individual, add_mutation, swap_mutation, tweak_mutation, error_rate, parent_selection, ProblemConsideration, initial_analysis
+from utility_new import Individual, add_mutation, swap_mutation, tweak_mutation, error_rate, parent_selection, ProblemConsideration, initial_analysis
 from representation.pixelRepresentation import pixelRepresentation
 from representation.rowRepresentation import rowRepresentation
 from representation.columnsRepresentation import columnsRepresentation
@@ -25,8 +25,8 @@ from representation.secondDiagonalRepresentation import secondDiagonalRepresenta
 
 POPULATION_SIZE = 50
 OFFSPRING_SIZE = 10
-MAX_GENERATIONS_1 = 500
-MAX_GENERATIONS_2 = 2500 * 4
+MAX_GENERATIONS_1 = 5
+MAX_GENERATIONS_2 = 50
 
 
 @dataclass
@@ -38,14 +38,6 @@ class PossibleSolution:
     errAvg: int
     errMin: int
 
-
-#Validation: I apply the set of actions to the example and find the error rate
-def evaluate_representation(rep, individual, inputGrid, outputGrid):
-    rappresentationX = rep(inputGrid)
-    for action, selector in zip(individual.performed_actions, individual.performed_selection):
-        action(rappresentationX, selector)
-    err = error_rate(outputGrid, rappresentationX.rappToGrid())
-    return err + abs(individual.fitness[0]) + abs(individual.fitness[1]/10)
 
 #I perform the operations on all the combinations of the examples received
 def generate_representation(rep, demo_pairs, base_act, act):
@@ -66,7 +58,7 @@ def generate_representation(rep, demo_pairs, base_act, act):
             val += rappresentationX[i].score(rappresentationY[i])
         new_individual.fitness = (float(val), 0)
         population1.append(new_individual)
-    for _ in range(MAX_GENERATIONS_1):
+    for _ in range(MAX_GENERATIONS_1 * len(demo_pairs[0].y) * len(demo_pairs[0].y[0])):
         #genero gli offspring
         offspring = list()
         for _ in range(OFFSPRING_SIZE):
@@ -100,7 +92,7 @@ def generate_representation(rep, demo_pairs, base_act, act):
     population = list()
     population.extend(population1)
     population.extend(population2)
-    for _ in range(MAX_GENERATIONS_2):
+    for _ in range(MAX_GENERATIONS_2 * len(demo_pairs[0].y) * len(demo_pairs[0].y[0])):
         #genero gli offspring
         offspring = list()
         for _ in range(OFFSPRING_SIZE):
@@ -130,7 +122,7 @@ def generate_representation(rep, demo_pairs, base_act, act):
         population.sort(key=lambda i: i.fitness, reverse = True)
         population = population[:POPULATION_SIZE]
 
-    '''
+    
     print("azioni")
     print(population[0].performed_actions)
     print(len(population[0].performed_actions))
@@ -142,7 +134,7 @@ def generate_representation(rep, demo_pairs, base_act, act):
     prediction.plot(show=True, title=f"Output-OutputGenerato")
     prediction = ArcIOPair(rappresentationY[1].rappToGrid(), population[0].genome[1].rappToGrid())
     prediction.plot(show=True, title=f"Output-OutputGenerato")
-    '''
+    ''''''
 
     errMin = 10000
     sum = 0
@@ -154,7 +146,7 @@ def generate_representation(rep, demo_pairs, base_act, act):
     return PossibleSolution(rep, copy.deepcopy(population[0].performed_actions), copy.deepcopy(population[0].performed_selection), population[0].fitness, sum/len(demo_pairs), errMin)
 
 #Class where I compare the results received from the various representations and apply the best one to the test grid
-class Agent(ArcAgent):
+class Agent_new(ArcAgent):
     def predict(self, demo_pairs: List[ArcIOPair], test_grids: List[ArcGrid]) -> List[ArcPrediction]:
         pc = initial_analysis(demo_pairs)
         reps = [

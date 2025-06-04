@@ -4,7 +4,8 @@ from arc import train_problems, validation_problems, ArcProblem, plot_grid, desc
 from arc.types import verify_is_arc_grid, ArcIOPair, ArcGrid, ArcPrediction
 from arc.agents import ArcAgent
 from arc.evaluation import evaluate_agent
-from agent1 import Agent
+from agent import Agent
+from agent_new import Agent_new
 from tqdm.auto import tqdm
 from argparse import ArgumentParser
 from utility import error_rate
@@ -30,7 +31,10 @@ def main(args):
             print(f"\nTrain problem number {numprob}")
 
         #trovo una soluzione outs
-        agent = Agent()
+        if args.new == False:
+            agent = Agent()
+        else:
+            agent = Agent_new()
         outs = agent.predict(prob.train_pairs, prob.test_inputs)
 
         i = 1
@@ -59,6 +63,7 @@ if __name__ == '__main__':
     parser.add_argument('--show_test_pairs', default=True)
     parser.add_argument('--show_solution', default=True)
     parser.add_argument('--show_train_pairs', default=False)
+    parser.add_argument('--new', default=False)
     main(parser.parse_args())
 
 #python test.py --min 0 --max 10 --show_test_pairs "false" --show_solution "false" --show_train_pairs "true"

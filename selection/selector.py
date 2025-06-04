@@ -52,3 +52,28 @@ def mutateSelector(s: Selector):
         l.remove(s.allComponent2)
         new_allComponent2 = l[np.random.randint(0, len(l))]
     return Selector(s.index, s.component, s.color, s.direction, new_allElement, new_allComponent1, new_allComponent2)
+
+#generates a new random selector from scratch
+def generateNewSelector_new(rappresentationList):
+    index = 0
+    component = (0,)
+    nemin = 1000
+    for i in range(0, len(rappresentationList)):
+        ne = rappresentationList[i].getNElement()
+        if ne != 0:
+            if ne <= nemin:
+                nemin = ne
+                index = np.random.randint(0, ne)
+                ec = rappresentationList[i].getElementComponent(index)
+                ok = 0
+                for val in ec:
+                    if val <= 0:
+                        ok = 1
+                if ok == 0:
+                    component = np.random.randint(0, ec)
+    allElement = np.random.randint(0, 5)
+    allComponent1 = np.random.randint(0, 5)
+    allComponent2 = np.random.randint(0, 5)
+    color = np.random.randint(1, 10)
+    direction = np.random.randint(0, 4)
+    return Selector(index, component, color, direction, allElement, allComponent1, allComponent2)
