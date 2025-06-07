@@ -7,10 +7,10 @@ from arc.evaluation import evaluate_agent
 from typing import List
 from dataclasses import dataclass
 import copy
-from selection.selector import Selector, generateNewSelector, mutateSelector
+from selection.selector import Selector
 from concurrent.futures import ProcessPoolExecutor
 
-from utility_new import Individual, add_mutation, swap_mutation, tweak_mutation, error_rate, parent_selection, ProblemConsideration, initial_analysis
+from utility_new import Individual, add_mutation, swap_mutation, tweak_mutation, parent_selection, lexicase_selection, initial_analysis, NSGA2Sorter
 from representation.pixelRepresentation import pixelRepresentation
 from representation.rowRepresentation import rowRepresentation
 from representation.columnsRepresentation import columnsRepresentation
@@ -43,6 +43,7 @@ class PossibleSolution:
 def generate_representation(rep, demo_pairs, base_act, act):
     rappresentationX = []
     rappresentationY = []
+    sorter = NSGA2Sorter()
     for i in range(0, len(demo_pairs)):
         rappresentationX.append(rep(demo_pairs[i].x))
         rappresentationY.append(rep(demo_pairs[i].y))
@@ -52,46 +53,47 @@ def generate_representation(rep, demo_pairs, base_act, act):
     population1 = list()
     for _ in range(0, POPULATION_SIZE//2):
         new_individual = Individual([], [], [])
-        val = 0
+        scores = []
         for i in range(0, len(demo_pairs)):
             new_individual.genome.append(copy.deepcopy(rappresentationX[i]))
-            val += rappresentationX[i].score(rappresentationY[i])
-        new_individual.fitness = (float(val), 0)
+            scores.append(rappresentationX[i].score(rappresentationY[i]))
+        new_individual.fitness = (scores, (np.sum(scores), 0))
         population1.append(new_individual)
     for _ in range(MAX_GENERATIONS_1 * len(demo_pairs[0].y) * len(demo_pairs[0].y[0])):
         #genero gli offspring
         offspring = list()
         for _ in range(OFFSPRING_SIZE):
             p = parent_selection(population1)
+            #p = lexicase_selection(population1)
             o: Individual = add_mutation(p, base_act)
             if o != None:
                 offspring.append(o)
         #valuto il genome calcolando fitness
         for i in offspring:
-            val = 0
-            for c in range(0, len(demo_pairs)):
-                val += i.genome[c].score(rappresentationY[c])
-            i.fitness = (val, rep.scoreAction(i.performed_actions, i.performed_selection))  
+            scores = [i.genome[c].score(rappresentationY[c]) for c in range(len(demo_pairs))]
+            i.fitness = (scores, (np.sum(scores), rep.scoreAction(i.performed_actions, i.performed_selection)))
         #reinserisco gli offspring nella popolazione e tengo solo i primi POPULATION_SIZE individui
         population1.extend(offspring)
-        population1.sort(key=lambda i: i.fitness, reverse = True)
+        #population1.sort(key=lambda i: i.fitness[1], reverse = True) #sorting con fitness aggregata
+        population1 = sorter.sort_population(population1) #NSGA2Sorter
         population1 = population1[:POPULATION_SIZE//2]
     
     #--------------------------------------generating the second part of the initial population with act--------------------------------------
     population2 = list()
     for _ in range(0, POPULATION_SIZE//2):
         new_individual = Individual([], [], [])
-        val = 0
+        scores = []
         for i in range(0, len(demo_pairs)):
             new_individual.genome.append(copy.deepcopy(rappresentationX[i]))
-            val += rappresentationX[i].score(rappresentationY[i])
-        new_individual.fitness = (float(val), 0)
+            scores.append(rappresentationX[i].score(rappresentationY[i]))
+        new_individual.fitness = (scores, (np.sum(scores), 0))
         population2.append(new_individual)
 
     #-----------------------------------second part of the evolutionary algorithm: we improve the individuals created-----------------------------------
     population = list()
     population.extend(population1)
     population.extend(population2)
+    print("EA Genetations: " + str(MAX_GENERATIONS_2 * len(demo_pairs[0].y) * len(demo_pairs[0].y[0])))
     for _ in range(MAX_GENERATIONS_2 * len(demo_pairs[0].y) * len(demo_pairs[0].y[0])):
         #genero gli offspring
         offspring = list()
@@ -99,27 +101,29 @@ def generate_representation(rep, demo_pairs, base_act, act):
             r = np.random.random()
             if r > 0.8:
                 #add
-                p = parent_selection(population)
+                #p = parent_selection(population)
+                p = lexicase_selection(population)
                 o: Individual = add_mutation(p, act)
             elif r > 0.4:
                 #tweak
-                p = parent_selection(population)
+                #p = parent_selection(population)
+                p = lexicase_selection(population)
                 o: Individual = tweak_mutation(p, act, rappresentationX)
             else:
                 #swap
-                p = parent_selection(population)
+                #p = parent_selection(population)
+                p = lexicase_selection(population)
                 o: Individual = swap_mutation(p, act, rappresentationX)
             if o != None:
                 offspring.append(o)
         #valuto il genome calcolando fitness
         for i in offspring:
-            val = 0
-            for c in range(0, len(demo_pairs)):
-                val += i.genome[c].score(rappresentationY[c])
-            i.fitness = (val, rep.scoreAction(i.performed_actions, i.performed_selection))  
+            scores = [i.genome[c].score(rappresentationY[c]) for c in range(len(demo_pairs))]
+            i.fitness = (scores, (np.sum(scores), rep.scoreAction(i.performed_actions, i.performed_selection)))
         #reinserisco gli offspring nella popolazione e tengo solo i primi POPULATION_SIZE individui
         population.extend(offspring)
-        population.sort(key=lambda i: i.fitness, reverse = True)
+        #population.sort(key=lambda i: i.fitness[1], reverse = True) #sorting con fitness aggregata
+        population = sorter.sort_population(population) #NSGA2Sorter
         population = population[:POPULATION_SIZE]
 
     

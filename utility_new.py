@@ -16,6 +16,21 @@ def parent_selection(population):
     candidates = sorted(np.random.choice(population, 2), key=lambda e: e.fitness, reverse = True)
     return candidates[0]
 
+#For parent selection we use lexicase selection
+def lexicase_selection(population):
+    candidates = population.copy()
+    test_cases = list(range(len(population[0].genome)))
+    np.random.shuffle(test_cases)
+    for test in test_cases:
+        # Trova il miglior punteggio su questo test
+        best_score = max([ind.fitness[0][test] for ind in candidates])
+        # Filtra solo quelli col punteggio migliore su questo test
+        candidates = [ind for ind in candidates if ind.fitness[0][test] == best_score]
+        if len(candidates) == 1:
+            return candidates[0]
+    # Se alla fine ce ne sono ancora più di uno, ne sceglie uno a caso
+    return np.random.choice(candidates)
+
 #add a new action to the parent generating a new individual
 def add_mutation(p: Individual, available_actions):
     new_gen = copy.deepcopy(p.genome)
@@ -152,3 +167,81 @@ def initial_analysis(demo_pairs):
             #rimozione 
             pc.countRemove += 1
     return pc
+
+#algoritmo multi-obiettivo a dominanza di Pareto con ordinamento per fronti di non-dominanza e crowding distance
+class NSGA2Sorter:
+    def dominates(self, ind1, ind2):
+        better_in_any = False
+        for s1, s2 in zip(ind1.fitness[0], ind2.fitness[0]):
+            if s1 < s2:
+                return False  # ind1 è peggiore in almeno un obiettivo
+            elif s1 > s2:
+                better_in_any = True
+        return better_in_any
+
+    def fast_non_dominated_sort(self, population):
+        fronts = [[]]
+        domination_counts = {}
+        dominated_solutions = {}
+
+        for p in population:
+            dominated_solutions[p] = []
+            domination_counts[p] = 0
+
+            for q in population:
+                if p == q:
+                    continue
+                if self.dominates(p, q):
+                    dominated_solutions[p].append(q)
+                elif self.dominates(q, p):
+                    domination_counts[p] += 1
+
+            if domination_counts[p] == 0:
+                fronts[0].append(p)
+
+        i = 0
+        while len(fronts[i]) > 0:
+            next_front = []
+            for p in fronts[i]:
+                for q in dominated_solutions[p]:
+                    domination_counts[q] -= 1
+                    if domination_counts[q] == 0:
+                        next_front.append(q)
+            i += 1
+            fronts.append(next_front)
+
+        fronts.pop()  # l'ultimo è vuoto
+        return fronts
+
+    def calculate_crowding_distance(self, front):
+        num_objectives = len(front[0].fitness[0])
+        distance = {ind: 0 for ind in front}
+
+        for m in range(num_objectives):
+            front.sort(key=lambda ind: ind.fitness[0][m], reverse=True)
+            fmax = front[0].fitness[0][m]
+            fmin = front[-1].fitness[0][m]
+
+            distance[front[0]] = float('inf')
+            distance[front[-1]] = float('inf')
+
+            for i in range(1, len(front) - 1):
+                prev_f = front[i - 1].fitness[0][m]
+                next_f = front[i + 1].fitness[0][m]
+                if fmax != fmin:
+                    distance[front[i]] += (next_f - prev_f) / (fmax - fmin)
+
+        return distance
+
+    def sort_population(self, population):
+        fronts = self.fast_non_dominated_sort(population)
+        sorted_population = []
+
+        for front in fronts:
+            if len(front) == 0:
+                continue
+            distances = self.calculate_crowding_distance(front)
+            front.sort(key=lambda ind: distances[ind], reverse=True)
+            sorted_population.extend(front)
+
+        return sorted_population
