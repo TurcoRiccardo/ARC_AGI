@@ -183,65 +183,63 @@ class NSGA2Sorter:
         fronts = [[]]
         domination_counts = {}
         dominated_solutions = {}
-
+        # Mappo id -> individuo per recuperarlo facilmente
+        id_to_individual = {id(ind): ind for ind in population}
         for p in population:
-            dominated_solutions[p] = []
-            domination_counts[p] = 0
-
+            indp = id(p)
+            dominated_solutions[indp] = []
+            domination_counts[indp] = 0
             for q in population:
-                if p == q:
+                indq = id(q)
+                if indp == indq:
                     continue
                 if self.dominates(p, q):
-                    dominated_solutions[p].append(q)
+                    dominated_solutions[indp].append(indq)
                 elif self.dominates(q, p):
-                    domination_counts[p] += 1
-
-            if domination_counts[p] == 0:
+                    domination_counts[indp] += 1
+            if domination_counts[indp] == 0:
                 fronts[0].append(p)
-
         i = 0
         while len(fronts[i]) > 0:
             next_front = []
             for p in fronts[i]:
-                for q in dominated_solutions[p]:
-                    domination_counts[q] -= 1
-                    if domination_counts[q] == 0:
-                        next_front.append(q)
+                indp = id(p)
+                for indq in dominated_solutions[indp]:
+                    domination_counts[indq] -= 1
+                    if domination_counts[indq] == 0:
+                        next_front.append(id_to_individual[indq])
             i += 1
             fronts.append(next_front)
-
         fronts.pop()  # l'ultimo è vuoto
         return fronts
 
     def calculate_crowding_distance(self, front):
+        if len(front) == 0:
+            return {}
+        elif len(front) == 1:
+            return {id(front[0]): float('inf')}
         num_objectives = len(front[0].fitness[0])
-        distance = {ind: 0 for ind in front}
-
+        distance = {id(ind): 0 for ind in front}
         for m in range(num_objectives):
             front.sort(key=lambda ind: ind.fitness[0][m], reverse=True)
             fmax = front[0].fitness[0][m]
             fmin = front[-1].fitness[0][m]
-
-            distance[front[0]] = float('inf')
-            distance[front[-1]] = float('inf')
-
+            distance[id(front[0])] = float('inf')
+            distance[id(front[-1])] = float('inf')
             for i in range(1, len(front) - 1):
                 prev_f = front[i - 1].fitness[0][m]
                 next_f = front[i + 1].fitness[0][m]
                 if fmax != fmin:
-                    distance[front[i]] += (next_f - prev_f) / (fmax - fmin)
-
+                    distance[id(front[i])] += (next_f - prev_f) / (fmax - fmin)
         return distance
 
     def sort_population(self, population):
         fronts = self.fast_non_dominated_sort(population)
         sorted_population = []
-
         for front in fronts:
             if len(front) == 0:
                 continue
-            distances = self.calculate_crowding_distance(front)
-            front.sort(key=lambda ind: distances[ind], reverse=True)
+            distance = self.calculate_crowding_distance(front)
+            front.sort(key=lambda ind: distance[id(ind)], reverse=True)
             sorted_population.extend(front)
-
         return sorted_population
