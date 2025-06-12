@@ -30,6 +30,18 @@ A grid can have any height or width between 1x1 and 30x30 inclusive (average hei
 - 8: Cyan
 - 9: Brown
 
+## Params
+- min: (default=0) the program execute the problem from min to max on the test dataset
+- max: (default=400) the program execute the problem from min to max on the test dataset
+- show_test_pairs: (default=True) Display the test pairs
+- show_solution: (default=True) Display the solution
+- show_train_pairs: (default=False) Display the training pairs
+- new: (default=True) Use the multi-objective algorithm
+
+### Example
+python test.py --min 0 --max 10 --show_test_pairs "false" --show_solution "false"
+
+
 ## Basic Geometry and Topology concepts that the algorithm knows as priors:
 - **translation:**
 - **color change:**
