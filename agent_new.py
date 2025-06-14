@@ -10,7 +10,7 @@ import copy
 from selection.selector import Selector
 from concurrent.futures import ProcessPoolExecutor
 
-from utility_new import Individual, add_mutation, swap_mutation, tweak_mutation, parent_selection, lexicase_selection, initial_analysis, NSGA2Sorter
+from utility_new import Individual, add_mutation, swap_mutation, tweak_mutation, tournament_selection, lexicase_selection, initial_analysis, NSGA2Sorter
 from representation.pixelRepresentation import pixelRepresentation
 from representation.rowRepresentation import rowRepresentation
 from representation.columnsRepresentation import columnsRepresentation
@@ -40,7 +40,7 @@ class PossibleSolution:
 
 
 #I perform the operations on all the combinations of the examples received
-def generate_representation(rep, demo_pairs, base_act, act):
+def generate_representation(rep, demo_pairs, base_act, act, parent_selection, survival_selection):
     rappresentationX = []
     rappresentationY = []
     sorter = NSGA2Sorter()
@@ -63,8 +63,10 @@ def generate_representation(rep, demo_pairs, base_act, act):
         #genero gli offspring
         offspring = list()
         for _ in range(OFFSPRING_SIZE):
-            p = parent_selection(population1)
-            #p = lexicase_selection(population1)
+            if parent_selection == 0:
+                p = tournament_selection(population1)
+            else:
+                p = lexicase_selection(population1)
             o: Individual = add_mutation(p, base_act)
             if o != None:
                 offspring.append(o)
@@ -74,8 +76,10 @@ def generate_representation(rep, demo_pairs, base_act, act):
             i.fitness = (scores, (np.sum(scores), rep.scoreAction(i.performed_actions, i.performed_selection)))
         #reinserisco gli offspring nella popolazione e tengo solo i primi POPULATION_SIZE individui
         population1.extend(offspring)
-        #population1.sort(key=lambda i: i.fitness[1], reverse = True) #sorting con fitness aggregata
-        population1 = sorter.sort_population(population1) #NSGA2Sorter
+        if survival_selection == 0:
+            population1.sort(key=lambda i: i.fitness[1], reverse = True) #sorting con fitness aggregata
+        else:
+            population1 = sorter.sort_population(population1) #NSGA2Sorter
         population1 = population1[:POPULATION_SIZE//2]
     
     #--------------------------------------generating the second part of the initial population with act--------------------------------------
@@ -93,7 +97,6 @@ def generate_representation(rep, demo_pairs, base_act, act):
     population = list()
     population.extend(population1)
     population.extend(population2)
-    print("EA Genetations: " + str(MAX_GENERATIONS_2 * len(demo_pairs[0].y) * len(demo_pairs[0].y[0])))
     for _ in range(MAX_GENERATIONS_2 * len(demo_pairs[0].y) * len(demo_pairs[0].y[0])):
         #genero gli offspring
         offspring = list()
@@ -101,18 +104,24 @@ def generate_representation(rep, demo_pairs, base_act, act):
             r = np.random.random()
             if r > 0.8:
                 #add
-                #p = parent_selection(population)
-                p = lexicase_selection(population)
+                if parent_selection == 0:
+                    p = tournament_selection(population)
+                else:
+                    p = lexicase_selection(population)
                 o: Individual = add_mutation(p, act)
             elif r > 0.4:
                 #tweak
-                #p = parent_selection(population)
-                p = lexicase_selection(population)
+                if parent_selection == 0:
+                    p = tournament_selection(population)
+                else:
+                    p = lexicase_selection(population)
                 o: Individual = tweak_mutation(p, act, rappresentationX)
             else:
                 #swap
-                #p = parent_selection(population)
-                p = lexicase_selection(population)
+                if parent_selection == 0:
+                    p = tournament_selection(population)
+                else:
+                    p = lexicase_selection(population)
                 o: Individual = swap_mutation(p, act, rappresentationX)
             if o != None:
                 offspring.append(o)
@@ -122,11 +131,13 @@ def generate_representation(rep, demo_pairs, base_act, act):
             i.fitness = (scores, (np.sum(scores), rep.scoreAction(i.performed_actions, i.performed_selection)))
         #reinserisco gli offspring nella popolazione e tengo solo i primi POPULATION_SIZE individui
         population.extend(offspring)
-        #population.sort(key=lambda i: i.fitness[1], reverse = True) #sorting con fitness aggregata
-        population = sorter.sort_population(population) #NSGA2Sorter
+        if survival_selection == 0:
+            population.sort(key=lambda i: i.fitness[1], reverse = True) #sorting con fitness aggregata
+        else:
+            population = sorter.sort_population(population) #NSGA2Sorter
         population = population[:POPULATION_SIZE]
 
-    
+    '''
     print("azioni")
     print(population[0].performed_actions)
     print(len(population[0].performed_actions))
@@ -138,7 +149,7 @@ def generate_representation(rep, demo_pairs, base_act, act):
     prediction.plot(show=True, title=f"Output-OutputGenerato")
     prediction = ArcIOPair(rappresentationY[1].rappToGrid(), population[0].genome[1].rappToGrid())
     prediction.plot(show=True, title=f"Output-OutputGenerato")
-    ''''''
+    '''
 
     errMin = 10000
     sum = 0
@@ -151,26 +162,31 @@ def generate_representation(rep, demo_pairs, base_act, act):
 
 #Class where I compare the results received from the various representations and apply the best one to the test grid
 class Agent_new(ArcAgent):
+    def __init__(self, parent_selection, survival_selection):
+        self.parent_selection = parent_selection
+        self.survival_selection = survival_selection
+
     def predict(self, demo_pairs: List[ArcIOPair], test_grids: List[ArcGrid]) -> List[ArcPrediction]:
         pc = initial_analysis(demo_pairs)
+        print("EA Genetations: " + str(MAX_GENERATIONS_2 * len(demo_pairs[0].y) * len(demo_pairs[0].y[0])))
         reps = [
-            #(pixelRepresentation, pixelRepresentation.baseActionList(pc), pixelRepresentation.actionList(pc)),
-            #(rowRepresentation, rowRepresentation.baseActionList(pc), rowRepresentation.actionList(pc)),
-            #(columnsRepresentation, columnsRepresentation.baseActionList(pc), columnsRepresentation.actionList(pc)),
-            #(colorLayerRepresentation, colorLayerRepresentation.baseActionList(pc), colorLayerRepresentation.actionList(pc)), #old
-            #(rectangleRepresentation, rectangleRepresentation.baseActionList(pc), rectangleRepresentation.actionList(pc)),
-            #(figureRepresentation, figureRepresentation.baseActionList(pc), figureRepresentation.actionList(pc)),
+            (pixelRepresentation, pixelRepresentation.baseActionList(pc), pixelRepresentation.actionList(pc)),
+            (rowRepresentation, rowRepresentation.baseActionList(pc), rowRepresentation.actionList(pc)),
+            (columnsRepresentation, columnsRepresentation.baseActionList(pc), columnsRepresentation.actionList(pc)),
+            #(colorLayerRepresentation_old, colorLayerRepresentation.baseActionList(pc), colorLayerRepresentation.actionList(pc)), #old
+            (rectangleRepresentation, rectangleRepresentation.baseActionList(pc), rectangleRepresentation.actionList(pc)),
+            (figureRepresentation, figureRepresentation.baseActionList(pc), figureRepresentation.actionList(pc)),
             (coloredFigureRepresentation, coloredFigureRepresentation.baseActionList(pc), coloredFigureRepresentation.actionList(pc)),
-            #(borderRepresentation, borderRepresentation.baseActionList(pc), borderRepresentation.actionList(pc)), #old
-            #(firstDiagonalRepresentation, firstDiagonalRepresentation.baseActionList(pc), firstDiagonalRepresentation.actionList(pc)),
-            #(secondDiagonalRepresentation, secondDiagonalRepresentation.baseActionList(pc), secondDiagonalRepresentation.actionList(pc))
+            #(borderRepresentation_old, borderRepresentation.baseActionList(pc), borderRepresentation.actionList(pc)), #old
+            (firstDiagonalRepresentation, firstDiagonalRepresentation.baseActionList(pc), firstDiagonalRepresentation.actionList(pc)),
+            (secondDiagonalRepresentation, secondDiagonalRepresentation.baseActionList(pc), secondDiagonalRepresentation.actionList(pc))
         ]
         #rappresentazione in cui ho delle figure che posso prolungare con ostacoli e elementi sovrapposti
         #un idea e quella di inserire azioni nelle base_action in base ad un analisi iniziale delle griglie
         #algoritmo evolutivo su piu test assieme
 
         with ProcessPoolExecutor() as executor:
-            futures = [executor.submit(generate_representation, rep, demo_pairs, base_act, actions) for rep, base_act, actions in reps]
+            futures = [executor.submit(generate_representation, rep, demo_pairs, base_act, actions, self.parent_selection, self.survival_selection) for rep, base_act, actions in reps]
             possibleSolution = [f.result() for f in futures]
 
         #I choose the best solution based on the error rate and apply it to the test input grid

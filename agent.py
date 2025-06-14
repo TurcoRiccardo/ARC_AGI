@@ -171,20 +171,17 @@ class Agent(ArcAgent):
         possibleSolutionRep = list()
         pc = initial_analysis(demo_pairs)
         reps = [
-            #(pixelRepresentation, pixelRepresentation.baseActionList(pc), pixelRepresentation.actionList(pc)),
-            #(rowRepresentation, rowRepresentation.baseActionList(pc), rowRepresentation.actionList(pc)),
-            #(columnsRepresentation, columnsRepresentation.baseActionList(pc), columnsRepresentation.actionList(pc)),
-            #(colorLayerRepresentation, colorLayerRepresentation.baseActionList(pc), colorLayerRepresentation.actionList(pc)), #old
-            #(rectangleRepresentation, rectangleRepresentation.baseActionList(pc), rectangleRepresentation.actionList(pc)),
-            #(figureRepresentation, figureRepresentation.baseActionList(pc), figureRepresentation.actionList(pc)),
+            (pixelRepresentation, pixelRepresentation.baseActionList(pc), pixelRepresentation.actionList(pc)),
+            (rowRepresentation, rowRepresentation.baseActionList(pc), rowRepresentation.actionList(pc)),
+            (columnsRepresentation, columnsRepresentation.baseActionList(pc), columnsRepresentation.actionList(pc)),
+            #(colorLayerRepresentation_old, colorLayerRepresentation.baseActionList(pc), colorLayerRepresentation.actionList(pc)), #old
+            (rectangleRepresentation, rectangleRepresentation.baseActionList(pc), rectangleRepresentation.actionList(pc)),
+            (figureRepresentation, figureRepresentation.baseActionList(pc), figureRepresentation.actionList(pc)),
             (coloredFigureRepresentation, coloredFigureRepresentation.baseActionList(pc), coloredFigureRepresentation.actionList(pc)),
-            #(borderRepresentation, borderRepresentation.baseActionList(pc), borderRepresentation.actionList(pc)), #old
-            #(firstDiagonalRepresentation, firstDiagonalRepresentation.baseActionList(pc), firstDiagonalRepresentation.actionList(pc)),
-            #(secondDiagonalRepresentation, secondDiagonalRepresentation.baseActionList(pc), secondDiagonalRepresentation.actionList(pc))
+            #(borderRepresentation_old, borderRepresentation.baseActionList(pc), borderRepresentation.actionList(pc)), #old
+            (firstDiagonalRepresentation, firstDiagonalRepresentation.baseActionList(pc), firstDiagonalRepresentation.actionList(pc)),
+            (secondDiagonalRepresentation, secondDiagonalRepresentation.baseActionList(pc), secondDiagonalRepresentation.actionList(pc))
         ]
-        #rappresentazione in cui ho delle figure che posso prolungare con ostacoli e elementi sovrapposti
-        #un idea e quella di inserire azioni nelle base_action in base ad un analisi iniziale delle griglie
-        #algoritmo evolutivo su piu test assieme
 
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(generate_representation, rep, demo_pairs, base_act, actions) for rep, base_act, actions in reps]

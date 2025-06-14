@@ -12,7 +12,7 @@ class Individual:
     fitness: tuple = (None, 0)
 
 #For parent selection we use Tournament Selection
-def parent_selection(population):
+def tournament_selection(population):
     candidates = sorted(np.random.choice(population, 2), key=lambda e: e.fitness, reverse = True)
     return candidates[0]
 
