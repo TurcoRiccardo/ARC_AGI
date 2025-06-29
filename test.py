@@ -63,7 +63,7 @@ if __name__ == '__main__':
     parser.add_argument('--show_test_pairs', default=True)
     parser.add_argument('--show_solution', default=True)
     parser.add_argument('--show_train_pairs', default=False)
-    parser.add_argument('--new', default=False)
+    parser.add_argument('--new', default=True)
     parser.add_argument('--parent_selection', type=int, default=0) #default 0 -> tournament_selection; 1 -> lexicase_selection
     parser.add_argument('--survival_selection', type=int, default=0) #default 0 -> aggregate fitness; 1 -> NSGA2Sorter
     main(parser.parse_args())

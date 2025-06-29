@@ -257,6 +257,21 @@ class pixelRepresentation:
         if len(output.pixelList) > len(self.pixelList):
             score += (len(output.pixelList) - len(self.pixelList)) * 1.5
         return -score
+    
+    #fitness function unbias
+    def score_unbias(self, output):
+        score = abs(output.nr - self.nr) + abs(output.nc - self.nc)
+        for z in range(0, len(self.pixelList)):
+            if z < len(output.pixelList):
+                #distance
+                score += abs(int(self.pixelList[z].x) - int(output.pixelList[z].x)) + abs(int(self.pixelList[z].y) - int(output.pixelList[z].y))
+                #color
+                score += abs(int(self.pixelList[z].color) - int(output.pixelList[z].color))
+            else:
+                score += 1
+        if len(output.pixelList) > len(self.pixelList):
+            score += (len(output.pixelList) - len(self.pixelList))
+        return -score
 
     #transform the representation into an ARC grid
     def rappToGrid(self):

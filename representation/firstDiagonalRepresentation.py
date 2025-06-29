@@ -434,6 +434,18 @@ class firstDiagonalRepresentation:
                     else:
                         score += abs(int(self.DiagonaleList[i][c]) - int(output.DiagonaleList[i][c]))/10
         return -score
+    
+    #fitness function unbias
+    def score_unbias(self, output):
+        score = abs(output.nr - self.nr) + abs(output.nc - self.nc)
+        for i in range(0, min(len(self.DiagonaleList), len(output.DiagonaleList))):
+            for c in range(0, min(len(self.DiagonaleList[i]), len(output.DiagonaleList[i]))):
+                if self.DiagonaleList[i][c] != output.DiagonaleList[i][c]:
+                    if self.DiagonaleList[i][c] == 0 or output.DiagonaleList[i][c] == 0:
+                        score += 1
+                    else:
+                        score += abs(int(self.DiagonaleList[i][c]) - int(output.DiagonaleList[i][c]))
+        return -score
 
     #transform the representation into an ARC grid
     def rappToGrid(self):

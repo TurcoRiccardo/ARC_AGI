@@ -365,6 +365,29 @@ class rectangleRepresentation:
                 score += output.rectangleList[z].h * output.rectangleList[z].w * 1.5
         return -score
 
+    #fitness function unbias
+    def score_unbias(self, output):
+        score = abs(output.nr - self.nr) + abs(output.nc - self.nc)
+        for z in range(0, len(self.rectangleList)):
+            if z < len(output.rectangleList):
+                #distanza tra le x piu distanza tra le y
+                score += abs(self.rectangleList[z].x - output.rectangleList[z].x) + abs(self.rectangleList[z].y - output.rectangleList[z].y)
+                #distanza tra le h piu distanza tra le w
+                score += abs(self.rectangleList[z].h - output.rectangleList[z].h) + abs(self.rectangleList[z].w - output.rectangleList[z].w)
+                #distanza tra il colore
+                if self.rectangleList[z].color != 0 and output.rectangleList[z].color != 0:
+                    score += abs(int(self.rectangleList[z].color) - int(output.rectangleList[z].color))
+                elif self.rectangleList[z].color == 0 and output.rectangleList[z].color == 0:
+                    score += 0
+                else:
+                    score += 1
+            else:
+                score += self.rectangleList[z].h * self.rectangleList[z].w
+        if len(output.rectangleList) - len(self.rectangleList) > 0:
+            for z in range(len(self.rectangleList), len(output.rectangleList)):
+                score += output.rectangleList[z].h * output.rectangleList[z].w
+        return -score
+
     #transform the representation into an ARC grid
     def rappToGrid(self):
         grid = np.zeros([self.nr, self.nc], dtype=np.uint8)

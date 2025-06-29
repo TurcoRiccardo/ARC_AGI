@@ -384,6 +384,43 @@ class rowRepresentation:
                             score += abs(int(self.RigheList[x][y]) - int(output.RigheList[x][y]))/10
         return -score
 
+    #fitness function unbias
+    def score_unbias(self, output):
+        score = abs(output.nr - self.nr) + abs(output.nc - self.nc)
+        if self.nr <= output.nr and self.nc <= output.nc:
+            for x in range(self.nr):
+                for y in range(self.nc):
+                    if output.RigheList[x][y] != self.RigheList[x][y]:
+                        if output.RigheList[x][y] == 0 or self.RigheList[x][y] == 0:
+                            score += 1
+                        else:
+                            score += abs(int(self.RigheList[x][y]) - int(output.RigheList[x][y]))
+        elif self.nr > output.nr and self.nc > output.nc:
+            for x in range(output.nr):
+                for y in range(output.nc):
+                    if output.RigheList[x][y] != self.RigheList[x][y]:
+                        if output.RigheList[x][y] == 0 or self.RigheList[x][y] == 0:
+                            score += 1
+                        else:
+                            score += abs(int(self.RigheList[x][y]) - int(output.RigheList[x][y]))
+        elif self.nr <= output.nr and self.nc > output.nc:
+            for x in range(self.nr):
+                for y in range(output.nc):
+                    if output.RigheList[x][y] != self.RigheList[x][y]:
+                        if output.RigheList[x][y] == 0 or self.RigheList[x][y] == 0:
+                            score += 1
+                        else:
+                            score += abs(int(self.RigheList[x][y]) - int(output.RigheList[x][y]))
+        elif self.nr > output.nr and self.nc <= output.nc:
+            for x in range(output.nr):
+                for y in range(self.nc):
+                    if output.RigheList[x][y] != self.RigheList[x][y]:
+                        if output.RigheList[x][y] == 0 or self.RigheList[x][y] == 0:
+                            score += 1
+                        else:
+                            score += abs(int(self.RigheList[x][y]) - int(output.RigheList[x][y]))
+        return -score
+
     #transform the representation into an ARC grid
     def rappToGrid(self):
         grid = np.zeros([self.nr, self.nc], dtype=np.uint8)

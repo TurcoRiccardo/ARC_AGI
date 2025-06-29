@@ -963,6 +963,29 @@ class figureRepresentation:
             for z in range(len(self.figureList), len(output.figureList)):
                 score += output.figureList[z].h * output.figureList[z].w * 1.5
         return -score
+    
+    #fitness function unbias
+    def score_unbias(self, output):
+        score = abs(output.nr - self.nr) + abs(output.nc - self.nc)
+        for z in range(0, len(self.figureList)):
+            if z < len(output.figureList):
+                for x in range(0, min(self.figureList[z].h, output.figureList[z].h)):
+                    for y in range(0, min(self.figureList[z].w, output.figureList[z].w)):
+                        if self.figureList[z].grid[x][y] == 1 and output.figureList[z].grid[x][y] == 1:
+                            score += abs(int(self.figureList[z].color) - int(output.figureList[z].color))
+                        else:
+                            if self.figureList[z].grid[x][y] != output.figureList[z].grid[x][y]:
+                                score += 1
+                #figure con diverse dimensioni
+                score += abs(self.figureList[z].h - output.figureList[z].h) + abs(self.figureList[z].w - output.figureList[z].w)
+                #distance
+                score += abs(int(self.figureList[z].pos.x) - int(output.figureList[z].pos.x)) + abs(int(self.figureList[z].pos.y) - int(output.figureList[z].pos.y))
+            else:
+                score += self.figureList[z].h * self.figureList[z].w
+        if len(output.figureList) - len(self.figureList) > 0:
+            for z in range(len(self.figureList), len(output.figureList)):
+                score += output.figureList[z].h * output.figureList[z].w
+        return -score
 
     #transform the representation into an ARC grid
     def rappToGrid(self):

@@ -384,6 +384,43 @@ class columnsRepresentation:
                             score += abs(int(self.ColonneList[y][x]) - int(output.ColonneList[y][x]))/10
         return -score
 
+    #fitness function unbias
+    def score_unbias(self, output):
+        score = abs(output.nr - self.nr) + abs(output.nc - self.nc)
+        if self.nr <= output.nr and self.nc <= output.nc:
+            for x in range(self.nr):
+                for y in range(self.nc):
+                    if output.ColonneList[y][x] != self.ColonneList[y][x]:
+                        if output.ColonneList[y][x] == 0 or self.ColonneList[y][x] == 0:
+                            score += 1
+                        else:
+                            score += abs(int(self.ColonneList[y][x]) - int(output.ColonneList[y][x]))
+        elif self.nr > output.nr and self.nc > output.nc:
+            for x in range(output.nr):
+                for y in range(output.nc):
+                    if output.ColonneList[y][x] != self.ColonneList[y][x]:
+                        if output.ColonneList[y][x] == 0 or self.ColonneList[y][x] == 0:
+                            score += 1
+                        else:
+                            score += abs(int(self.ColonneList[y][x]) - int(output.ColonneList[y][x]))
+        elif self.nr <= output.nr and self.nc > output.nc:
+            for x in range(self.nr):
+                for y in range(output.nc):
+                    if output.ColonneList[y][x] != self.ColonneList[y][x]:
+                        if output.ColonneList[y][x] == 0 or self.ColonneList[y][x] == 0:
+                            score += 1
+                        else:
+                            score += abs(int(self.ColonneList[y][x]) - int(output.ColonneList[y][x]))
+        elif self.nr > output.nr and self.nc <= output.nc:
+            for x in range(output.nr):
+                for y in range(self.nc):
+                    if output.ColonneList[y][x] != self.ColonneList[y][x]:
+                        if output.ColonneList[y][x] == 0 or self.ColonneList[y][x] == 0:
+                            score += 1
+                        else:
+                            score += abs(int(self.ColonneList[y][x]) - int(output.ColonneList[y][x]))
+        return -score
+
     #transform the representation into an ARC grid
     def rappToGrid(self):
         grid = np.zeros([self.nr, self.nc], dtype=np.uint8)

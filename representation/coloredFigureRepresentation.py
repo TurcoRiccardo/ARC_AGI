@@ -1204,8 +1204,8 @@ class coloredFigureRepresentation:
                 score += output.figureList[z].h * output.figureList[z].w * 1.5
         return -score
 
-    #fitness function
-    def score1(self, output):
+    #fitness function unbias
+    def score_unbias(self, output):
         score = abs(output.nr - self.nr) + abs(output.nc - self.nc)
         for z in range(0, len(self.figureList)):
             if z < len(output.figureList):
