@@ -40,7 +40,7 @@ class PossibleSolution:
 
 
 #I perform the operations on all the combinations of the examples received
-def generate_representation(rep, demo_pairs, base_act, act, parent_selection, survival_selection):
+def generate_representation(rep, demo_pairs, base_act, act, parent_selection, survival_selection, score_unbias):
     rappresentationX = []
     rappresentationY = []
     sorter = NSGA2Sorter()
@@ -56,7 +56,10 @@ def generate_representation(rep, demo_pairs, base_act, act, parent_selection, su
         scores = []
         for i in range(0, len(demo_pairs)):
             new_individual.genome.append(copy.deepcopy(rappresentationX[i]))
-            scores.append(rappresentationX[i].score(rappresentationY[i]))
+            if score_unbias == 0:
+                scores.append(rappresentationX[i].score(rappresentationY[i]))
+            else:
+                scores.append(rappresentationX[i].score_unbias(rappresentationY[i]))
         new_individual.fitness = (scores, (np.sum(scores), 0))
         population1.append(new_individual)
     for _ in range(MAX_GENERATIONS_1 * len(demo_pairs[0].y) * len(demo_pairs[0].y[0])):
@@ -72,7 +75,10 @@ def generate_representation(rep, demo_pairs, base_act, act, parent_selection, su
                 offspring.append(o)
         #valuto il genome calcolando fitness
         for i in offspring:
-            scores = [i.genome[c].score(rappresentationY[c]) for c in range(len(demo_pairs))]
+            if score_unbias == 0:
+                scores = [i.genome[c].score(rappresentationY[c]) for c in range(len(demo_pairs))]
+            else:
+                scores = [i.genome[c].score_unbias(rappresentationY[c]) for c in range(len(demo_pairs))]
             i.fitness = (scores, (np.sum(scores), rep.scoreAction(i.performed_actions, i.performed_selection)))
         #reinserisco gli offspring nella popolazione e tengo solo i primi POPULATION_SIZE individui
         population1.extend(offspring)
@@ -89,7 +95,10 @@ def generate_representation(rep, demo_pairs, base_act, act, parent_selection, su
         scores = []
         for i in range(0, len(demo_pairs)):
             new_individual.genome.append(copy.deepcopy(rappresentationX[i]))
-            scores.append(rappresentationX[i].score(rappresentationY[i]))
+            if score_unbias == 0:
+                scores.append(rappresentationX[i].score(rappresentationY[i]))
+            else:
+                scores.append(rappresentationX[i].score_unbias(rappresentationY[i]))
         new_individual.fitness = (scores, (np.sum(scores), 0))
         population2.append(new_individual)
 
@@ -127,7 +136,10 @@ def generate_representation(rep, demo_pairs, base_act, act, parent_selection, su
                 offspring.append(o)
         #valuto il genome calcolando fitness
         for i in offspring:
-            scores = [i.genome[c].score(rappresentationY[c]) for c in range(len(demo_pairs))]
+            if score_unbias == 0:
+                scores = [i.genome[c].score(rappresentationY[c]) for c in range(len(demo_pairs))]
+            else:
+                scores = [i.genome[c].score_unbias(rappresentationY[c]) for c in range(len(demo_pairs))]
             i.fitness = (scores, (np.sum(scores), rep.scoreAction(i.performed_actions, i.performed_selection)))
         #reinserisco gli offspring nella popolazione e tengo solo i primi POPULATION_SIZE individui
         population.extend(offspring)
@@ -154,7 +166,10 @@ def generate_representation(rep, demo_pairs, base_act, act, parent_selection, su
     errMin = 10000
     sum = 0
     for i in range(0, len(demo_pairs)):
-        val = abs(population[0].genome[i].score(rappresentationY[i]))
+        if score_unbias == 0:
+            val = abs(population[0].genome[i].score(rappresentationY[i]))
+        else:
+            val = abs(population[0].genome[i].score_unbias(rappresentationY[i]))
         sum += val
         if val < errMin:
             errMin = val
@@ -162,12 +177,14 @@ def generate_representation(rep, demo_pairs, base_act, act, parent_selection, su
 
 #Class where I compare the results received from the various representations and apply the best one to the test grid
 class Agent_new(ArcAgent):
-    def __init__(self, parent_selection, survival_selection):
+    def __init__(self, parent_selection, survival_selection, score_unbias):
         self.parent_selection = parent_selection
         self.survival_selection = survival_selection
+        self.score_unbias = score_unbias
 
     def predict(self, demo_pairs: List[ArcIOPair], test_grids: List[ArcGrid]) -> List[ArcPrediction]:
         pc = initial_analysis(demo_pairs)
+        print("multi-objective algorithm")
         print("EA Genetations: " + str(MAX_GENERATIONS_2 * len(demo_pairs[0].y) * len(demo_pairs[0].y[0])))
         reps = [
             (pixelRepresentation, pixelRepresentation.baseActionList(pc), pixelRepresentation.actionList(pc)),
@@ -181,12 +198,11 @@ class Agent_new(ArcAgent):
             (firstDiagonalRepresentation, firstDiagonalRepresentation.baseActionList(pc), firstDiagonalRepresentation.actionList(pc)),
             (secondDiagonalRepresentation, secondDiagonalRepresentation.baseActionList(pc), secondDiagonalRepresentation.actionList(pc))
         ]
-        #rappresentazione in cui ho delle figure che posso prolungare con ostacoli e elementi sovrapposti
+        #da aggiungere rappresentazioni in cui ho delle figure che posso prolungare con ostacoli e elementi sovrapposti
         #un idea e quella di inserire azioni nelle base_action in base ad un analisi iniziale delle griglie
-        #algoritmo evolutivo su piu test assieme
 
         with ProcessPoolExecutor() as executor:
-            futures = [executor.submit(generate_representation, rep, demo_pairs, base_act, actions, self.parent_selection, self.survival_selection) for rep, base_act, actions in reps]
+            futures = [executor.submit(generate_representation, rep, demo_pairs, base_act, actions, self.parent_selection, self.survival_selection, self.score_unbias) for rep, base_act, actions in reps]
             possibleSolution = [f.result() for f in futures]
 
         #I choose the best solution based on the error rate and apply it to the test input grid

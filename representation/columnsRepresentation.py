@@ -18,6 +18,14 @@ class columnsRepresentation:
     def getNElement(self):
         return self.nc
     
+    #return a set of colors used in the grid
+    def getColors(self):
+        colorSet = set()
+        for column in self.ColonneList:
+            for e in column:
+                colorSet.add(e)
+        return colorSet
+
     #return the total number of row 
     def getElementComponent(self, index):
         return (self.nr,)

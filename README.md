@@ -38,6 +38,7 @@ List of params for the test:
 - show_solution: (default=True) Display the solution
 - show_train_pairs: (default=False) Display the training pairs
 - new: (default=True) Use the multi-objective algorithm
+- score_unbias: (default=0) the program uses to calculate the fitness: 0 -> score with bias; 1 -> score unbias
 
 List of params for the evaluation:
 - new: (default=True) Use the multi-objective algorithm
@@ -56,9 +57,11 @@ python test.py --min 0 --max 10 --show_test_pairs "false" --show_solution "false
 - **rotations:**
 - **Copy, repeat objects:**
 - **Shape upscaling or downscaling:**
-- **symmetries:** ?
-- **Draw lines, connection points, orthogonal projections:** ?
-- **To contain or be contained within or outside a perimeter:** ?
+
+For future improvements you can add:
+- **symmetries:** 
+- **Draw lines, connection points, orthogonal projections:** 
+- **To contain or be contained within or outside a perimeter:** 
 
 
 ## Representation
@@ -136,7 +139,7 @@ We can select or group the components of the column in various ways:
 - based on the color of the components in the column
 - we can select all the components in the column
 
-### Color Layer Representation
+### Color Layer Representation (old)
 We can represent the grid as a list of layer composed of all the pixels of one color, we have a layer for color.
 
 We can apply different types of actions to layers: 
@@ -261,7 +264,7 @@ We can select or group the components of the figure in various ways:
 - based on the central column in the figure
 - we can select all the columns in the figure
 
-### Border Representation
+### Border Representation (old)
 We can represent the grid as a group of border having the same color having an central area, we do not allow overlapping border.
 
 We can apply different types of actions to borders: 

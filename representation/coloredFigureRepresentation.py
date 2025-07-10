@@ -117,6 +117,15 @@ class coloredFigureRepresentation:
     def getNElement(self):
         return len(self.figureList)
     
+    #return a set of colors used in the grid
+    def getColors(self):
+        colorSet = set()
+        for f in self.figureList:
+            for x in range(0, f.h):
+                for y in range(0, f.w):
+                    colorSet.add(f.grid[x][y])
+        return colorSet
+
     #return the number of row and column in the figure
     def getElementComponent(self, index):
         return (self.figureList[index].h, self.figureList[index].w)

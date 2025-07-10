@@ -34,7 +34,7 @@ def main(args):
         if args.new == False:
             agent = Agent()
         else:
-            agent = Agent_new(args.parent_selection, args.survival_selection)
+            agent = Agent_new(args.parent_selection, args.survival_selection, args.score_unbias)
         outs = agent.predict(prob.train_pairs, prob.test_inputs)
 
         i = 1
@@ -66,6 +66,7 @@ if __name__ == '__main__':
     parser.add_argument('--new', default=True)
     parser.add_argument('--parent_selection', type=int, default=0) #default 0 -> tournament_selection; 1 -> lexicase_selection
     parser.add_argument('--survival_selection', type=int, default=0) #default 0 -> aggregate fitness; 1 -> NSGA2Sorter
+    parser.add_argument('--score_unbias', type=int, default=0) #default 0 -> score with bias; 1 -> score unbias
     main(parser.parse_args())
 
 #python test.py --min 0 --max 10 --show_test_pairs "false" --show_solution "false" --show_train_pairs "true"

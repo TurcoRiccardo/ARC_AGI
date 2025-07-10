@@ -41,6 +41,14 @@ class secondDiagonalRepresentation:
     def getNElement(self):
         return len(self.DiagonaleList)
     
+    #return a set of colors used in the grid
+    def getColors(self):
+        colorSet = set()
+        for diag in self.DiagonaleList:
+            for e in diag:
+                colorSet.add(e)
+        return colorSet
+
     #return the total number of element in the diagonal
     def getElementComponent(self, index):
         return (len(self.DiagonaleList[index]),)

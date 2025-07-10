@@ -46,6 +46,13 @@ class rectangleRepresentation:
     def getNElement(self):
         return len(self.rectangleList)
     
+    #return a set of colors used in the grid
+    def getColors(self):
+        colorSet = set()
+        for r in self.rectangleList:
+            colorSet.add(r.color)
+        return colorSet
+
     #return the total number of pixel in the rectangle
     def getElementComponent(self, index):
         adapted_index = index % len(self.rectangleList)

@@ -72,6 +72,13 @@ class figureRepresentation:
     def getNElement(self):
         return len(self.figureList)
     
+    #return a set of colors used in the grid
+    def getColors(self):
+        colorSet = set()
+        for f in self.figureList:
+            colorSet.add(f.color)
+        return colorSet
+
     #return the number of row and column in the figure
     def getElementComponent(self, index):
         return (self.figureList[index].h, self.figureList[index].w)

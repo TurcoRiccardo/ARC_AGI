@@ -23,6 +23,13 @@ class pixelRepresentation:
     def getNElement(self):
         return len(self.pixelList)
     
+    #return a set of colors used in the grid
+    def getColors(self):
+        colorSet = set()
+        for p in self.pixelList:
+            colorSet.add(p.color)
+        return colorSet
+
     #return the total number of pixel
     def getElementComponent(self, index):
         return (self.nr * self.nc,)

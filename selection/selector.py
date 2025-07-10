@@ -29,7 +29,13 @@ def generateNewSelector(rappresentation):
     allElement = np.random.randint(0, 5)
     allComponent1 = np.random.randint(0, 5)
     allComponent2 = np.random.randint(0, 5)
-    color = np.random.randint(1, 10)
+    if allElement == 4:
+        colorList = list(rappresentation.getColors())
+        if 0 in colorList:
+            colorList.remove(0)
+        color = np.random.choice(colorList)
+    else:
+        color = np.random.randint(1, 10)
     direction = np.random.randint(0, 4)
     return Selector(index, component, color, direction, allElement, allComponent1, allComponent2)
 
@@ -74,6 +80,15 @@ def generateNewSelector_new(rappresentationList):
     allElement = np.random.randint(0, 5)
     allComponent1 = np.random.randint(0, 5)
     allComponent2 = np.random.randint(0, 5)
-    color = np.random.randint(1, 10)
+    if allElement == 4:
+        colorSet = set()
+        for i in range(0, len(rappresentationList)):
+            colorSet.update(rappresentationList[i].getColors())
+        colorList = list(colorSet)
+        if 0 in colorList:
+            colorList.remove(0)
+        color = np.random.choice(colorList)
+    else:
+        color = np.random.randint(1, 10)
     direction = np.random.randint(0, 4)
     return Selector(index, component, color, direction, allElement, allComponent1, allComponent2)
