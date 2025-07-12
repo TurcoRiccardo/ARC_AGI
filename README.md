@@ -231,8 +231,8 @@ We can apply different types of actions to figures:
 - **changeColorFigureCenter:** changes the color of the center of the figure index based on color
 - **changeColorFigure_row_column:** changes the color of a pixel in the figure index based on color
 - **fillFigureCenter:** fill the center of the figure index based on color
-- **expandFigure:** expand the figure in the direction direction
-- **reduceFigure:** reduce the figure in the direction direction
+- **expandFigure:** expand the figure in the direction
+- **reduceFigure:** reduce the figure in the direction
 - **addElementFigure_row_column:** add a element in the figure in the selected row and column
 - **moveElementFigure_row_column:** move a pixel in the figure based on the direction
 - **removeElementFigure_row_column:** remove the element in the figure in the selected row and column
@@ -270,7 +270,7 @@ We can represent the grid as a group of border having the same color having an c
 We can apply different types of actions to borders: 
 - **moveBorder:** moves the selected border of one in one direction
 - **changeColorBorder:** slightly changes the color of the selected border
-- **changeColorCenter2:** slightly changes the color of the centrel colored pixel of the selected border
+- **changeColorCenter2:** slightly changes the color of the central colored pixel of the selected border
 - **changeColorCenter3:** slightly changes the color of the central area of the selected border
 - **modifyBorderFigure:** slightly changes the dimension of the selected border
 - **expandGrid:** expands the grid size
