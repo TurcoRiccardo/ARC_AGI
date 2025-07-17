@@ -1017,7 +1017,8 @@ class figureRepresentation:
     
     #return the list of actions
     def actionList(pc):     
-        l = [figureRepresentation.moveFigure, figureRepresentation.moveElementFigure_row, figureRepresentation.moveElementFigure_column, figureRepresentation.rotateFigure, figureRepresentation.mergeFigure, figureRepresentation.divideFigure_row, figureRepresentation.divideFigure_column, figureRepresentation.changeOrder]    
+        l = [figureRepresentation.moveFigure, figureRepresentation.moveElementFigure_row, figureRepresentation.moveElementFigure_column, figureRepresentation.rotateFigure, figureRepresentation.mergeFigure,  figureRepresentation.changeOrder]    
+        # figureRepresentation.divideFigure_row, figureRepresentation.divideFigure_column,
         if pc.countDim != pc.numProb:
             l.append(figureRepresentation.expandGrid)
             l.append(figureRepresentation.reduceGrid)

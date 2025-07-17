@@ -170,6 +170,7 @@ class Agent(ArcAgent):
     def predict(self, demo_pairs: List[ArcIOPair], test_grids: List[ArcGrid]) -> List[ArcPrediction]:
         possibleSolutionRep = list()
         pc = initial_analysis(demo_pairs)
+        print("single-objective algorithm")
         reps = [
             (pixelRepresentation, pixelRepresentation.baseActionList(pc), pixelRepresentation.actionList(pc)),
             (rowRepresentation, rowRepresentation.baseActionList(pc), rowRepresentation.actionList(pc)),

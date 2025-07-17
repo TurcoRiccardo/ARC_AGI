@@ -26,6 +26,7 @@ from representation.secondDiagonalRepresentation import secondDiagonalRepresenta
 POPULATION_SIZE = 50
 OFFSPRING_SIZE = 10
 MAX_GENERATIONS_1 = 5
+MIN_GENERATIONS = 1000
 MAX_GENERATIONS_2 = 50
 
 
@@ -106,7 +107,10 @@ def generate_representation(rep, demo_pairs, base_act, act, parent_selection, su
     population = list()
     population.extend(population1)
     population.extend(population2)
-    for _ in range(MAX_GENERATIONS_2 * len(demo_pairs[0].y) * len(demo_pairs[0].y[0])):
+    num_gen = MIN_GENERATIONS + MAX_GENERATIONS_2 * len(demo_pairs[0].y) * len(demo_pairs[0].y[0])
+    if num_gen > 8000:
+        num_gen = 8000
+    for _ in range(num_gen):
         #genero gli offspring
         offspring = list()
         for _ in range(OFFSPRING_SIZE):
@@ -155,6 +159,10 @@ def generate_representation(rep, demo_pairs, base_act, act, parent_selection, su
     print(len(population[0].performed_actions))
     print(population[0].performed_selection)
     print(population[0].fitness)
+    print("genoma su training example")
+    print(population[0].genome[0].rappToGrid())
+    print(population[0].genome[1].rappToGrid())
+    print(population[0].genome[2].rappToGrid())
     prediction = ArcIOPair(rappresentationX[0].rappToGrid(), rappresentationY[0].rappToGrid())
     prediction.plot(show=True, title=f"Input-Output")
     prediction = ArcIOPair(rappresentationY[0].rappToGrid(), population[0].genome[0].rappToGrid())
@@ -185,7 +193,10 @@ class Agent_new(ArcAgent):
     def predict(self, demo_pairs: List[ArcIOPair], test_grids: List[ArcGrid]) -> List[ArcPrediction]:
         pc = initial_analysis(demo_pairs)
         print("multi-objective algorithm")
-        print("EA Genetations: " + str(MAX_GENERATIONS_2 * len(demo_pairs[0].y) * len(demo_pairs[0].y[0])))
+        num_gen = MIN_GENERATIONS + MAX_GENERATIONS_2 * len(demo_pairs[0].y) * len(demo_pairs[0].y[0])
+        if num_gen > 8000:
+            num_gen = 8000
+        print("EA Genetations: " + str(num_gen))
         reps = [
             (pixelRepresentation, pixelRepresentation.baseActionList(pc), pixelRepresentation.actionList(pc)),
             (rowRepresentation, rowRepresentation.baseActionList(pc), rowRepresentation.actionList(pc)),

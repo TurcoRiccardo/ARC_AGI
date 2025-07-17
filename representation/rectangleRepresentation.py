@@ -127,7 +127,7 @@ class rectangleRepresentation:
     #changes the color of the rectangle index based on color
     def changeColorRectangle(self, s):
         if len(self.rectangleList) == 0:
-            return
+            return 1
         count = 0
         l = self.generateIndexList(s)
         for adapted_index in l:

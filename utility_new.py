@@ -43,10 +43,14 @@ def add_mutation(p: Individual, available_actions):
         #execute the action with the selector
         r = 0
         for c in range(0, len(p.genome)):
-            r += action(new_gen[c], s)
-        if r > 0:
+            sas = action(new_gen[c], s)
+            if sas == None:
+                print("errore")
+                print(action)
+            r += int(sas)
+        if r < len(p.genome):
             break
-    if r == 0:
+    if r == len(p.genome):
         return None
     new_selection = p.performed_selection.copy()
     new_selection.append(s)

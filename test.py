@@ -71,4 +71,6 @@ if __name__ == '__main__':
 
 #python test.py --min 0 --max 10 --show_test_pairs "false" --show_solution "false" --show_train_pairs "true"
 
-#Correctly solved problems: 1, 3, 9
+#Correctly solved problems with single-objective algorithm: 1, 3, 9
+
+#Correctly solved problems with multi-objective algorithm: 1
