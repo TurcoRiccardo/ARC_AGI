@@ -4,7 +4,7 @@ My personal solution for ARK_AGI benchmark (https://arcprize.org/)
 
 ## Packages
 - representation: contains the possible representations of the grid.
-
+- selection: contains the code to generate various selectors.
 
 ## Requirements
 - numpy
@@ -14,6 +14,23 @@ My personal solution for ARK_AGI benchmark (https://arcprize.org/)
 ## Description
 The ARC-AGI (Abstraction and Reasoning Corpus - Artificial General Intelligence) benchmark is a dataset created by François Chollet to test AI's ability for abstract reasoning. It consists of a series of tasks based on colored grids, where the AI must infer rules and transformations from a few examples without explicit instructions.
 ARC is designed to assess human-like cognitive skills such as generalization, analogy, and pattern recognition, posing a challenge for traditional machine learning models. The benchmark is considered a key test for measuring progress toward Artificial General Intelligence (AGI).
+
+
+This section summarizes the proposed approach for solving ARC tasks using evolutionary algorithms applied to multiple geometric representations of the grids. The methodology can be divided into the following main steps:
+1. Geometric Representations: Each ARC grid is transformed into one or more alternative geometric representations. These representations capture different spatial and structural properties of the objects and their relationships within the grid.
+2. Initial Analysis: An initial analysis of the ARC task is also performed to identify the most relevant actions for each representation. This preliminary inspection allows excluding unnecessary actions that are unlikely to be useful for the specific task, reducing the search space for the evolutionary algorithm and potentially improving its efficiency and convergence.
+3. Initial Population Generation: For each representation, an initial population of individuals is generated using a simplified evolutionary algorithm. This preliminary step, based solely on the add_mutation operation, ensures the creation of non-empty individuals while preserving diversity by adding some empty individuals to the population.
+4. Evolutionary Algorithm Execution: Two alternative strategies are applied:
+    - Single-Example Evolution: An evolutionary algorithm is executed independently for each training example and representation. The best individual is selected and evaluated across the other training examples, scoring its performance based on error rate and solution quality. The best-performing individual among all representations is then applied to the test grid.
+    - Multi-Example Evolution: A single evolutionary algorithm is executed for each representation across all training examples simultaneously. The fitness function aggregates the performance on multiple examples and the representation whose best individual achieves the highest aggregated fitness is applied to the test grid.
+5. Mutation Operators: The evolutionary process relies on three mutation operators:
+    - add_mutation: adds a new action-selector pair to an individual.
+    - tweak_mutation: modifies the selector of a specific action in the individual.
+    - swap_mutation: swaps the positions of two action-selector pairs
+within the individual.
+6. Parent Selection Individuals are selected for mutation using tournament selection (or lexicase selection in the multi-example case).
+7. Survival Selection Survival selection retains the top-performing individuals based on either individual fitness values or aggregated multi-objective performance.
+8. Solution Generation: The best individual from the selected representation is applied to the test grid to generate the final predicted solution
 
 ### Grid dimension
 A grid can have any height or width between 1x1 and 30x30 inclusive (average height is 9 and average width is 10).
