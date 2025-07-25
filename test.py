@@ -73,4 +73,4 @@ if __name__ == '__main__':
 
 #Correctly solved problems with single-objective algorithm: 1, 3, 9
 
-#Correctly solved problems with multi-objective algorithm: 1
+#Correctly solved problems with multi-objective algorithm: 1, 3, 9
