@@ -9,7 +9,8 @@ My personal solution for ARK_AGI benchmark (https://arcprize.org/)
 ## Requirements
 - numpy
 - matplotlib
-- arc-py: (https://github.com/ikamensh/arc-py) Used to convert the original .json files to numpy arrays, view them with matplotlib.
+- arc-py: (https://github.com/ikamensh/arc-py) Used for the datasets and view them with matplotlib.
+- tqdm
 
 ## Description
 The ARC-AGI (Abstraction and Reasoning Corpus - Artificial General Intelligence) benchmark is a dataset created by François Chollet to test AI's ability for abstract reasoning. It consists of a series of tasks based on colored grids, where the AI must infer rules and transformations from a few examples without explicit instructions.
